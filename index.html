@@ -7,8 +7,9 @@
     <title>AIRA | AI Student Mental Health & Support Platform</title>
     
     <!-- Stylesheets & Fonts -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     
     <!-- ChartJS CDN for Analytics Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,7 +23,7 @@
     <nav class="navbar" id="main-navbar">
         <div class="navbar-container">
             <a href="#home" class="nav-logo">
-                <i class="fa-solid fa-brain-circuit"></i> AIRA
+                <svg class="brand-svg-logo" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan); margin-right: 0.5rem; filter: drop-shadow(0 0 5px var(--neon-cyan));"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"/></svg> AIRA
             </a>
             <ul class="nav-links" id="navbar-links">
                 <li><a href="#home" class="nav-link active">Home</a></li>
@@ -59,10 +60,10 @@
             </p>
             <div class="hero-btns">
                 <a href="#analysis" class="neon-btn neon-btn-primary">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Mental Health
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M15 4V2M15 16v-2M8 9h2M20 9h-2M17.8 5.2l-1.4 1.4M7.6 15.4l-1.4 1.4M6.2 5.2l1.4 1.4M16.4 15.4l1.4 1.4M2 22l9-9M13 11l4-4"/></svg> Analyze Mental Health
                 </a>
                 <a href="javascript:void(0)" class="neon-btn neon-btn-secondary" id="hero-chat-trigger">
-                    <i class="fa-solid fa-message-smile"></i> Talk with AI Friend
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> Talk with AI Friend
                 </a>
             </div>
             
@@ -117,7 +118,7 @@
             <!-- Card 1: Stress Detection -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 </div>
                 <h3>Stress Detection</h3>
                 <p>Cross-references physiological estimates, sleep records, and workload to track acute cognitive exhaustion indexes.</p>
@@ -127,7 +128,7 @@
             <!-- Card 2: Depression Prediction -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-cloud-showers-heavy"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="16" y1="16" x2="16" y2="22"/></svg>
                 </div>
                 <h3>Depression Prediction</h3>
                 <p>Monitors long-term behavioral drops, persistent low moods, and withdrawal trends over structured timelines.</p>
@@ -137,7 +138,7 @@
             <!-- Card 3: Anxiety Analysis -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-heart-pulse"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
                 <h3>Anxiety Analysis</h3>
                 <p>Gathers qualitative anxiety assessments and isolates acute nervous behaviors under exam stress periods.</p>
@@ -147,7 +148,7 @@
             <!-- Card 4: DistilBERT Emotion Detection -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-quote-left"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </div>
                 <h3>DistilBERT Emotion NLP</h3>
                 <p>Parses linguistic triggers, extracting emotional sentiments (Joy, Sadness, Anger, Fear, Love, Surprise) from journals.</p>
@@ -157,7 +158,7 @@
             <!-- Card 5: AI Wellness Suggestions -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-seedling"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22C2 12 10 4 22 2M22 2c-10 0-18 8-18 18M11 11a5 5 0 0 1 7-7"/></svg>
                 </div>
                 <h3>AI Recommendations</h3>
                 <p>Generates tailored bio-behavioral recommendations, coping exercises, and micro-breaks based on calculated scores.</p>
@@ -167,7 +168,7 @@
             <!-- Card 6: Burnout Detection -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-fire"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
                 </div>
                 <h3>Burnout Analytics</h3>
                 <p>Calculates the exact ratio of social activity and screen time relative to sleep to map academic saturation risks.</p>
@@ -177,7 +178,12 @@
             <!-- Card 7: Emotional Tracking -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-chart-line-up"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Shield representing trust/safety -->
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <!-- Heart at center -->
+                        <path d="M12 14.5c-.83-.75-2.5-2.08-2.5-3.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0c0 1.42-1.67 2.75-2.5 3.5z" />
+                    </svg>
                 </div>
                 <h3>Emotional Tracking</h3>
                 <p>Provides interactive mood metrics, historical tracking dashboards, and emoji stability patterns.</p>
@@ -187,7 +193,13 @@
             <!-- Card 8: Nearby Counselor Referral -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-user-doctor-hair"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Heart outline -->
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                        <!-- Handshake lines inside heart -->
+                        <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9" />
+                        <path d="m14 13 2.96-2.96a2.17 2.17 0 0 1 3.08 0v0a2.17 2.17 0 0 1 0 3.08L17 16" />
+                    </svg>
                 </div>
                 <h3>Counselor Recommendation</h3>
                 <p>Leverages native geolocation metrics to connect you immediately with verified psychologists and advisors.</p>
@@ -197,7 +209,13 @@
             <!-- Card 9: AI Gen-Z Chatbot -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-message-smile"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Two friends (users) -->
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
                 </div>
                 <h3>AI Gen-Z Friend</h3>
                 <p>A conversational bot built with high emotional intelligence, speaking in relatable terms to lift your spirits.</p>
@@ -207,7 +225,7 @@
             <!-- Card 10: Analytics Dashboard -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
-                    <i class="fa-solid fa-sliders"></i>
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
                 </div>
                 <h3>Analytics Dashboard</h3>
                 <p>Fully customizable visual arrays highlighting emotional wellness index curves over weekly intervals.</p>
@@ -333,6 +351,7 @@
                         <!-- Mood Selector -->
                         <div class="form-group-full form-group">
                             <label><i class="fa-solid fa-face-smile"></i> Current Dominant Mood Status</label>
+                            <input type="hidden" name="selected_mood" id="selected-mood-input" value="calm">
                             <div class="mood-selector" id="mood-selector-container">
                                 <div class="mood-option" data-mood="super_happy">
                                     <span class="emoji">😊</span>
@@ -350,7 +369,7 @@
                                     <span class="emoji">😫</span>
                                     <span>Anxious</span>
                                 </div>
-                                <div class="mood-option" data-mood="sad">
+                                <div class="mood-option" data-mood="melancholy">
                                     <span class="emoji">😭</span>
                                     <span>Melancholy</span>
                                 </div>
@@ -383,7 +402,7 @@
                     </div>
 
                     <button type="submit" class="neon-btn neon-btn-pink form-group-full" style="width: 100%; border-radius: 12px;" id="submit-scan-btn">
-                        <i class="fa-solid fa-radar"></i> Analyze My Mental Health
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze My Mental Health
                     </button>
                 </form>
 
@@ -602,7 +621,7 @@
             <!-- 30-Day Mood Heatmap Calendar Card -->
             <div class="heatmap-card glass-panel" style="grid-column: span 2;">
                 <div class="heatmap-header">
-                    <h4>30-Day Mood Stability Heatmap <i class="fa-solid fa-calendar-heart" style="color: var(--neon-pink);"></i></h4>
+                    <h4>30-Day Mood Stability Heatmap <i class="fa-solid fa-calendar-days" style="color: var(--neon-pink);"></i></h4>
                     <!-- Legend -->
                     <div class="heatmap-legend">
                         <span class="legend-item"><span class="legend-dot dot-joy"></span> Joy</span>
@@ -801,15 +820,72 @@
             <!-- Cards are generated dynamically in script.js to support proximity ordering and diagnostic filters -->
         </div>
 
-        <!-- Emergency Crisis hotlines Banner -->
-        <div class="support-hotline-banner">
-            <div class="support-banner-content">
-                <h3><i class="fa-solid fa-triangle-exclamation"></i> Immediate Crisis Assistance Required?</h3>
-                <p>If you are experiencing severe distress or self-harm triggers, connect immediately. Experts are online 24/7.</p>
+        <!-- Smart Global Crisis support Banner -->
+        <div class="crisis-banner-container glass-panel" id="crisis-banner">
+            <!-- Left Side: Informational Context -->
+            <div class="crisis-banner-left">
+                <h3>
+                    <span class="crisis-badge-blink"><i class="fa-solid fa-triangle-exclamation"></i> LIVE PROTOCOL</span>
+                    Immediate Crisis Assistance Required?
+                </h3>
+                <p class="crisis-explanation">
+                    If you are experiencing severe emotional distress, panic, suicidal thoughts, or self-harm triggers, connect immediately. Professional support is available 24/7.
+                </p>
+                <div class="crisis-indicator-row">
+                    <div class="crisis-currently-showing">
+                        <span class="showing-label">Currently Showing Support For:</span>
+                        <div class="showing-country-box">
+                            <img id="crisis-flag-img" class="crisis-country-flag" src="https://flagcdn.com/w40/in.png" alt="Country Flag" onerror="this.style.display='none'">
+                            <span id="crisis-country-name" class="showing-country-name">India</span>
+                        </div>
+                    </div>
+                    <button class="neon-btn neon-btn-purple change-country-trigger-btn" id="change-country-btn">
+                        <i class="fa-solid fa-earth-americas"></i> Change Country
+                    </button>
+                </div>
             </div>
-            <div class="support-banner-action">
-                <a href="tel:988" class="hotline-number">Dial 988</a>
-                <span class="hotline-subtext">Free • Confidential • National Support Line</span>
+
+            <!-- Right Side: Big helpline number & call trigger -->
+            <div class="crisis-banner-right">
+                <div class="crisis-skeleton-loader" id="crisis-skeleton">
+                    <div class="skeleton-shimmer"></div>
+                </div>
+                <div class="crisis-helpline-content" id="crisis-helpline-display" style="display: none;">
+                    <span class="helpline-title" id="crisis-support-desc">Tele-MANAS Support Line</span>
+                    <a href="tel:14416" class="crisis-main-number" id="crisis-phone-link">14416</a>
+                    
+                    <div class="crisis-subline-box">
+                        <span class="crisis-subline-item"><strong>National Emergency:</strong> <span id="crisis-emergency-num">112</span></span>
+                        <span class="crisis-subline-meta">Free • Confidential • 24/7 Support</span>
+                    </div>
+
+                    <div class="crisis-actions">
+                        <a href="tel:14416" class="crisis-action-call-btn" id="crisis-call-action-btn">
+                            <i class="fa-solid fa-phone-volume"></i> Connect Now
+                        </a>
+                        <button class="crisis-action-copy-btn" id="crisis-copy-action-btn" title="Copy Number">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Searchable Country Selector Modal Overlay -->
+            <div class="country-selector-modal" id="country-selector-modal">
+                <div class="country-modal-content glass-panel">
+                    <div class="country-modal-header">
+                        <h4>Select Your Location</h4>
+                        <button class="country-modal-close" id="country-modal-close-btn">&times;</button>
+                    </div>
+                    <p class="country-modal-desc">Search and select a country to view local emergency mental health helplines.</p>
+                    <div class="country-search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="country-search-input" placeholder="Search country by name or code (e.g. Canada)...">
+                    </div>
+                    <div class="country-list-scroll" id="country-list-container">
+                        <!-- Countries generated dynamically in JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -932,7 +1008,7 @@
             <div class="chatbot-input-area">
                 <input type="text" class="chatbot-input" id="chatbot-input-field" placeholder="Vent to Aira... (e.g. 'I feel stressed')">
                 <button class="chatbot-send-btn" id="chatbot-submit-btn">
-                    <i class="fa-solid fa-paper-plane-top"></i>
+                    <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
         </div>
@@ -949,7 +1025,7 @@
             <!-- Column 1: App Bio -->
             <div class="footer-info-column">
                 <a href="#home" class="footer-info-logo">
-                    <i class="fa-solid fa-brain-circuit"></i> AIRA
+                    <i class="fa-solid fa-brain"></i> AIRA
                 </a>
                 <p class="footer-info-desc">
                     Futuristic Student Mental Health Monitoring & support protocols. Merging cognitive classification logic with geolocation medical referrals.
@@ -1007,6 +1083,6 @@
     </footer>
 
     <!-- Script File -->
-    <script src="script.js"></script>
+    <script src="script.js?v=2.0"></script>
 </body>
 </html>

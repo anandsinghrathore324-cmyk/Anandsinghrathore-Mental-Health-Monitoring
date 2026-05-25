@@ -4,7 +4,7 @@
   "description": "AIRA - AI Student Mental Health & Support Platform",
   "main": "index.html",
   "scripts": {
-    "dev": "npx http-server"
+    "dev": "npx http-server -c-1"
   },
   "keywords": [],
   "author": "",

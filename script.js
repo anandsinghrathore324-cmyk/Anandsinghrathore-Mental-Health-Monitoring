@@ -145,22 +145,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // Clickable Emoji Mood selector logic
-    let selectedMood = "calm"; // Default mood parameter
+    // Clickable Emoji Mood selector logic with native hidden input tracking
+    const moodInput = document.getElementById("selected-mood-input");
     const moodOptions = document.querySelectorAll(".mood-option");
     
-    moodOptions.forEach(opt => {
-        // Init default
-        if (opt.getAttribute("data-mood") === selectedMood) {
-            opt.classList.add("active");
-        }
-        
-        opt.addEventListener("click", () => {
-            moodOptions.forEach(o => o.classList.remove("active"));
-            opt.classList.add("active");
-            selectedMood = opt.getAttribute("data-mood");
+    // Init default active option based on input value
+    if (moodInput) {
+        moodOptions.forEach(opt => {
+            if (opt.getAttribute("data-mood") === moodInput.value) {
+                opt.classList.add("active");
+            }
         });
-    });
+    }
+    
+    const moodSelectorContainer = document.getElementById("mood-selector-container");
+    if (moodSelectorContainer && moodInput) {
+        moodSelectorContainer.addEventListener("click", (e) => {
+            const opt = e.target.closest(".mood-option");
+            if (opt) {
+                moodOptions.forEach(o => o.classList.remove("active"));
+                opt.classList.add("active");
+                moodInput.value = opt.getAttribute("data-mood");
+                console.log("Selected Mood updated in hidden input:", moodInput.value);
+            }
+        });
+    }
 
     // ==========================================================================
     // 4. PRESET CHART.JS DATA STRUCTURES & INITIALIZATION
@@ -698,6 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const inputAnxiety = parseInt(document.getElementById("anxiety-level").value) || 4;
         const inputStress = parseInt(document.getElementById("stress-level").value) || 5;
         const textVal = document.getElementById("diary-input").value.toLowerCase();
+        const selectedMood = document.getElementById("selected-mood-input")?.value || "calm";
 
         // 1. COMPUTE STRESS RISK LEVEL (0 - 100%)
         // Formula variables: sleep deficit spikes stress, high pressure spikes stress
@@ -720,7 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let screenExcess = Math.max(0, screenVal - 6);
         let baseDepression = (sleepDeficit * 6) + (screenExcess * 4) + (academicVal * 2);
         
-        if (selectedMood === "sad") baseDepression += 20;
+        if (selectedMood === "sad" || selectedMood === "melancholy") baseDepression += 20;
         if (selectedMood === "anxious") baseDepression += 10;
         if (textVal.includes("sad") || textVal.includes("lonely") || textVal.includes("cry")) baseDepression += 12;
         if (textVal.includes("hopeless") || textVal.includes("empty") || textVal.includes("worthless")) baseDepression += 20;
@@ -776,10 +786,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update Day 30 in Heatmap
         let todayMood = "joy";
-        if (finalWellness < 55) {
-            todayMood = finalStress > finalAnxiety ? "burnout" : "anxiety";
-        } else if (finalWellness < 80) {
+        if (selectedMood === "sad" || selectedMood === "melancholy") {
             todayMood = "melancholy";
+        } else if (selectedMood === "anxious") {
+            todayMood = "anxiety";
+        } else if (selectedMood === "stressed") {
+            todayMood = "burnout";
+        } else {
+            if (finalWellness < 55) {
+                todayMood = finalStress > finalAnxiety ? "burnout" : "anxiety";
+            } else if (finalWellness < 80) {
+                todayMood = "melancholy";
+            }
         }
         
         heatmapHistory[29] = {
@@ -1435,6 +1453,1573 @@ document.addEventListener("DOMContentLoaded", () => {
     resetBtn.addEventListener("click", () => {
         stopBreathingSession();
     });
+
+    // ==========================================================================
+    // 9. SMART GLOBAL CRISIS-SUPPORT BANNER SYSTEM
+    // ==========================================================================
+    const globalHelplineDb = {
+    "AF": {
+        "name": "Afghanistan",
+        "flag": "af",
+        "emergency": "119",
+        "helpline": "119",
+        "title": "National Emergency & Crisis Support"
+    },
+    "AL": {
+        "name": "Albania",
+        "flag": "al",
+        "emergency": "112",
+        "helpline": "127",
+        "title": "Emergency Medical Assistance Services"
+    },
+    "DZ": {
+        "name": "Algeria",
+        "flag": "dz",
+        "emergency": "112",
+        "helpline": "021 63 00 63",
+        "title": "Algerian Suicide Support Lifeline"
+    },
+    "AD": {
+        "name": "Andorra",
+        "flag": "ad",
+        "emergency": "112",
+        "helpline": "116 111",
+        "title": "Inf\u00e0ncia Respon Children Support Line"
+    },
+    "AO": {
+        "name": "Angola",
+        "flag": "ao",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Emergency & Support Protocols"
+    },
+    "AG": {
+        "name": "Antigua and Barbuda",
+        "flag": "ag",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency & Support Line"
+    },
+    "AR": {
+        "name": "Argentina",
+        "flag": "ar",
+        "emergency": "911",
+        "helpline": "135",
+        "title": "Centro de Asistencia al Suicida"
+    },
+    "AM": {
+        "name": "Armenia",
+        "flag": "am",
+        "emergency": "112",
+        "helpline": "103",
+        "title": "National Psychiatric Emergency Services"
+    },
+    "AU": {
+        "name": "Australia",
+        "flag": "au",
+        "emergency": "000",
+        "helpline": "13 11 14",
+        "title": "Lifeline Suicide & Crisis Support"
+    },
+    "AT": {
+        "name": "Austria",
+        "flag": "at",
+        "emergency": "112",
+        "helpline": "142",
+        "title": "Telefonseelsorge Crisis Support Line"
+    },
+    "AZ": {
+        "name": "Azerbaijan",
+        "flag": "az",
+        "emergency": "112",
+        "helpline": "103",
+        "title": "Psychiatric Emergency Support Team"
+    },
+    "BS": {
+        "name": "Bahamas",
+        "flag": "bs",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Support Protocols"
+    },
+    "BH": {
+        "name": "Bahrain",
+        "flag": "bh",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "Emergency Medical Services & Crisis Line"
+    },
+    "BD": {
+        "name": "Bangladesh",
+        "flag": "bd",
+        "emergency": "999",
+        "helpline": "09612 119922",
+        "title": "Kaan \u09aa\u09c7\u09a4\u09c7 \u09b0\u0987 Mental Support Line"
+    },
+    "BB": {
+        "name": "Barbados",
+        "flag": "bb",
+        "emergency": "511",
+        "helpline": "511",
+        "title": "Emergency Support & Crisis Services"
+    },
+    "BY": {
+        "name": "Belarus",
+        "flag": "by",
+        "emergency": "112",
+        "helpline": "170",
+        "title": "Minsk National Crisis Counseling Line"
+    },
+    "BE": {
+        "name": "Belgium",
+        "flag": "be",
+        "emergency": "112",
+        "helpline": "1813",
+        "title": "Selfmoordlijn 1813 Crisis Support"
+    },
+    "BZ": {
+        "name": "Belize",
+        "flag": "bz",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Services Lifeline"
+    },
+    "BJ": {
+        "name": "Benin",
+        "flag": "bj",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Crisis Assistance Protocol"
+    },
+    "BT": {
+        "name": "Bhutan",
+        "flag": "bt",
+        "emergency": "112",
+        "helpline": "1010",
+        "title": "Sherig Counselling Help & Crisis Line"
+    },
+    "BO": {
+        "name": "Bolivia",
+        "flag": "bo",
+        "emergency": "911",
+        "helpline": "110",
+        "title": "Servicio de Emergencia y Apoyo Social"
+    },
+    "BA": {
+        "name": "Bosnia and Herzegovina",
+        "flag": "ba",
+        "emergency": "112",
+        "helpline": "1261",
+        "title": "Plavi Telefon Crisis Support Line"
+    },
+    "BW": {
+        "name": "Botswana",
+        "flag": "bw",
+        "emergency": "997",
+        "helpline": "3911270",
+        "title": "BOCONGO Mental Support Services"
+    },
+    "BR": {
+        "name": "Brazil",
+        "flag": "br",
+        "emergency": "192",
+        "helpline": "188",
+        "title": "Centro de Valoriza\u00e7\u00e3o da Vida (CVV)"
+    },
+    "BN": {
+        "name": "Brunei",
+        "flag": "bn",
+        "emergency": "991",
+        "helpline": "145",
+        "title": "Talian Harapan 145 Mental Support"
+    },
+    "BG": {
+        "name": "Bulgaria",
+        "flag": "bg",
+        "emergency": "112",
+        "helpline": "0035 9249 30237",
+        "title": "Bulgarian Red Cross Mental Support"
+    },
+    "BF": {
+        "name": "Burkina Faso",
+        "flag": "bf",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Crisis Relief Protocol"
+    },
+    "BI": {
+        "name": "Burundi",
+        "flag": "bi",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Medical Emergency Services"
+    },
+    "KH": {
+        "name": "Cambodia",
+        "flag": "kh",
+        "emergency": "119",
+        "helpline": "119",
+        "title": "National Emergency & General Crisis"
+    },
+    "CM": {
+        "name": "Cameroon",
+        "flag": "cm",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Medical Emergency & Support"
+    },
+    "CA": {
+        "name": "Canada",
+        "flag": "ca",
+        "emergency": "911",
+        "helpline": "988",
+        "title": "988 Suicide Crisis Helpline"
+    },
+    "CV": {
+        "name": "Cabo Verde",
+        "flag": "cv",
+        "emergency": "130",
+        "helpline": "130",
+        "title": "General Emergency & Medical Support"
+    },
+    "CF": {
+        "name": "Central African Republic",
+        "flag": "cf",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Medical Emergency Crisis Relief"
+    },
+    "TD": {
+        "name": "Chad",
+        "flag": "td",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Dispatch & Crisis Protocol"
+    },
+    "CL": {
+        "name": "Chile",
+        "flag": "cl",
+        "emergency": "131",
+        "helpline": "*4141",
+        "title": "MINSAL *4141 No Est\u00e1s Solo Line"
+    },
+    "CN": {
+        "name": "China",
+        "flag": "cn",
+        "emergency": "120",
+        "helpline": "800-810-1117",
+        "title": "Beijing Suicide Research & Crisis Line"
+    },
+    "CO": {
+        "name": "Colombia",
+        "flag": "co",
+        "emergency": "123",
+        "helpline": "192",
+        "title": "L\u00ednea Apoyo Emocional de Salud Mental"
+    },
+    "KM": {
+        "name": "Comoros",
+        "flag": "km",
+        "emergency": "172",
+        "helpline": "172",
+        "title": "Emergency Response & Crisis Line"
+    },
+    "CG": {
+        "name": "Congo",
+        "flag": "cg",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "General Medical Emergency Services"
+    },
+    "CR": {
+        "name": "Costa Rica",
+        "flag": "cr",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "Servicio de Emergencia e Intervenci\u00f3n"
+    },
+    "HR": {
+        "name": "Croatia",
+        "flag": "hr",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Plavi Telefon Crisis Counselling"
+    },
+    "CU": {
+        "name": "Cuba",
+        "flag": "cu",
+        "emergency": "104",
+        "helpline": "104",
+        "title": "Servicio de Urgencias M\u00e9dicas"
+    },
+    "CY": {
+        "name": "Cyprus",
+        "flag": "cy",
+        "emergency": "112",
+        "helpline": "1410",
+        "title": "National Psychiatric Support Lifeline"
+    },
+    "CZ": {
+        "name": "Czech Republic",
+        "flag": "cz",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Linka D\u016fv\u011bry Mental Support Line"
+    },
+    "DK": {
+        "name": "Denmark",
+        "flag": "dk",
+        "emergency": "112",
+        "helpline": "70 201 201",
+        "title": "Livslinien Suicide Prevention Line"
+    },
+    "DJ": {
+        "name": "Djibouti",
+        "flag": "dj",
+        "emergency": "17",
+        "helpline": "17",
+        "title": "Emergency & Crisis Relief Dispatch"
+    },
+    "DM": {
+        "name": "Dominica",
+        "flag": "dm",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Crisis Assistance Services"
+    },
+    "DO": {
+        "name": "Dominican Republic",
+        "flag": "do",
+        "emergency": "911",
+        "helpline": "809 200 1200",
+        "title": "L\u00ednea de Ayuda del Ministerio"
+    },
+    "EC": {
+        "name": "Ecuador",
+        "flag": "ec",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "ECU 911 Salud Mental Crisis Line"
+    },
+    "EG": {
+        "name": "Egypt",
+        "flag": "eg",
+        "emergency": "123",
+        "helpline": "02 20816831",
+        "title": "General Secretariat Mental Health"
+    },
+    "SV": {
+        "name": "El Salvador",
+        "flag": "sv",
+        "emergency": "911",
+        "helpline": "122",
+        "title": "Asistencia de Emergencia M\u00e9dica"
+    },
+    "GQ": {
+        "name": "Equatorial Guinea",
+        "flag": "gq",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Medical Crisis Dispatch"
+    },
+    "ER": {
+        "name": "Eritrea",
+        "flag": "er",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Medical Services Protocol"
+    },
+    "EE": {
+        "name": "Estonia",
+        "flag": "ee",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Eluliin Emotional Support Hotline"
+    },
+    "SZ": {
+        "name": "Eswatini",
+        "flag": "sz",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Crisis Relief Services"
+    },
+    "ET": {
+        "name": "Ethiopia",
+        "flag": "et",
+        "emergency": "907",
+        "helpline": "907",
+        "title": "Red Cross Emergency Crisis Support"
+    },
+    "FJ": {
+        "name": "Fiji",
+        "flag": "fj",
+        "emergency": "911",
+        "helpline": "1325",
+        "title": "National Lifeline Support Network"
+    },
+    "FI": {
+        "name": "Finland",
+        "flag": "fi",
+        "emergency": "112",
+        "helpline": "09 2525 0111",
+        "title": "MIELI Mental Health Finland Line"
+    },
+    "FR": {
+        "name": "France",
+        "flag": "fr",
+        "emergency": "112",
+        "helpline": "3114",
+        "title": "Num\u00e9ro National de Pr\u00e9vention Suicide"
+    },
+    "GA": {
+        "name": "Gabon",
+        "flag": "ga",
+        "emergency": "1300",
+        "helpline": "1300",
+        "title": "Medical Emergency Support Protocol"
+    },
+    "GM": {
+        "name": "Gambia",
+        "flag": "gm",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "General Emergency Medical Services"
+    },
+    "GE": {
+        "name": "Georgia",
+        "flag": "ge",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Medical Care Support"
+    },
+    "DE": {
+        "name": "Germany",
+        "flag": "de",
+        "emergency": "112",
+        "helpline": "0800 111 0 111",
+        "title": "Telefonseelsorge Crisis Support"
+    },
+    "GH": {
+        "name": "Ghana",
+        "flag": "gh",
+        "emergency": "112",
+        "helpline": "0543 189 265",
+        "title": "Psychological Association Lifeline"
+    },
+    "GR": {
+        "name": "Greece",
+        "flag": "gr",
+        "emergency": "112",
+        "helpline": "1018",
+        "title": "Klimaka Suicide Prevention Hotline"
+    },
+    "GD": {
+        "name": "Grenada",
+        "flag": "gd",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Crisis Line"
+    },
+    "GT": {
+        "name": "Guatemala",
+        "flag": "gt",
+        "emergency": "911",
+        "helpline": "1500",
+        "title": "Asistencia Social y Salud Emocional"
+    },
+    "GN": {
+        "name": "Guinea",
+        "flag": "gn",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Emergency Crisis Services"
+    },
+    "GW": {
+        "name": "Guinea-Bissau",
+        "flag": "gw",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Dispatch Services"
+    },
+    "GY": {
+        "name": "Guyana",
+        "flag": "gy",
+        "emergency": "913",
+        "helpline": "223-0001",
+        "title": "Inter-agency Suicide Prevention Helpline"
+    },
+    "HT": {
+        "name": "Haiti",
+        "flag": "ht",
+        "emergency": "116",
+        "helpline": "116",
+        "title": "Emergency Medical Services Support"
+    },
+    "HN": {
+        "name": "Honduras",
+        "flag": "hn",
+        "emergency": "911",
+        "helpline": "150",
+        "title": "Servicio de Apoyo y Emergencia"
+    },
+    "HU": {
+        "name": "Hungary",
+        "flag": "hu",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Lelki Els\u0151seg\u00e9ly Mental Support"
+    },
+    "IS": {
+        "name": "Iceland",
+        "flag": "is",
+        "emergency": "112",
+        "helpline": "1717",
+        "title": "Red Cross Helpline Iceland"
+    },
+    "IN": {
+        "name": "India",
+        "flag": "in",
+        "emergency": "112",
+        "helpline": "14416",
+        "title": "Tele-MANAS Support Line"
+    },
+    "ID": {
+        "name": "Indonesia",
+        "flag": "id",
+        "emergency": "112",
+        "helpline": "500-454",
+        "title": "LISA Suicide Prevention Hotline"
+    },
+    "IR": {
+        "name": "Iran",
+        "flag": "ir",
+        "emergency": "115",
+        "helpline": "1480",
+        "title": "National Welfare Mental Counseling"
+    },
+    "IQ": {
+        "name": "Iraq",
+        "flag": "iq",
+        "emergency": "122",
+        "helpline": "122",
+        "title": "Medical Emergency Relief Dispatch"
+    },
+    "IE": {
+        "name": "Ireland",
+        "flag": "ie",
+        "emergency": "112 / 999",
+        "helpline": "116 123",
+        "title": "Samaritans Ireland Crisis Support"
+    },
+    "IL": {
+        "name": "Israel",
+        "flag": "il",
+        "emergency": "101 / 112",
+        "helpline": "1201",
+        "title": "ERAN Mental First Aid Hotline"
+    },
+    "IT": {
+        "name": "Italy",
+        "flag": "it",
+        "emergency": "112",
+        "helpline": "02 2327 2327",
+        "title": "Samaritans Italy Support Line"
+    },
+    "CI": {
+        "name": "Ivory Coast",
+        "flag": "ci",
+        "emergency": "180",
+        "helpline": "180",
+        "title": "Medical Emergency Assistance Service"
+    },
+    "JM": {
+        "name": "Jamaica",
+        "flag": "jm",
+        "emergency": "119",
+        "helpline": "888-639-5433",
+        "title": "Mental Health Support Line Jamaica"
+    },
+    "JP": {
+        "name": "Japan",
+        "flag": "jp",
+        "emergency": "119",
+        "helpline": "0570 783 556",
+        "title": "Japanese Federation of Inochi no Denwa"
+    },
+    "JO": {
+        "name": "Jordan",
+        "flag": "jo",
+        "emergency": "911",
+        "helpline": "110",
+        "title": "Emergency Medical & Crisis Support"
+    },
+    "KZ": {
+        "name": "Kazakhstan",
+        "flag": "kz",
+        "emergency": "103",
+        "helpline": "150",
+        "title": "National Youth Mental Crisis Support"
+    },
+    "KE": {
+        "name": "Kenya",
+        "flag": "ke",
+        "emergency": "999 / 112",
+        "helpline": "0722 178 177",
+        "title": "Befrienders Kenya Crisis Support"
+    },
+    "KI": {
+        "name": "Kiribati",
+        "flag": "ki",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Emergency Services Protocol"
+    },
+    "KW": {
+        "name": "Kuwait",
+        "flag": "kw",
+        "emergency": "112",
+        "helpline": "2462 1730",
+        "title": "Kuwait Association for Mental Health"
+    },
+    "KG": {
+        "name": "Kyrgyzstan",
+        "flag": "kg",
+        "emergency": "103",
+        "helpline": "111",
+        "title": "Children and Youth Helpline Services"
+    },
+    "LA": {
+        "name": "Laos",
+        "flag": "la",
+        "emergency": "1195",
+        "helpline": "1195",
+        "title": "Emergency Medical Rescue Dispatch"
+    },
+    "LV": {
+        "name": "Latvia",
+        "flag": "lv",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Skalbes Crisis Counseling Center"
+    },
+    "LB": {
+        "name": "Lebanon",
+        "flag": "lb",
+        "emergency": "140",
+        "helpline": "1564",
+        "title": "Embrace Suicide Prevention Hotline"
+    },
+    "LS": {
+        "name": "Lesotho",
+        "flag": "ls",
+        "emergency": "121",
+        "helpline": "121",
+        "title": "Emergency Medical Services Support"
+    },
+    "LR": {
+        "name": "Liberia",
+        "flag": "lr",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Crisis Assistance Protocol"
+    },
+    "LY": {
+        "name": "Libya",
+        "flag": "ly",
+        "emergency": "193",
+        "helpline": "193",
+        "title": "Medical Emergency Relief Dispatch"
+    },
+    "LI": {
+        "name": "Liechtenstein",
+        "flag": "li",
+        "emergency": "112",
+        "helpline": "143",
+        "title": "Die Dargebotene Hand Liechtenstein"
+    },
+    "LT": {
+        "name": "Lithuania",
+        "flag": "lt",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Jaunimo Linija Youth Helpline"
+    },
+    "LU": {
+        "name": "Luxembourg",
+        "flag": "lu",
+        "emergency": "112",
+        "helpline": "116 111",
+        "title": "Kanner-Jugendtelefon Support Line"
+    },
+    "MG": {
+        "name": "Madagascar",
+        "flag": "mg",
+        "emergency": "124",
+        "helpline": "124",
+        "title": "Medical Emergency Relief Services"
+    },
+    "MW": {
+        "name": "Malawi",
+        "flag": "mw",
+        "emergency": "997",
+        "helpline": "997",
+        "title": "General Emergency & Medical Support"
+    },
+    "MY": {
+        "name": "Malaysia",
+        "flag": "my",
+        "emergency": "999",
+        "helpline": "03-76272929",
+        "title": "Befrienders Malaysia Support Line"
+    },
+    "MV": {
+        "name": "Maldives",
+        "flag": "mv",
+        "emergency": "102",
+        "helpline": "1410",
+        "title": "Thalassemia Society Crisis Lifeline"
+    },
+    "ML": {
+        "name": "Mali",
+        "flag": "ml",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Response & Crisis Protocol"
+    },
+    "MT": {
+        "name": "Malta",
+        "flag": "mt",
+        "emergency": "112",
+        "helpline": "179",
+        "title": "Supportline 179 National Support"
+    },
+    "MH": {
+        "name": "Marshall Islands",
+        "flag": "mh",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Crisis Intervention Services"
+    },
+    "MR": {
+        "name": "Mauritania",
+        "flag": "mr",
+        "emergency": "118",
+        "helpline": "118",
+        "title": "Emergency Medical Response Line"
+    },
+    "MU": {
+        "name": "Mauritius",
+        "flag": "mu",
+        "emergency": "114",
+        "helpline": "800 2345",
+        "title": "Ministry of Health Support Services"
+    },
+    "MX": {
+        "name": "Mexico",
+        "flag": "mx",
+        "emergency": "911",
+        "helpline": "800 911 2000",
+        "title": "L\u00ednea de la Vida Mental Support"
+    },
+    "FM": {
+        "name": "Micronesia",
+        "flag": "fm",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Services Lifeline"
+    },
+    "MD": {
+        "name": "Moldova",
+        "flag": "md",
+        "emergency": "112",
+        "helpline": "060 475 475",
+        "title": "Pentru Viata Suicide Prevention"
+    },
+    "MC": {
+        "name": "Monaco",
+        "flag": "mc",
+        "emergency": "112",
+        "helpline": "1410",
+        "title": "Croix-Rouge Mon\u00e9gasque Support"
+    },
+    "MN": {
+        "name": "Mongolia",
+        "flag": "mn",
+        "emergency": "103",
+        "helpline": "1800 2000",
+        "title": "National Psychiatric Counseling Center"
+    },
+    "ME": {
+        "name": "Montenegro",
+        "flag": "me",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "SOS Telefon Crisis Support"
+    },
+    "MA": {
+        "name": "Morocco",
+        "flag": "ma",
+        "emergency": "15",
+        "helpline": "05 22 26 20 62",
+        "title": "Sourire Association Crisis Line"
+    },
+    "MZ": {
+        "name": "Mozambique",
+        "flag": "mz",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Dispatch & Crisis Protocol"
+    },
+    "MM": {
+        "name": "Myanmar",
+        "flag": "mm",
+        "emergency": "192",
+        "helpline": "192",
+        "title": "General Emergency & Psychiatric Support"
+    },
+    "NA": {
+        "name": "Namibia",
+        "flag": "na",
+        "emergency": "10111",
+        "helpline": "061 232221",
+        "title": "Lifeline Childline Namibia Support"
+    },
+    "NR": {
+        "name": "Nauru",
+        "flag": "nr",
+        "emergency": "110",
+        "helpline": "110",
+        "title": "Emergency Medical Services Protocol"
+    },
+    "NP": {
+        "name": "Nepal",
+        "flag": "np",
+        "emergency": "100",
+        "helpline": "9801235444",
+        "title": "TUTH Mental Health Suicide Line"
+    },
+    "NL": {
+        "name": "Netherlands",
+        "flag": "nl",
+        "emergency": "112",
+        "helpline": "0800-0113",
+        "title": "113 Zelfmoordpreventie Support"
+    },
+    "NZ": {
+        "name": "New Zealand",
+        "flag": "nz",
+        "emergency": "111",
+        "helpline": "1737",
+        "title": "Need to Talk? Free Call/Text Lifeline"
+    },
+    "NI": {
+        "name": "Nicaragua",
+        "flag": "ni",
+        "emergency": "911",
+        "helpline": "118",
+        "title": "Asistencia de Emergencia M\u00e9dica"
+    },
+    "NE": {
+        "name": "Niger",
+        "flag": "ne",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Emergency & Support Line"
+    },
+    "NG": {
+        "name": "Nigeria",
+        "flag": "ng",
+        "emergency": "112",
+        "helpline": "0806 210 6496",
+        "title": "Mentally Aware Nigeria Initiative (MANI)"
+    },
+    "KP": {
+        "name": "North Korea",
+        "flag": "kp",
+        "emergency": "119",
+        "helpline": "119",
+        "title": "National Emergency Services Dispatch"
+    },
+    "MK": {
+        "name": "North Macedonia",
+        "flag": "mk",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Red Cross Crisis Support Services"
+    },
+    "NO": {
+        "name": "Norway",
+        "flag": "no",
+        "emergency": "113 / 112",
+        "helpline": "116 123",
+        "title": "Mental Helse Hjelpetelefonen"
+    },
+    "OM": {
+        "name": "Oman",
+        "flag": "om",
+        "emergency": "9999",
+        "helpline": "9999",
+        "title": "Emergency Response & Crisis Dispatch"
+    },
+    "PK": {
+        "name": "Pakistan",
+        "flag": "pk",
+        "emergency": "1122",
+        "helpline": "042-35761999",
+        "title": "Umang Mental Health Support Line"
+    },
+    "PW": {
+        "name": "Palau",
+        "flag": "pw",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Dispatch Services"
+    },
+    "PS": {
+        "name": "Palestine",
+        "flag": "ps",
+        "emergency": "101",
+        "helpline": "1201",
+        "title": "Sawa Organization Psychological Helpline"
+    },
+    "PA": {
+        "name": "Panama",
+        "flag": "pa",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "Servicio de Emergencias M\u00e9dicas"
+    },
+    "PG": {
+        "name": "Papua New Guinea",
+        "flag": "pg",
+        "emergency": "111",
+        "helpline": "111",
+        "title": "National Crisis Assistance Network"
+    },
+    "PY": {
+        "name": "Paraguay",
+        "flag": "py",
+        "emergency": "911",
+        "helpline": "140",
+        "title": "Servicio de Apoyo de Salud Mental"
+    },
+    "PE": {
+        "name": "Peru",
+        "flag": "pe",
+        "emergency": "106 / 117",
+        "helpline": "113",
+        "title": "INFOSALUD Ministerio de Salud Opci\u00f3n 5"
+    },
+    "PH": {
+        "name": "Philippines",
+        "flag": "ph",
+        "emergency": "911",
+        "helpline": "1553",
+        "title": "NCMH Mental Health Crisis Hotline"
+    },
+    "PL": {
+        "name": "Poland",
+        "flag": "pl",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Telefon Zaufania dla Doros\u0142ych"
+    },
+    "PT": {
+        "name": "Portugal",
+        "flag": "pt",
+        "emergency": "112",
+        "helpline": "808 24 24 24",
+        "title": "SNS 24 Linha de Apoio Psicol\u00f3gico"
+    },
+    "QA": {
+        "name": "Qatar",
+        "flag": "qa",
+        "emergency": "999",
+        "helpline": "16000",
+        "title": "Mental Health Helpline HMC Qatar"
+    },
+    "RO": {
+        "name": "Romania",
+        "flag": "ro",
+        "emergency": "112",
+        "helpline": "0800 801 200",
+        "title": "Alianta Romana de Preventie a Suicidului"
+    },
+    "RU": {
+        "name": "Russia",
+        "flag": "ru",
+        "emergency": "112",
+        "helpline": "8-800-2000-122",
+        "title": "Unified Mental Crisis Support Lifeline"
+    },
+    "RW": {
+        "name": "Rwanda",
+        "flag": "rw",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Medical Emergency & Psychiatric Team"
+    },
+    "KN": {
+        "name": "Saint Kitts and Nevis",
+        "flag": "kn",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "Emergency Dispatch Services"
+    },
+    "LC": {
+        "name": "Saint Lucia",
+        "flag": "lc",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Crisis Line"
+    },
+    "VC": {
+        "name": "Saint Vincent",
+        "flag": "vc",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Crisis Relief Services"
+    },
+    "WS": {
+        "name": "Samoa",
+        "flag": "ws",
+        "emergency": "996",
+        "helpline": "996",
+        "title": "Emergency Rescue & Support Line"
+    },
+    "SM": {
+        "name": "San Marino",
+        "flag": "sm",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Response Service Protocol"
+    },
+    "ST": {
+        "name": "Sao Tome and Principe",
+        "flag": "st",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Medical Emergency & Crisis Relief"
+    },
+    "SA": {
+        "name": "Saudi Arabia",
+        "flag": "sa",
+        "emergency": "911 / 997",
+        "helpline": "920033360",
+        "title": "National Mental Health Hotline"
+    },
+    "SN": {
+        "name": "Senegal",
+        "flag": "sn",
+        "emergency": "18",
+        "helpline": "18",
+        "title": "Medical Emergency Assistance Service"
+    },
+    "RS": {
+        "name": "Serbia",
+        "flag": "rs",
+        "emergency": "112",
+        "helpline": "0700 116 123",
+        "title": "Liman Mental Health Crisis Center"
+    },
+    "SC": {
+        "name": "Seychelles",
+        "flag": "sc",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Emergency & Crisis Service"
+    },
+    "SL": {
+        "name": "Sierra Leone",
+        "flag": "sl",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Crisis Relief Protocol"
+    },
+    "SG": {
+        "name": "Singapore",
+        "flag": "sg",
+        "emergency": "995",
+        "helpline": "1-767",
+        "title": "Samaritans of Singapore (SOS)"
+    },
+    "SK": {
+        "name": "Slovakia",
+        "flag": "sk",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Linka D\u00f4very Nez\u00e1budka Support"
+    },
+    "SI": {
+        "name": "Slovenia",
+        "flag": "si",
+        "emergency": "112",
+        "helpline": "116 123",
+        "title": "Zaupni Telefon Samarijan Support"
+    },
+    "SB": {
+        "name": "Solomon Islands",
+        "flag": "sb",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "National Emergency Dispatch Protocol"
+    },
+    "SO": {
+        "name": "Somalia",
+        "flag": "so",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "Emergency Medical Services Lifeline"
+    },
+    "ZA": {
+        "name": "South Africa",
+        "flag": "za",
+        "emergency": "10111 / 112",
+        "helpline": "0800 567 567",
+        "title": "SADAG Mental Health Support Line"
+    },
+    "SS": {
+        "name": "South Sudan",
+        "flag": "ss",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "Emergency Crisis Relief Team"
+    },
+    "ES": {
+        "name": "Spain",
+        "flag": "es",
+        "emergency": "112",
+        "helpline": "024",
+        "title": "L\u00ednea de Prevenci\u00f3n de la Conducta Suicida"
+    },
+    "LK": {
+        "name": "Sri Lanka",
+        "flag": "lk",
+        "emergency": "119",
+        "helpline": "1333",
+        "title": "CCCline Lifeline Mental Health Support"
+    },
+    "SD": {
+        "name": "Sudan",
+        "flag": "sd",
+        "emergency": "999",
+        "helpline": "999",
+        "title": "General Emergency & Medical Response"
+    },
+    "SR": {
+        "name": "Suriname",
+        "flag": "sr",
+        "emergency": "115",
+        "helpline": "115",
+        "title": "Emergency Medical Assistance Services"
+    },
+    "SE": {
+        "name": "Sweden",
+        "flag": "se",
+        "emergency": "112",
+        "helpline": "90101",
+        "title": "MIND Sj\u00e4lvmordslinjen Support Line"
+    },
+    "CH": {
+        "name": "Switzerland",
+        "flag": "ch",
+        "emergency": "144 / 112",
+        "helpline": "143",
+        "title": "Die Dargebotene Hand / 143 Support"
+    },
+    "SY": {
+        "name": "Syria",
+        "flag": "sy",
+        "emergency": "110",
+        "helpline": "110",
+        "title": "Emergency Medical Relief Services"
+    },
+    "TW": {
+        "name": "Taiwan",
+        "flag": "tw",
+        "emergency": "119",
+        "helpline": "1925",
+        "title": "\u5b89\u5fc3\u5c08\u7dda Suicide Prevention Hotline"
+    },
+    "TJ": {
+        "name": "Tajikistan",
+        "flag": "tj",
+        "emergency": "103",
+        "helpline": "103",
+        "title": "National Psychiatric Health Clinic"
+    },
+    "TZ": {
+        "name": "Tanzania",
+        "flag": "tz",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Crisis Assistance Network"
+    },
+    "TH": {
+        "name": "Thailand",
+        "flag": "th",
+        "emergency": "191 / 1669",
+        "helpline": "02-113-6789",
+        "title": "Samaritans of Thailand Crisis Line"
+    },
+    "TL": {
+        "name": "Timor-Leste",
+        "flag": "tl",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "National Emergency Medical Support"
+    },
+    "TG": {
+        "name": "Togo",
+        "flag": "tg",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Dispatch Crisis Response"
+    },
+    "TO": {
+        "name": "Tonga",
+        "flag": "to",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Services Protocol"
+    },
+    "TT": {
+        "name": "Trinidad and Tobago",
+        "flag": "tt",
+        "emergency": "990",
+        "helpline": "800-5588",
+        "title": "Lifeline Trinidad and Tobago Support"
+    },
+    "TN": {
+        "name": "Tunisia",
+        "flag": "tn",
+        "emergency": "190",
+        "helpline": "190",
+        "title": "Emergency Medical Assistance Line"
+    },
+    "TR": {
+        "name": "Turkey",
+        "flag": "tr",
+        "emergency": "112",
+        "helpline": "182",
+        "title": "MHRS Psychiatric Consultation Line"
+    },
+    "TM": {
+        "name": "Turkmenistan",
+        "flag": "tm",
+        "emergency": "103",
+        "helpline": "103",
+        "title": "Emergency Medical Services Protocol"
+    },
+    "TV": {
+        "name": "Tuvalu",
+        "flag": "tv",
+        "emergency": "911",
+        "helpline": "911",
+        "title": "National Emergency Services Lifeline"
+    },
+    "UG": {
+        "name": "Uganda",
+        "flag": "ug",
+        "emergency": "112",
+        "helpline": "0709 900 900",
+        "title": "Heart 2 Heart Mental Health Lifeline"
+    },
+    "UA": {
+        "name": "Ukraine",
+        "flag": "ua",
+        "emergency": "112 / 103",
+        "helpline": "7333",
+        "title": "Lifeline Ukraine 24/7 Support Line"
+    },
+    "AE": {
+        "name": "United Arab Emirates",
+        "flag": "ae",
+        "emergency": "998 / 999",
+        "helpline": "800 4673",
+        "title": "Hope Line Mental Support Service"
+    },
+    "GB": {
+        "name": "United Kingdom",
+        "flag": "gb",
+        "emergency": "999",
+        "helpline": "116 123",
+        "title": "NHS 111 & Samaritans Crisis Support"
+    },
+    "US": {
+        "name": "United States",
+        "flag": "us",
+        "emergency": "911",
+        "helpline": "988",
+        "title": "988 Suicide & Crisis Lifeline"
+    },
+    "UY": {
+        "name": "Uruguay",
+        "flag": "uy",
+        "emergency": "911",
+        "helpline": "0800 0767",
+        "title": "L\u00ednea de Prevenci\u00f3n del Suicidio"
+    },
+    "UZ": {
+        "name": "Uzbekistan",
+        "flag": "uz",
+        "emergency": "103",
+        "helpline": "103",
+        "title": "National Psychiatric Care Hotline"
+    },
+    "VU": {
+        "name": "Vanuatu",
+        "flag": "vu",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Response Service Dispatch"
+    },
+    "VA": {
+        "name": "Vatican City",
+        "flag": "va",
+        "emergency": "112",
+        "helpline": "112",
+        "title": "Emergency Medical Care Support"
+    },
+    "VE": {
+        "name": "Venezuela",
+        "flag": "ve",
+        "emergency": "911",
+        "helpline": "0212-41 500 77",
+        "title": "L\u00ednea de Prevenci\u00f3n de Suicidio"
+    },
+    "VN": {
+        "name": "Vietnam",
+        "flag": "vn",
+        "emergency": "115",
+        "helpline": "1900 599 930",
+        "title": "Mind Care Psychological Support Services"
+    },
+    "YE": {
+        "name": "Yemen",
+        "flag": "ye",
+        "emergency": "191",
+        "helpline": "191",
+        "title": "Medical Emergency Relief Dispatch"
+    },
+    "ZM": {
+        "name": "Zambia",
+        "flag": "zm",
+        "emergency": "991",
+        "helpline": "991",
+        "title": "General Emergency & Support Network"
+    },
+    "ZW": {
+        "name": "Zimbabwe",
+        "flag": "zw",
+        "emergency": "999 / 112",
+        "helpline": "0772 178 177",
+        "title": "Befrienders Zimbabwe Lifeline Support"
+    }
+};
+
+    let activeCountryCode = "IN"; // Default Core Fallback
+
+    function initCrisisBanner() {
+        const flagImg = document.getElementById("crisis-flag-img");
+        const countryNameEl = document.getElementById("crisis-country-name");
+        const supportDescEl = document.getElementById("crisis-support-desc");
+        const phoneLink = document.getElementById("crisis-phone-link");
+        const emergencyNumEl = document.getElementById("crisis-emergency-num");
+        const callActionBtn = document.getElementById("crisis-call-action-btn");
+        const copyActionBtn = document.getElementById("crisis-copy-action-btn");
+        const skeleton = document.getElementById("crisis-skeleton");
+        const displayContainer = document.getElementById("crisis-helpline-display");
+        
+        const openModalBtn = document.getElementById("change-country-btn");
+        const closeModalBtn = document.getElementById("country-modal-close-btn");
+        const modal = document.getElementById("country-selector-modal");
+        const listContainer = document.getElementById("country-list-container");
+        const searchInput = document.getElementById("country-search-input");
+
+        // Helper to update crisis UI elements with animation
+        function updateCrisisUI(code) {
+            const data = globalHelplineDb[code] || globalHelplineDb["IN"];
+            
+            // Render loading transition
+            if (skeleton && displayContainer) {
+                skeleton.style.display = "flex";
+                displayContainer.style.display = "none";
+            }
+
+            setTimeout(() => {
+                activeCountryCode = code;
+                localStorage.setItem("aira_crisis_country", code);
+
+                // Update text fields
+                if (flagImg) {
+                    flagImg.src = `https://flagcdn.com/w40/${data.flag}.png`;
+                    flagImg.alt = `${data.name} Flag`;
+                    flagImg.style.display = "block";
+                }
+                if (countryNameEl) countryNameEl.textContent = data.name;
+                if (supportDescEl) supportDescEl.textContent = data.title;
+                if (emergencyNumEl) emergencyNumEl.textContent = data.emergency;
+
+                if (phoneLink) {
+                    phoneLink.textContent = data.helpline;
+                    phoneLink.href = `tel:${data.helpline.replace(/\s+/g, '')}`;
+                    // Scale animation visual cue
+                    phoneLink.style.transform = "scale(1.15)";
+                    setTimeout(() => phoneLink.style.transform = "scale(1)", 200);
+                }
+
+                if (callActionBtn) {
+                    callActionBtn.href = `tel:${data.helpline.replace(/\s+/g, '')}`;
+                }
+
+                // Remove loading skeleton
+                if (skeleton && displayContainer) {
+                    skeleton.style.display = "none";
+                    displayContainer.style.display = "flex";
+                }
+            }, 300);
+        }
+
+        // Copy helpline to clipboard action
+        if (copyActionBtn && phoneLink) {
+            copyActionBtn.addEventListener("click", () => {
+                navigator.clipboard.writeText(phoneLink.textContent.trim()).then(() => {
+                    const originalHTML = copyActionBtn.innerHTML;
+                    copyActionBtn.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                    copyActionBtn.style.color = "var(--neon-emerald)";
+                    setTimeout(() => {
+                        copyActionBtn.innerHTML = originalHTML;
+                        copyActionBtn.style.color = "";
+                    }, 1500);
+                });
+            });
+        }
+
+        // Searchable Country Dropdown Modal logic
+        if (openModalBtn && modal) {
+            openModalBtn.addEventListener("click", () => {
+                modal.style.display = "flex";
+                setTimeout(() => modal.classList.add("active"), 10);
+                if (searchInput) searchInput.focus();
+                renderCountryList("");
+            });
+        }
+
+        const closeModal = () => {
+            if (modal) {
+                modal.classList.remove("active");
+                setTimeout(() => modal.style.display = "none", 300);
+            }
+        };
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener("click", closeModal);
+        }
+
+        if (modal) {
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // Render manual scrollable country listing
+        function renderCountryList(filterText) {
+            if (!listContainer) return;
+            listContainer.innerHTML = "";
+            
+            const normalizedFilter = filterText.toLowerCase().trim();
+            const sortedKeys = Object.keys(globalHelplineDb).sort((a, b) => 
+                globalHelplineDb[a].name.localeCompare(globalHelplineDb[b].name)
+            );
+
+            let matchesFound = 0;
+            sortedKeys.forEach(key => {
+                const data = globalHelplineDb[key];
+                if (data.name.toLowerCase().includes(normalizedFilter) || key.toLowerCase().includes(normalizedFilter)) {
+                    matchesFound++;
+                    const item = document.createElement("div");
+                    item.className = "country-item";
+                    item.innerHTML = `
+                        <div class="country-item-left">
+                            <img class="country-item-flag" src="https://flagcdn.com/w20/${data.flag}.png" alt="${data.name} Flag" onerror="this.style.display='none'">
+                            <span class="country-item-name">${data.name}</span>
+                            <span class="country-item-code">(${key})</span>
+                        </div>
+                        <span class="country-item-number"><i class="fa-solid fa-phone-flip" style="font-size:0.75rem; margin-right:0.3rem;"></i> ${data.helpline}</span>
+                    `;
+                    
+                    item.addEventListener("click", () => {
+                        updateCrisisUI(key);
+                        closeModal();
+                    });
+
+                    listContainer.appendChild(item);
+                }
+            });
+
+            if (matchesFound === 0) {
+                const emptyItem = document.createElement("div");
+                emptyItem.className = "country-item";
+                emptyItem.style.pointerEvents = "none";
+                emptyItem.style.justifyContent = "center";
+                emptyItem.style.color = "var(--text-muted)";
+                emptyItem.textContent = "No matching countries found.";
+                listContainer.appendChild(emptyItem);
+            }
+        }
+
+        // Filter country list in real-time
+        if (searchInput) {
+            searchInput.addEventListener("input", (e) => {
+                renderCountryList(e.target.value);
+            });
+        }
+
+        // Detect user location
+        const savedCountry = localStorage.getItem("aira_crisis_country");
+        if (savedCountry && globalHelplineDb[savedCountry]) {
+            // Priority 1: Persistent localStorage choice
+            updateCrisisUI(savedCountry);
+        } else {
+            // Priority 2: Geolocation IP-fetch with fallback to Browser Language
+            if (skeleton && displayContainer) {
+                skeleton.style.display = "flex";
+                displayContainer.style.display = "none";
+            }
+
+            // High availability fetch
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+            fetch("https://ipapi.co/json/", { signal: controller.signal })
+                .then(res => res.json())
+                .then(data => {
+                    clearTimeout(timeoutId);
+                    const detectedCode = data.country_code ? data.country_code.toUpperCase() : "IN";
+                    if (globalHelplineDb[detectedCode]) {
+                        updateCrisisUI(detectedCode);
+                    } else {
+                        updateCrisisUI("IN"); // Default Fallback
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    // Fallback to browser locale
+                    const locale = navigator.language || (navigator.languages ? navigator.languages[0] : "en-IN");
+                    const parsedCode = locale.split("-")[1] ? locale.split("-")[1].toUpperCase() : "IN";
+                    
+                    if (globalHelplineDb[parsedCode]) {
+                        updateCrisisUI(parsedCode);
+                    } else {
+                        updateCrisisUI("IN"); // Safe hardcoded fallback
+                    }
+                });
+        }
+    }
+
+    // Initialize smart crisis system
+    initCrisisBanner();
 
     // Initialize defaults on start
     resetBreathingVisuals();
