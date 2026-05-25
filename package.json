@@ -1,0 +1,12 @@
+{
+  "name": "social-media-mental-health-risk-analyzer",
+  "version": "1.0.0",
+  "description": "AIRA - AI Student Mental Health & Support Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

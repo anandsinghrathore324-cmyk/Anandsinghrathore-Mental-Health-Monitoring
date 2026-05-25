@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AIRA - Futuristic AI-based Student Mental Health Monitoring & Support Platform. Real-time stress, depression, anxiety analysis using NLP, interactive dashboards, and geolocation doctor referrals.">
+    <title>AIRA | AI Student Mental Health & Support Platform</title>
+    
+    <!-- Stylesheets & Fonts -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ChartJS CDN for Analytics Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Dynamic Particle Network Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- 1. STICKY RESPONSIVE NAVBAR -->
+    <nav class="navbar" id="main-navbar">
+        <div class="navbar-container">
+            <a href="#home" class="nav-logo">
+                <i class="fa-solid fa-brain-circuit"></i> AIRA
+            </a>
+            <ul class="nav-links" id="navbar-links">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#analysis" class="nav-link">AI Analysis</a></li>
+                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="#mindfulness" class="nav-link">Mindfulness</a></li>
+                <li><a href="javascript:void(0)" class="nav-link" id="nav-chat-trigger">AI Chatbot</a></li>
+                <li><a href="#doctors" class="nav-link">Doctor Support</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#footer" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-hamburger" id="nav-hamburger-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. FUTURISTIC HERO SECTION -->
+    <header class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span></span> Quantum Emotion AI v2.5 Active
+            </div>
+            <h1 class="hero-title">
+                AI-Based Student <br>
+                <span class="gradient-text">Mental Health Monitoring</span> <br>
+                & Support System
+            </h1>
+            <p class="hero-description">
+                Unlock deeper self-awareness. Our platform parses academic pressure, sleep parameters, and journal transcripts using DistilBERT NLP to provide dynamic stress models, actionable mental health analytics, and empathetic Gen-Z guidance.
+            </p>
+            <div class="hero-btns">
+                <a href="#analysis" class="neon-btn neon-btn-primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Mental Health
+                </a>
+                <a href="javascript:void(0)" class="neon-btn neon-btn-secondary" id="hero-chat-trigger">
+                    <i class="fa-solid fa-message-smile"></i> Talk with AI Friend
+                </a>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">99.2%</span>
+                    <span class="stat-label">NLP Accuracy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">12k+</span>
+                    <span class="stat-label">Students Assisted</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">&lt;3ms</span>
+                    <span class="stat-label">Latency Response</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hologram-container">
+                <div class="holo-circle holo-circle-1"></div>
+                <div class="holo-circle holo-circle-2"></div>
+                <div class="holo-circle holo-circle-3"></div>
+                <div class="holo-core">
+                    <i class="fa-solid fa-head-side-brain"></i>
+                </div>
+                
+                <!-- Voice Assistant Pulsing Waveform -->
+                <div class="holo-waveform">
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                </div>
+                
+                <span class="hologram-label">AIRA CORE AI</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. DETAILED FEATURES SECTION -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <span class="section-tag">System Protocols</span>
+            <h2 class="section-title">Sophisticated Mental Health Features</h2>
+            <p class="section-desc">Explore our cutting-edge AI architecture built specifically to identify, monitor, and alleviate emotional and academic struggles in student life.</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Card 1: Stress Detection -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h3>Stress Detection</h3>
+                <p>Cross-references physiological estimates, sleep records, and workload to track acute cognitive exhaustion indexes.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 2: Depression Prediction -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-cloud-showers-heavy"></i>
+                </div>
+                <h3>Depression Prediction</h3>
+                <p>Monitors long-term behavioral drops, persistent low moods, and withdrawal trends over structured timelines.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 3: Anxiety Analysis -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <h3>Anxiety Analysis</h3>
+                <p>Gathers qualitative anxiety assessments and isolates acute nervous behaviors under exam stress periods.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 4: DistilBERT Emotion Detection -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-quote-left"></i>
+                </div>
+                <h3>DistilBERT Emotion NLP</h3>
+                <p>Parses linguistic triggers, extracting emotional sentiments (Joy, Sadness, Anger, Fear, Love, Surprise) from journals.</p>
+                <a href="#analysis" class="feature-link">NLP details <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 5: AI Wellness Suggestions -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <h3>AI Recommendations</h3>
+                <p>Generates tailored bio-behavioral recommendations, coping exercises, and micro-breaks based on calculated scores.</p>
+                <a href="#analysis" class="feature-link">Analyze details <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 6: Burnout Detection -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <h3>Burnout Analytics</h3>
+                <p>Calculates the exact ratio of social activity and screen time relative to sleep to map academic saturation risks.</p>
+                <a href="#analysis" class="feature-link">Check indicators <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 7: Emotional Tracking -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-chart-line-up"></i>
+                </div>
+                <h3>Emotional Tracking</h3>
+                <p>Provides interactive mood metrics, historical tracking dashboards, and emoji stability patterns.</p>
+                <a href="#dashboard" class="feature-link">View charts <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 8: Nearby Counselor Referral -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-user-doctor-hair"></i>
+                </div>
+                <h3>Counselor Recommendation</h3>
+                <p>Leverages native geolocation metrics to connect you immediately with verified psychologists and advisors.</p>
+                <a href="#doctors" class="feature-link">Find doctor <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 9: AI Gen-Z Chatbot -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-message-smile"></i>
+                </div>
+                <h3>AI Gen-Z Friend</h3>
+                <p>A conversational bot built with high emotional intelligence, speaking in relatable terms to lift your spirits.</p>
+                <a href="javascript:void(0)" class="feature-link" id="feature-chat-trigger">Talk to Aira <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 10: Analytics Dashboard -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <h3>Analytics Dashboard</h3>
+                <p>Fully customizable visual arrays highlighting emotional wellness index curves over weekly intervals.</p>
+                <a href="#dashboard" class="feature-link">Open metrics <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. MENTAL HEALTH ANALYSIS FORM SECTION -->
+    <section class="analysis-section" id="analysis">
+        <div class="section-header">
+            <span class="section-tag">Diagnostic Scan</span>
+            <h2 class="section-title">Quantum Mental Health Scanner</h2>
+            <p class="section-desc">Fill out the variables below to let our AI model perform a simulated DistilBERT neural classification on your emotional profile.</p>
+        </div>
+
+        <div class="analysis-container">
+            <!-- Sidebar Guide Info -->
+            <div class="analysis-sidebar-card glass-panel">
+                <h3>Scan Parameters</h3>
+                <p>AIRA gathers a comprehensive demographic, academic, and linguistic matrix to run multi-label classifications.</p>
+                
+                <div class="analysis-steps">
+                    <div class="step-bullet">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <h4>Student Variables</h4>
+                            <p>Academic load ratios vs sleep hours balance.</p>
+                        </div>
+                    </div>
+                    <div class="step-bullet">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <h4>Behavioral Inputs</h4>
+                            <p>Digital footprint variables like screen time and usage.</p>
+                        </div>
+                    </div>
+                    <div class="step-bullet">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <h4>NLP Sentiment Mapping</h4>
+                            <p>Translating linguistic cues into emotional percentages.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-support-note">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <span>All inputs are encrypted. AIRA supports data anonymization compliant with healthcare guidelines.</span>
+                </div>
+            </div>
+
+            <!-- Analysis Input Form -->
+            <div class="analysis-form-card glass-panel scan-overlay" id="form-container">
+                <!-- Laser Scanning Effect overlay -->
+                <div class="scanner-laser" id="scanner-laser-bar"></div>
+
+                <form id="mental-health-form" onsubmit="event.preventDefault();">
+                    <div class="form-grid">
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label for="student-name"><i class="fa-solid fa-user"></i> Full Name</label>
+                            <input type="text" id="student-name" class="form-input" placeholder="e.g. Liam Johnson" required>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="form-group">
+                            <label for="student-age"><i class="fa-solid fa-calendar-days"></i> Age</label>
+                            <input type="number" id="student-age" class="form-input" placeholder="e.g. 21" min="15" max="40" required>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="form-group">
+                            <label for="student-gender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                            <select id="student-gender" class="form-input" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="nonbinary">Non-Binary</option>
+                                <option value="prefer_not_to_say">Prefer Not To Say</option>
+                            </select>
+                        </div>
+
+                        <!-- University -->
+                        <div class="form-group">
+                            <label for="student-college"><i class="fa-solid fa-graduation-cap"></i> College / University</label>
+                            <input type="text" id="student-college" class="form-input" placeholder="e.g. Stanford University" required>
+                        </div>
+
+                        <!-- Study Hours -->
+                        <div class="form-group">
+                            <label for="study-hours"><i class="fa-solid fa-book-open"></i> Daily Study Hours</label>
+                            <input type="number" id="study-hours" class="form-input" placeholder="e.g. 6" min="0" max="24" required>
+                        </div>
+
+                        <!-- Sleep Hours -->
+                        <div class="form-group">
+                            <label for="sleep-hours"><i class="fa-solid fa-bed"></i> Daily Sleep Hours</label>
+                            <input type="number" id="sleep-hours" class="form-input" placeholder="e.g. 7" min="0" max="24" required>
+                        </div>
+
+                        <!-- Academic Pressure Level -->
+                        <div class="form-group">
+                            <label for="academic-pressure"><i class="fa-solid fa-weight-hanging"></i> Academic Pressure (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="academic-pressure" class="range-slider" min="1" max="10" value="5">
+                                <span class="range-value" id="academic-pressure-val">5</span>
+                            </div>
+                        </div>
+
+                        <!-- Screen Time -->
+                        <div class="form-group">
+                            <label for="screen-time"><i class="fa-solid fa-mobile-screen-button"></i> Screen Time (Hours/Day)</label>
+                            <input type="number" id="screen-time" class="form-input" placeholder="e.g. 5" min="0" max="24" required>
+                        </div>
+
+                        <!-- Social Media Usage -->
+                        <div class="form-group-full form-group">
+                            <label for="social-media"><i class="fa-solid fa-hashtag"></i> Active Social Media Apps Used</label>
+                            <input type="text" id="social-media" class="form-input" placeholder="e.g. Instagram, TikTok, Reddit, Discord" required>
+                        </div>
+
+                        <!-- Mood Selector -->
+                        <div class="form-group-full form-group">
+                            <label><i class="fa-solid fa-face-smile"></i> Current Dominant Mood Status</label>
+                            <div class="mood-selector" id="mood-selector-container">
+                                <div class="mood-option" data-mood="super_happy">
+                                    <span class="emoji">😊</span>
+                                    <span>Super Happy</span>
+                                </div>
+                                <div class="mood-option" data-mood="calm">
+                                    <span class="emoji">😌</span>
+                                    <span>Calm/Relaxed</span>
+                                </div>
+                                <div class="mood-option" data-mood="stressed">
+                                    <span class="emoji">😕</span>
+                                    <span>Stressed</span>
+                                </div>
+                                <div class="mood-option" data-mood="anxious">
+                                    <span class="emoji">😫</span>
+                                    <span>Anxious</span>
+                                </div>
+                                <div class="mood-option" data-mood="sad">
+                                    <span class="emoji">😭</span>
+                                    <span>Melancholy</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Anxiety Level Range -->
+                        <div class="form-group">
+                            <label for="anxiety-level"><i class="fa-solid fa-triangle-exclamation"></i> Anxiety Level (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="anxiety-level" class="range-slider" min="1" max="10" value="4">
+                                <span class="range-value" id="anxiety-level-val">4</span>
+                            </div>
+                        </div>
+
+                        <!-- Stress Level Range -->
+                        <div class="form-group">
+                            <label for="stress-level"><i class="fa-solid fa-heart-crack"></i> Subjective Stress Level (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="stress-level" class="range-slider" min="1" max="10" value="5">
+                                <span class="range-value" id="stress-level-val">5</span>
+                            </div>
+                        </div>
+
+                        <!-- Textarea description -->
+                        <div class="form-group-full form-group">
+                            <label for="diary-input"><i class="fa-solid fa-keyboard"></i> Describe how you feel today (Journal Log)</label>
+                            <textarea id="diary-input" class="form-input" placeholder="Explain your current thoughts, worries, or details on academic tasks. Be honest, the AI parses these semantics to isolate risks..." required></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="neon-btn neon-btn-pink form-group-full" style="width: 100%; border-radius: 12px;" id="submit-scan-btn">
+                        <i class="fa-solid fa-radar"></i> Analyze My Mental Health
+                    </button>
+                </form>
+
+                <!-- Simulated Flask API log console output -->
+                <div class="scan-console-log" id="terminal-console"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. AI PREDICTION RESULTS SECTION -->
+    <section class="results-section" id="results-display">
+        <div class="dashboard-title-bar">
+            <div>
+                <span class="section-tag" style="margin-bottom:0.2rem;">Processed Diagnostics</span>
+                <h2>Core AI Predictions</h2>
+            </div>
+            <div class="dashboard-meta">
+                <span><i class="fa-solid fa-lock"></i> Secured Node</span>
+                <span>|</span>
+                <span id="diagnostic-timestamp">2026-05-24 10:49:31</span>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            <!-- Left Side: Risk breakdowns -->
+            <div class="results-cards-container">
+                <!-- Stress Risk Card -->
+                <div class="result-card glass-panel" id="stress-risk-card">
+                    <div class="result-card-header">
+                        <h4>Stress Risk</h4>
+                        <i class="fa-solid fa-bolt-lightning" style="color: var(--neon-cyan);"></i>
+                    </div>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-stress" cx="50" cy="50" r="40" stroke="var(--neon-cyan)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-stress">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-stress">Calm</div>
+                </div>
+
+                <!-- Anxiety Risk Card -->
+                <div class="result-card glass-panel" id="anxiety-risk-card">
+                    <div class="result-card-header">
+                        <h4>Anxiety Risk</h4>
+                        <i class="fa-solid fa-heart-pulse" style="color: var(--neon-purple);"></i>
+                    </div>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-anxiety" cx="50" cy="50" r="40" stroke="var(--neon-purple)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-anxiety">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-anxiety">Stable</div>
+                </div>
+
+                <!-- Depression Risk Card -->
+                <div class="result-card glass-panel" id="depression-risk-card">
+                    <div class="result-card-header">
+                        <h4>Depression Risk</h4>
+                        <i class="fa-solid fa-cloud-showers-heavy" style="color: var(--neon-rose);"></i>
+                    </div>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-depression" cx="50" cy="50" r="40" stroke="var(--neon-rose)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-depression">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-depression">Optimal</div>
+                </div>
+
+                <!-- Wellness Index Full Card -->
+                <div class="wellness-card glass-panel">
+                    <div class="wellness-text">
+                        <h3>Overall Wellness Index</h3>
+                        <p id="wellness-interpretation">Your cognitive loads are in harmony with physiological patterns. AI recommends maintaining physical breaks every two hours.</p>
+                    </div>
+                    <div class="wellness-score-container">
+                        <div class="wellness-score-num" id="total-wellness-score">85</div>
+                        <div class="wellness-score-label">Wellness Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: DistilBERT NLP Analysis visualizer -->
+            <div class="nlp-visualization-card glass-panel">
+                <div class="nlp-header">
+                    <h3><i class="fa-solid fa-quote-left"></i> NLP Semantic Breakdown</h3>
+                    <span class="nlp-badge">DistilBERT-v3</span>
+                </div>
+                
+                <p class="nlp-interpretation" id="nlp-interpretation-text">"Analyzing emotional parameters. Sentiment registers slight anxiety tags corresponding to academic keyword logs."</p>
+                
+                <div class="nlp-metrics-list">
+                    <!-- Joy -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Joy / Optimism</span>
+                            <span id="nlp-joy-perc">40%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-joy-bar" style="background: var(--neon-emerald);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sadness -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Sadness / Melancholy</span>
+                            <span id="nlp-sad-perc">20%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-sad-bar" style="background: var(--neon-rose);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Anger / Burnout -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Anger / Frustration</span>
+                            <span id="nlp-anger-perc">15%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-anger-bar" style="background: var(--neon-orange);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Anxiety / Stress -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Fear / Anxiety</span>
+                            <span id="nlp-fear-perc">25%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-fear-bar" style="background: var(--neon-purple);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Highlighted Semantic Keywords Box -->
+                <div class="nlp-keywords-box">
+                    <span class="nlp-keywords-title">Extracted Keyword Sentiment Triggers:</span>
+                    <div class="nlp-keywords-list" id="nlp-extracted-keywords">
+                        <span class="nlp-keyword-tag">exam</span>
+                        <span class="nlp-keyword-tag">exhausted</span>
+                        <span class="nlp-keyword-tag">sleep</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tailored Wellness Action Plan Card -->
+        <div class="action-plan-card glass-panel" id="wellness-action-plan" style="margin-top: 2.5rem; display: none;">
+            <div class="action-plan-header">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-pink);">AI Recovery Protocol</span>
+                    <h3>Personalized Wellness Action Plan</h3>
+                </div>
+                <div class="action-plan-badge" id="action-plan-badge-status">0/4 Completed</div>
+            </div>
+            
+            <p class="action-plan-desc">Based on your computed NLP and physiological stress coefficients, AIRA has compiled these target behaviors to restore your cognitive balance.</p>
+
+            <!-- Dynamic progress bar -->
+            <div class="action-progress-container">
+                <div class="action-progress-bg">
+                    <div class="action-progress-fill" id="action-progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <span class="action-progress-text" id="action-progress-percent">0%</span>
+            </div>
+
+            <!-- Checklist container -->
+            <div class="action-checklist" id="action-checklist-container">
+                <!-- Checkbox items are injected dynamically in script.js -->
+            </div>
+
+            <!-- Unlocked Success Badge -->
+            <div class="action-success-badge" id="action-success-alert" style="display: none;">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <h4>Neural Balance Restored! ✨</h4>
+                    <p>Great job completing your personalized wellness checklist! Your nervous system will thank you for these intentional micro-breaks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. STRESS & EMOTIONAL ANALYTICS DASHBOARD -->
+    <section class="dashboard-section" id="dashboard">
+        <div class="section-header">
+            <span class="section-tag">Interactive Analytics</span>
+            <h2 class="section-title">Academic & Stress Trend Matrix</h2>
+            <p class="section-desc">Monitor continuous temporal behaviors, sleep correlations, and mood thresholds in our quantum reporting dashboard.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Line Graph -->
+            <div class="chart-card glass-panel">
+                <h4>Stress & Anxiety Bi-Weekly Path <i class="fa-solid fa-chart-line"></i></h4>
+                <div class="chart-container">
+                    <canvas id="stressTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Radar / Doughnut Graph -->
+            <div class="chart-card glass-panel">
+                <h4>Linguistic Emotion Distribution <i class="fa-solid fa-chart-pie"></i></h4>
+                <div class="chart-container">
+                    <canvas id="emotionProfileChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 30-Day Mood Heatmap Calendar Card -->
+            <div class="heatmap-card glass-panel" style="grid-column: span 2;">
+                <div class="heatmap-header">
+                    <h4>30-Day Mood Stability Heatmap <i class="fa-solid fa-calendar-heart" style="color: var(--neon-pink);"></i></h4>
+                    <!-- Legend -->
+                    <div class="heatmap-legend">
+                        <span class="legend-item"><span class="legend-dot dot-joy"></span> Joy</span>
+                        <span class="legend-item"><span class="legend-dot dot-melancholy"></span> Melancholy</span>
+                        <span class="legend-item"><span class="legend-dot dot-burnout"></span> Burnout</span>
+                        <span class="legend-item"><span class="legend-dot dot-anxiety"></span> Anxiety</span>
+                        <span class="legend-item"><span class="legend-dot dot-neutral"></span> Neutral</span>
+                    </div>
+                </div>
+
+                <div class="heatmap-body">
+                    <div class="heatmap-grid" id="mood-heatmap-grid">
+                        <!-- 30 cells will be dynamically injected here in script.js -->
+                    </div>
+
+                    <!-- Side Day Inspector Panel -->
+                    <div class="heatmap-inspector glass-panel" id="heatmap-inspector-panel">
+                        <div class="inspector-empty" id="inspector-empty-msg">
+                            <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 0.5rem;"></i>
+                            <p>Click any logged day square to inspect historical sentiment logs and wellness index scores.</p>
+                        </div>
+                        <div class="inspector-details" id="inspector-content" style="display: none;">
+                            <div class="inspector-header">
+                                <h5 id="inspector-day-title">Day 12 Details</h5>
+                                <span class="inspector-score-badge" id="inspector-wellness-score">85 Wellness</span>
+                            </div>
+                            <p class="inspector-mood-label">Primary Sentiment: <span id="inspector-mood-name">Joy 😊</span></p>
+                            <div class="inspector-journal-quote">
+                                <i class="fa-solid fa-quote-left"></i>
+                                <span id="inspector-journal-text">"Did really well on the exam today, feeling so accomplished!"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Emoji Status Strip -->
+            <div class="analytics-status-strip glass-panel" id="emoji-status-strip">
+                <div class="status-indicator">
+                    <span class="status-emoji-large" id="status-emoji">😌</span>
+                    <div class="status-info-text">
+                        <h3 id="status-message-title">Stress Category: Slight Stress</h3>
+                        <p id="status-message-desc">Your profiles suggest stable resilience. Recommended protocol: 7 hours sleep cycles.</p>
+                    </div>
+                </div>
+                <div class="status-action-box">
+                    <div class="status-score-bubble" id="status-score-display">Wellness score: 85</div>
+                    <a href="#doctors" class="neon-btn neon-btn-primary" style="padding: 0.6rem 1.4rem; border-radius: 12px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-hospital-user"></i> View Counselors
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mini Dashboard statistics metrics cards -->
+            <div class="analytics-cards-grid">
+                <!-- 1 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-shield-heart" style="color: var(--neon-cyan);"></i>
+                    <h5>Stability Index</h5>
+                    <span id="stat-stability">78%</span>
+                </div>
+                <!-- 2 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-bed" style="color: var(--neon-emerald);"></i>
+                    <h5>Sleep Quality</h5>
+                    <span id="stat-sleep">Good</span>
+                </div>
+                <!-- 3 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-fire" style="color: var(--neon-orange);"></i>
+                    <h5>Burnout Threat</h5>
+                    <span id="stat-burnout">Low</span>
+                </div>
+                <!-- 4 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-weight-hanging" style="color: var(--neon-rose);"></i>
+                    <h5>Academic Strain</h5>
+                    <span id="stat-academic">Medium</span>
+                </div>
+                <!-- 5 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-user-group" style="color: var(--neon-purple);"></i>
+                    <h5>Social Balance</h5>
+                    <span id="stat-social">Balanced</span>
+                </div>
+                <!-- 6 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-face-laugh-beam" style="color: var(--neon-pink);"></i>
+                    <h5>Primary Emotion</h5>
+                    <span id="stat-primary-emo">Calm</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.5 MINDFULNESS & GUIDED BREATHING CENTER -->
+    <section class="mindfulness-section" id="mindfulness">
+        <div class="section-header">
+            <span class="section-tag" style="color: var(--neon-cyan);">De-escalation Node</span>
+            <h2 class="section-title">Guided Breathing & Mindfulness</h2>
+            <p class="section-desc">Pace your nervous system, reset mental saturation indexes, and restore emotional resilience with interactive bio-rhythm selectors.</p>
+        </div>
+
+        <div class="mindfulness-container">
+            <!-- Left Pane: Control Panel -->
+            <div class="mindfulness-controls glass-panel">
+                <h3>Breathing Controls</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select your breathing routine below, hit Play, and follow the visual bubble indicators.</p>
+
+                <!-- Routine Selection Cards -->
+                <div class="breath-rhythm-list">
+                    <div class="breath-rhythm-card active" data-rhythm="box">
+                        <div class="rhythm-meta">
+                            <h5>Box Breathing</h5>
+                            <span>4s Inhale • 4s Hold • 4s Exhale • 4s Hold</span>
+                        </div>
+                        <p class="rhythm-desc">Navy SEAL standard for extreme focus under high stress.</p>
+                    </div>
+
+                    <div class="breath-rhythm-card" data-rhythm="relax">
+                        <div class="rhythm-meta">
+                            <h5>4-7-8 Relax Routine</h5>
+                            <span>4s Inhale • 7s Hold • 8s Exhale</span>
+                        </div>
+                        <p class="rhythm-desc">Clinically proven sequence for grounding acute anxieties.</p>
+                    </div>
+
+                    <div class="breath-rhythm-card" data-rhythm="coherent">
+                        <div class="rhythm-meta">
+                            <h5>Coherent Breathing</h5>
+                            <span>5s Inhale • 5s Exhale</span>
+                        </div>
+                        <p class="rhythm-desc">Harmonizes heart rate and oxygen coefficients for clarity.</p>
+                    </div>
+                </div>
+
+                <!-- Playback Controllers -->
+                <div class="breath-play-controls">
+                    <button class="neon-btn neon-btn-primary" id="breath-btn-play" style="flex: 1; border-radius: 12px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-play" style="margin-right: 0.4rem;"></i> Start Session
+                    </button>
+                    <button class="neon-btn neon-btn-secondary" id="breath-btn-reset" style="padding: 0.8rem 1.2rem; border-radius: 12px;" disabled>
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Pane: Breathing Bubble Visualizer -->
+            <div class="mindfulness-visualizer glass-panel">
+                <!-- Visual morphing background glow rings -->
+                <div class="visual-glow-ring ring-1"></div>
+                <div class="visual-glow-ring ring-2"></div>
+
+                <!-- Pulsing Core Bubble -->
+                <div class="breath-bubble-outer" id="breath-visual-bubble">
+                    <div class="breath-bubble-inner">
+                        <span class="breath-state-label" id="breath-text-indicator">Paced</span>
+                        <span class="breath-timer" id="breath-countdown">4</span>
+                    </div>
+                </div>
+
+                <div class="breath-instructions" id="breath-instruction-text">Choose a rhythm and press Start to synchronize your breath.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. COUNSELOR & THERAPIST RECOMMENDATION SYSTEM -->
+    <section class="doctor-section" id="doctors">
+        <div class="section-header">
+            <span class="section-tag">Clinical Referrals</span>
+            <h2 class="section-title">Nearby Verified Psychologists</h2>
+            <p class="section-desc">Connect immediately with credentialed mental health specialists. Allowing location services ranks psychologists relative to your physical proximity.</p>
+        </div>
+
+        <div class="doctor-filter-bar">
+            <!-- Geolocation trigger info -->
+            <div class="geolocation-info">
+                <div class="geolocation-status-light" id="geo-status-light"></div>
+                <span id="geo-text-status">Proximity matching: Active Fallback Mode</span>
+                <button class="geolocation-btn" id="trigger-geo-api">
+                    <i class="fa-solid fa-location-crosshairs"></i> Use Geolocation
+                </button>
+            </div>
+
+            <!-- Category filter selectors -->
+            <div class="doctor-filters">
+                <span class="filter-tab active" data-filter="all">All Specialists</span>
+                <span class="filter-tab" data-filter="stress">Stress & Burnout</span>
+                <span class="filter-tab" data-filter="anxiety">General Anxiety</span>
+                <span class="filter-tab" data-filter="depression">Clinical Depression</span>
+            </div>
+        </div>
+
+        <!-- Doctor Cards Grid -->
+        <div class="doctor-grid" id="doctor-results-grid">
+            <!-- Cards are generated dynamically in script.js to support proximity ordering and diagnostic filters -->
+        </div>
+
+        <!-- Emergency Crisis hotlines Banner -->
+        <div class="support-hotline-banner">
+            <div class="support-banner-content">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Immediate Crisis Assistance Required?</h3>
+                <p>If you are experiencing severe distress or self-harm triggers, connect immediately. Experts are online 24/7.</p>
+            </div>
+            <div class="support-banner-action">
+                <a href="tel:988" class="hotline-number">Dial 988</a>
+                <span class="hotline-subtext">Free • Confidential • National Support Line</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. DETAILED ABOUT PLATFORM SECTION -->
+    <section class="about-section" id="about">
+        <div class="about-grid">
+            <div class="about-info-side">
+                <span class="section-tag">Platform Manifesto</span>
+                <h2 class="section-title">Decoding Academic Stress with Ethical AI</h2>
+                <p class="section-desc" style="margin-bottom:1.5rem;">
+                    AIRA stands at the intersection of cognitive clinical sciences and neural machine learning. We believe that student mental wellness should never be an afterthought in fast-paced modern learning environments.
+                </p>
+                <p class="section-desc">
+                    By tracking continuous metrics like academic hours, digital strain ratios, and subjective journal expressions, AIRA computes deep-layered risk profiles. This provides students with proactive recommendations and seamless pathways to counselors long before acute fatigue shifts to clinical levels.
+                </p>
+
+                <div class="about-features-list">
+                    <!-- Feature Item 1 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Fine-Tuned NLP Classifiers</h5>
+                            <p>Powered by fine-tuned DistilBERT models mapping syntactic features to emotional labels.</p>
+                        </div>
+                    </div>
+                    <!-- Feature Item 2 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Proactive Geolocation Sourcing</h5>
+                            <p>Computes Haversine distances to match you immediately with nearest certified therapist nodes.</p>
+                        </div>
+                    </div>
+                    <!-- Feature Item 3 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Ethical Anonymization Standard</h5>
+                            <p>Data privacy first. We never monetize sensitive metrics or logs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-image-side">
+                <div class="about-visual-box glass-panel">
+                    <div class="about-visual-overlay"></div>
+                    
+                    <!-- Futuristic Node Network Visualization -->
+                    <div class="neuro-nodes-container">
+                        <div class="neuro-node neuro-node-1"></div>
+                        <div class="neuro-node neuro-node-2"></div>
+                        <div class="neuro-node neuro-node-3"></div>
+                        <div class="neuro-node neuro-node-4"></div>
+                        <div class="neuro-node neuro-node-5"></div>
+                    </div>
+                    
+                    <svg class="neuro-line-svg">
+                        <path class="neuro-signal" d="M 144 114 L 96 228 L 288 266 L 336 152 L 264 76 Z" />
+                        <path d="M 144 114 L 96 228 M 96 228 L 288 266 M 288 266 L 336 152 M 336 152 L 264 76 M 264 76 L 144 114 M 144 114 L 288 266" />
+                    </svg>
+                    
+                    <div class="hologram-container" style="width:200px; height:200px; z-index:2;">
+                        <div class="holo-circle holo-circle-1" style="border-color: var(--neon-pink);"></div>
+                        <div class="holo-core" style="width:70px; height:70px; box-shadow: 0 0 15px rgba(225, 0, 255, 0.4);">
+                            <i class="fa-solid fa-microchip-ai" style="font-size:1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FLOATING EMOTIONAL SMART CHATBOT ("AIRA") -->
+    <div class="chatbot-widget" id="chatbot-wrapper">
+        <!-- Floating Chatbox Panel -->
+        <div class="chatbot-panel glass-panel" id="chat-panel">
+            <!-- Header -->
+            <div class="chatbot-header">
+                <div class="chatbot-identity">
+                    <div class="chatbot-avatar-ring">
+                        <div class="chatbot-avatar-inner">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="chatbot-info">
+                        <h4>Aira <span></span></h4>
+                        <span class="chatbot-status">AI Bestie • Online</span>
+                    </div>
+                </div>
+                <button class="chatbot-close-btn" id="close-chat-widget">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Messages Window -->
+            <div class="chatbot-messages" id="chatbot-msg-container">
+                <div class="chat-msg chat-msg-bot">
+                    Hey! 👋 I'm Aira, your digital bestie! Life as a student can be super exhausting 😭 I'm here to listen, hype you up, and help you chill. How's your energy level today? 💙
+                </div>
+                <!-- Dynamic typing indicator dots -->
+                <div class="typing-indicator" id="chat-typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestion Vent Chips Scrollable Tray -->
+            <div class="chatbot-chips-container" id="chatbot-quick-chips">
+                <span class="chat-chip" data-msg="I feel super stressed by exams">😫 Exam Panic</span>
+                <span class="chat-chip" data-msg="I am burnt out and exhausted">🔥 Burnout</span>
+                <span class="chat-chip" data-msg="Can you help me focus?">📚 Focus Help</span>
+                <span class="chat-chip" data-msg="Teach me a breathing exercise">😌 Calm Me</span>
+                <span class="chat-chip" data-msg="I feel lonely and isolated">🥺 Feeling Lonely</span>
+            </div>
+
+            <!-- Input area -->
+            <div class="chatbot-input-area">
+                <input type="text" class="chatbot-input" id="chatbot-input-field" placeholder="Vent to Aira... (e.g. 'I feel stressed')">
+                <button class="chatbot-send-btn" id="chatbot-submit-btn">
+                    <i class="fa-solid fa-paper-plane-top"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <div class="chatbot-toggle-btn" id="open-chat-widget" title="Vent to Aira">
+            <i class="fa-solid fa-comment-dots"></i>
+        </div>
+    </div>
+
+    <!-- 10. FOOTER & CONTACT COLUMN -->
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <!-- Column 1: App Bio -->
+            <div class="footer-info-column">
+                <a href="#home" class="footer-info-logo">
+                    <i class="fa-solid fa-brain-circuit"></i> AIRA
+                </a>
+                <p class="footer-info-desc">
+                    Futuristic Student Mental Health Monitoring & support protocols. Merging cognitive classification logic with geolocation medical referrals.
+                </p>
+                <div class="footer-socials">
+                    <a href="https://github.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://twitter.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://discord.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://linkedin.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Column 2: Quick Navigation links -->
+            <div class="footer-column">
+                <h4>Protocols</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="#home">Quantum Home</a></li>
+                    <li class="footer-link-item"><a href="#features">Platform Features</a></li>
+                    <li class="footer-link-item"><a href="#analysis">Neuro Assessment</a></li>
+                    <li class="footer-link-item"><a href="#dashboard">Stability Dashboard</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Resources -->
+            <div class="footer-column">
+                <h4>Sourcing</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="#doctors">Therapist Locator</a></li>
+                    <li class="footer-link-item"><a href="#about">Technical Manifesto</a></li>
+                    <li class="footer-link-item"><a href="tel:988">988 Emergency Crisis</a></li>
+                    <li class="footer-link-item"><a href="#analysis">NLP Confidence Scale</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Contact details -->
+            <div class="footer-column">
+                <h4>Quantum Node</h4>
+                <ul class="footer-contact-details">
+                    <li><i class="fa-solid fa-square-envelope"></i> support@aira-wellness.ai</li>
+                    <li><i class="fa-solid fa-square-phone"></i> +1 (800) 555-AIRA</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Silicon Valley Tech Hub, California, USA</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom bar copyright details -->
+        <div class="footer-bottom-bar">
+            <span>&copy; 2026 AIRA Wellness Systems. Designed under Ethical AI Guidelines. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="javascript:void(0)">Privacy Policy</a>
+                <a href="javascript:void(0)">Terms of Compliance</a>
+                <a href="javascript:void(0)">Ethical AI Code</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+</html>
