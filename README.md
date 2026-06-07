@@ -1,273 +1,160 @@
 # AIRA — AI-Based Student Mental Health Monitoring & Support System
-
-Welcome to the technical master manual for **AIRA (AI Student Mental Health & Support Platform)**. This documentation provides a comprehensive, bottom-up architectural breakdown of every system layer, including HTML5 semantics, CSS variables, interactive JavaScript algorithms, and the underlying mathematical models simulating natural language processing (NLP) and physiological stress.
+Welcome to the comprehensive technical documentation for **AIRA (AI Student Mental Health & Support Platform)**. This manual provides a bottom-up architectural breakdown of every system layer, detailing the frontend design system, the Python Flask backend microservices, the MongoDB database collections, and the integrated machine learning prediction models (Hugging Face Transformers & Ridge Regression).
 
 ---
 
-## 1. Architectural Overview & Design System
+## 1. Project Overview & Architectural Flow
+AIRA is a high-fidelity mental health monitoring dashboard designed specifically for students. It combines real-time natural language processing (NLP), physiological metrics, interactive timeline visualizations, mindfulness tools, and an AI-driven chatbot assistant.
 
-AIRA is a futuristic student wellness dashboard that operates as a high-fidelity client-side web application. It combines particle canvas backgrounds, dynamic mood logs, guided breathing tools, therapist referrals, and NLP analysis to assess student stress, anxiety, and depression threat levels.
-
+### System Workflow
 ```mermaid
 graph TD
     A[Preloader Screen] -->|Fade Out after 2.5s| B[Opaque Login Portal]
-    B -->|Login with student@aira.edu & password| C[Main Application View]
-    C --> D[Sticky Responsive Navbar]
-    C --> E[Quantum Mental Health Scanner]
-    C --> F[Core AI Predictions & NLP Results]
-    C --> G[Academic & Stress Analytics Dashboard]
-    C --> H[Mindfulness Breathing Center]
-    C --> I[AI Chatbot Aira Widget]
-    C --> J[Doctor counselor referral]
-```
-
-### The Tech Stack
-* **HTML5**: Structured semantic nodes dividing features (Nav, Hero, Features, Analysis, Results, Dashboard, Mindfulness, Chatbot, Referrals, Footer).
-* **CSS3 (Cyber Dark Neon & Glassmorphism)**: Harmonious color palettes using Tailwind-free custom CSS variables, vibrant linear neon gradients, glow animations, and glass panels (`backdrop-filter`).
-* **Vanilla ES6+ JS**: Event listeners, dynamic canvas rendering, Chart.js datasets, sessionStorage browser persistence, and math matrices mapping digital workloads to threat indexes.
-
----
-
-## 2. HTML Semantics & Layout Hierarchy
-
-The markup is divided into independent semantic sections to maintain browser accessibility and structural modularity:
-
-* **Canvas Backdrop (`<canvas id="bg-canvas">`)**: Fixed viewport overlay rendering a neural network of floating particle nodes.
-* **Preloader Node (`<div id="aira-preloader">`)**: Solid overlay housing the orbital loading hologram and simulated console loading logs.
-* **Authentication Portal (`<div id="aira-login-portal">`)**: Solid secure entry node housing credential verification inputs and biometric scanner laser lines.
-* **Sticky Responsive Navbar (`<nav class="navbar">`)**: Houses logo anchors, navigation routes, and the active session Logout link.
-* **Hero Section (`<header class="hero">`)**: Premium introductory hub containing quantum accuracy badges and direct-vent chat triggers.
-* **Interactive Diagnostic Section (`<section class="analysis-section">`)**: Grid split between form instructions (demographics/sleep/screen) and the input controls.
-* **AI Diagnostics (`<section class="results-section">`)**: Initially hidden overlay container revealed on submission, rendering risk rings, DistilBERT sentiment ratios, and the tailored recovery protocols.
-* **Interactive Analytics Dashboard (`<section class="dashboard-section">`)**: Hosts the weekly stress timeline paths, linguistic radar charts, and the 30-Day Mood Heatmap grid.
-* **Breathing Center (`<section class="mindfulness-section">`)**: Combines routine breathing control panels with a dynamic pulsing bubble visualizer.
-* **Chatbot Widget (`<div class="chatbot-widget">`)**: Floating, specificity-safe chat box wrapper integrating standard Ventchips and messaging streams.
-
----
-
-## 3. CSS Style Engine & Glowing Neon Tokens
-
-The styling architecture is built upon a custom dark neon palette defined in `style.css`. It uses custom properties (CSS variables) to define cohesive glows and smooth transition properties:
-
-```css
-:root {
-    /* Base Backgrounds */
-    --bg-base: #060813;
-    --bg-card: rgba(13, 20, 38, 0.65);
-    
-    /* Neon Palettes */
-    --neon-cyan: #00f2fe;
-    --neon-purple: #7f00ff;
-    --neon-pink: #e100ff;
-    --neon-emerald: #00ff87;
-    --neon-orange: #ff9f43;
-    --neon-rose: #ff0055;
-    
-    /* Neon Glow Vectors */
-    --glow-cyan: 0 0 15px rgba(0, 242, 254, 0.35);
-    --glow-purple: 0 0 15px rgba(127, 0, 255, 0.35);
-    --glow-emerald: 0 0 15px rgba(0, 255, 135, 0.35);
-    --glow-rose: 0 0 15px rgba(255, 0, 85, 0.35);
-    
-    /* Transition Engines */
-    --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    --transition-fast: all 0.2s ease-out;
-}
-```
-
-### Key Style Features Explained
-
-1. **Glassmorphism (`.glass-panel`)**:
-   Achieved through absolute background opacity mixing combined with hardware-accelerated filters:
-   ```css
-   .glass-panel {
-       background: var(--bg-card);
-       backdrop-filter: blur(16px) saturate(180%);
-       border: 1px solid var(--border-glass);
-       border-radius: 20px;
-       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-   }
-   ```
-2. **Glowing Highlights (`.neon-btn-primary`)**:
-   Provides high-tech visual feedback by casting a linear gradient overlay with box-shadow reflections.
-3. **Animated preloader rings**:
-   Orbital rotation keyframes spin dashed circles in opposite directions to represent active calculations:
-   ```css
-   @keyframes rotateCW {
-       100% { transform: rotate(360deg); }
-   }
-   @keyframes rotateCCW {
-       100% { transform: rotate(-360deg); }
-   }
-   ```
-
----
-
-## 4. JavaScript Client Engine Code Explanation
-
-The primary interactive logic is located in `script.js`. It runs completely inside a `DOMContentLoaded` event block. Here is a walkthrough of its key systems:
-
-### System 1: The Preloader Loading Loop
-When the page loads and no active session token is identified, the script runs a simulated loader interval:
-```javascript
-const preloaderInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 5) + 3; // Random incremental progress ticks
-    if (progress >= 100) {
-        progress = 100;
-        clearInterval(preloaderInterval);
-        setTimeout(() => {
-            preloader.classList.add("fade-out"); // Triggers CSS fade transitions
-            setTimeout(() => { preloader.style.display = "none"; }, 800);
-            
-            // Displays secure login screen
-            loginPortal.style.display = "flex";
-            loginPortal.style.opacity = "1";
-            loginPortal.style.visibility = "visible";
-        }, 500);
-    }
-    progressBar.style.width = `${progress}%`;
-    percentageText.textContent = `${progress}%`;
-}, 80);
-```
-
-### System 2: Secure Session Verification & Login
-Authenticates users against default keys, displays high-fidelity scanning, and bypasses screens if cached:
-```javascript
-loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    loginSubmitBtn.disabled = true; // Prevent double inputs
-    loginSubmitBtn.innerHTML = `Initializing Neural Handshake...`;
-    laserScanner.style.display = "block"; // Turn on floating laser scanner line
-
-    setTimeout(() => {
-        const usernameVal = usernameInput.value.trim();
-        const passwordVal = passwordInput.value;
-        const isValid = (usernameVal === "student@aira.edu" || usernameVal === "AIRA-2026") && passwordVal === "password";
-
-        if (isValid) {
-            loginSubmitBtn.innerHTML = `Login Successful!`;
-            loginSubmitBtn.style.background = "var(--neon-emerald)";
-            
-            setTimeout(() => {
-                sessionStorage.setItem("aira_session_active", "true"); // Cache login state
-                loginPortal.style.display = "none"; // Instantly remove portal overlays
-                logoutTrigger.style.display = "block"; // Reveal Logout option in header
-                document.body.style.overflow = ""; // Unlock dashboard scrolling
-            }, 200);
-        } else {
-            laserScanner.style.display = "none";
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.innerHTML = `Login`;
-            errorMsg.style.display = "flex"; // Alert invalid password key
-        }
-    }, 200); // Super snappy authentication loop
-});
+    B -->|Login with credentials / OTP verified| C[Main Application View]
+    C --> D[Sticky Cyberpunk Navbar]
+    C --> E[Quantum Mental Health Scanner Form]
+    E -->|POST request payload| F[Python Flask API Server]
+    F -->|Inference| G1[DistilBERT NLP Model]
+    F -->|Inference| G2[Ridge Regression Model]
+    F -->|Persist & Log| H[MongoDB / Mongomock DB]
+    F -->|JSON Response| C
+    C --> I[AI Diagnostics & Score Dashboard]
+    C --> J[30-Day Mood Stability Heatmap]
+    C --> K[Mindfulness Breathing Center]
+    C --> L[Aira Chatbot Widget]
+    C --> M[Doctor Counselor Referral Module]
 ```
 
 ---
 
-## 5. Machine Learning Models & Stress Calculations
+## 2. Technology Stack Breakdown
 
-Although this application is built as a highly responsive client-side model, it integrates an advanced mathematical simulation of **Natural Language Processing (NLP)** and physiological stress indexing to estimate risk threat parameters.
+### Frontend (Client Interface)
+* **HTML5**: Semantically structured document (Nav, Hero, Analysis Form, Results, Analytics Dashboard, Mindfulness, Chatbot Widget, Referrals, Footer).
+* **Vanilla CSS3 (Tailwind-Free Custom Styling)**: Engineered using a cyber dark neon palette, glassmorphism panel styles (`backdrop-filter`), hover scale micro-animations, and glowing neon box-shadow highlights.
+* **Vanilla ES6+ JS**: Event delegation, session storage cache lifecycle, dynamic `#bg-canvas` network background rendering, interactive Chart.js graphs, and front-end validators.
 
-### NLP Sentiment Analysis (Linguistic Simulation)
-The application reads the qualitative student text journal logs (`#diary-input`), parses them against sentiment keywords, extracts them into active tags, and calculates a normalized emotion profile distribution representing **Joy**, **Sadness / Melancholy**, **Anger / Frustration**, and **Fear / Anxiety**.
-
-```javascript
-const dictionary = [
-    "exam", "stressed", "grades", "lonely", "exhausted", "tired", "sleep", "fail", "hopeless", "sad",
-    "study", "anxious", "worry", "projects", "family", "friends", "happy", "accomplished", "relax"
-];
-```
-Based on the parsed weights of these semantic indicators:
-$$\text{Joy Value} = 100 - \frac{\text{Stress Risk} + \text{Depression Risk}}{2}$$
-$$\text{Sadness Value} = \text{Depression Risk} \times 0.90$$
-$$\text{Anger Value} = \text{Stress Risk} \times 0.80$$
-$$\text{Fear Value} = \text{Anxiety Risk} \times 0.95$$
-
-These values are then **normalized** so their sum equals exactly $100\%$, providing the custom radar/doughnut graph data inputs in Chart.js.
-
-### Workload & Sleep Work Risk Formulas
-The core diagnostic algorithm (`executeDiagnosticMetrics()`) calculates continuous stress coefficients based on the quantitative inputs from the student form:
-
-1. **Sleep Deficit Coefficient**:
-   The human body operates optimally on 8 hours of sleep. The sleep deficit represents sleep deprivation stress:
-   $$\text{Sleep Deficit} = \max(0, 8 - \text{Sleep Hours})$$
-
-2. **Stress Risk Level ($R_{stress}$)**:
-   Calculated by blending subjective stress indicators, academic pressures, sleep deficits, and semantic distress tags:
-   $$R_{stress} = (\text{Subjective Stress} \times 6) + (\text{Academic pressure} \times 3) + (\text{Sleep Deficit} \times 5)$$
-   * *If text log contains `stressed`, `heavy`, or `tired`*: Add $8\%$.
-   * *If text log contains `exam`, `deadline`, or `grades`*: Add $6\%$.
-   * Bounds: locked between $8\%$ and $98\%$.
-
-3. **Anxiety Risk Level ($R_{anxiety}$)**:
-   Determined by subjective nervous factors, workload demands, and acute panic triggers:
-   $$R_{anxiety} = (\text{Subjective Anxiety} \times 7) + (\text{Academic pressure} \times 2) + (\text{Sleep Deficit} \times 3)$$
-   * *If text log contains `anxious`, `worry`, or `nervous`*: Add $10\%$.
-   * *If text log contains `scared`, `shaking`, or `panic`*: Add $12\%$.
-   * Bounds: locked between $5\%$ and $99\%$.
-
-4. **Depression Risk Level ($R_{depression}$)**:
-   Correlates screen exposure saturation, chronic sleep loss, low moods, and withdrawal feelings:
-   $$\text{Screen Excess} = \max(0, \text{Screen Time} - 6)$$
-   $$R_{depression} = (\text{Sleep Deficit} \times 6) + (\text{Screen Excess} \times 4) + (\text{Academic pressure} \times 2)$$
-   * *If selected mood is `Melancholy`*: Add $20\%$.
-   * *If selected mood is `Anxious`*: Add $10\%$.
-   * *If text log contains `sad`, `lonely`, or `cry`*: Add $12\%$.
-   * *If text log contains `hopeless`, `empty`, or `worthless`*: Add $20\%$.
-   * Bounds: locked between $4\%$ and $98\%$.
-
-5. **Overall Wellness Index ($W$)**:
-   The aggregate health value of the student's cognitive harmony is computed as:
-   $$W = 100 - \frac{R_{stress} + R_{anxiety} + R_{depression}}{3}$$
+### Backend (Server Node)
+* **Language**: **Python 3.12**
+* **Framework**: **Flask** (structured with decoupled blueprints for routing modularity).
+* **Authentication & Encryption**: **PyJWT** (JSON Web Tokens) for session tokens and **Bcrypt** for secure password hashing.
+* **CORS Policy**: Configured via `flask-cors` to block unverified cross-origin script executions.
 
 ---
 
-## 6. The 30-Day Mood Heatmap State Engine
+## 3. Database Architecture (MongoDB)
+AIRA connects to a secure **MongoDB** database instance using **PyMongo**. For test environments or resilient container setups, the engine automatically deploys a **MongoMock** in-memory database fallback to guarantee zero uptime disruption.
 
-AIRA provides a calendar grid representing mood patterns over a 30-day temporal baseline. 
+### Indexing Patterns & Constraints
+Essential indexing schemas are configured programmatically inside `backend/database/db.py`:
+* **`users`**: Unique constraint index on `"email"` to prevent duplicate account registration.
+* **`mental_health_reports`**: Indexed on `"user_id"` and `"created_at"` to optimize timeline aggregation.
+* **`mood_logs`**: Dual unique compound index `[("user_id", 1), ("date", 1)]` to prevent duplicate daily log entries.
+* **`otp_codes`**: Programmatic Time-to-Live (TTL) index set on `"created_at"` to automatically expire and remove OTP authorization documents after **5 minutes (300 seconds)**.
+* **`doctor_recommendations`**: Compound index on `[("latitude", 1), ("longitude", 1)]` for immediate spatial query performance.
 
-* **Initial Baseline:** Generating 29 mock history objects (mapping randomized dates, wellness scores, primary sentiments, and matching diagnostic paragraphs).
-* **Live Update:** When you click "Analyze My Mental Health" and submit, the algorithm automatically calculates the mood category of "Day 30" ($Mood_{30}$) using the selected mood and the wellness index:
-  * Selected Melancholy $\rightarrow$ `melancholy`
-  * Selected Anxious $\rightarrow$ `anxiety`
-  * Selected Stressed $\rightarrow$ `burnout`
-  * Wellness index $< 55\%$ $\rightarrow$ `burnout` or `anxiety`
-  * Wellness index $< 80\%$ $\rightarrow$ `melancholy`
-  * Default $\rightarrow$ `joy`
-* **Heatmap Selection Inspector:**
-  A click listener is attached to each rendered grid cell. When clicked, it passes the historical indices to the inspector sidebar, displaying specific quotes and numeric metrics dynamically:
-  ```javascript
-  const cells = document.querySelectorAll(".heatmap-day-cell");
-  cells.forEach((cell, index) => {
-      cell.addEventListener("click", () => {
-          const log = heatmapHistory[index];
-          inspectorTitle.textContent = `Day ${log.day} Details`;
-          inspectorScore.textContent = `${log.score} Wellness`;
-          inspectorJournal.textContent = log.journal;
-          inspectorContent.style.display = "block"; // Display detail cards
-      });
-  });
-  ```
+### Core Collections & Schema Mappings
+1. **`users`**: Stores hashed credentials, names, and profiles.
+2. **`mental_health_reports`**: Logs self-reported metrics (study hours, sleep hours, screen time, academic pressure, subjective stress, and anxiety ratings), parsed emotion distribution, and generated recommendations.
+3. **`chatbot_history`**: Persists conversational nodes between students and the chatbot assistant.
+4. **`mood_logs`**: Tracks daily scores and mapped categorical sentiment labels.
+5. **`doctor_recommendations`**: Stores counselor details, geolocation points (lat/long), specialization type tags, and ratings.
 
 ---
 
-## 7. Project Diagnostics & Complete Code Mapping
+## 4. Machine Learning & Predictive Engines
+AIRA implements a hybrid predictive architecture blending deep neural network models with classic statistical algorithms.
 
-All elements are organized inside a clean structure to support development:
+### A. NLP Sentiment Analysis: DistilBERT Model
+The user's qualitative journal log entries (`#diary-input`) are parsed by a Hugging Face Transformers pipeline utilizing the **`bhadresh-savani/distilbert-base-uncased-emotion`** weights.
+* **Working Principle**:
+  * Tokenizes input sentences and extracts emotional vectors.
+  * Outputs raw classification percentages across standard keys: `joy`, `love`, `sadness`, `fear`, `anger`, and `surprise`.
+* **Output Mapping Layer**:
+  To maintain clean metrics, the pipeline maps raw predictions to normalized dashboard categories:
+  * `joy` / `love` $\rightarrow$ **Joy**
+  * `sadness` $\rightarrow$ **Melancholy**
+  * `fear` $\rightarrow$ **Anxiety**
+  * `anger` $\rightarrow$ **Burnout/Frustration**
+  * `surprise` $\rightarrow$ **Neutral**
+* **Validation Guards**:
+  * **Short Entry Safeguard**: If the entry has fewer than 5 words, the NLP engine bypasses the pipeline and returns a `Neutral` classification with `0.0` confidence to avoid text-hallucination indicators.
+  * **Low-Confidence Alert**: Real-time warning banners display if Hugging Face prediction confidence registers below `0.45`.
 
+### B. Wellness Index: Blended Ridge Regression Model
+Structured numerical features (demographics, screen excess, sleep deficit) are evaluated alongside subjective stress ratings through a trained **Ridge Regression** model (`saved_model.pkl`).
+* **Feature Extraction**:
+  $$\text{Sleep Deficit} = \max(0, 8 - \text{Sleep Hours})$$
+  $$\text{Screen Excess} = \max(0, \text{Screen Time} - 6)$$
+* **Mathematical Risk Equations**:
+  $$\text{Stress Score } (R_{stress}) = (\text{Stress Level} \times 6) + (\text{Academic pressure} \times 3) + (\text{Sleep Deficit} \times 5)$$
+  *(Increments by $+8\%$ on negative NLP sentiment, and $+6\%$ on exam/deadline keywords)*
+  
+  $$\text{Anxiety Score } (R_{anxiety}) = (\text{Anxiety Level} \times 7) + (\text{Academic pressure} \times 2) + (\text{Sleep Deficit} \times 3)$$
+  *(Increments by $+12\%$ on panic/scared keywords)*
+  
+  $$\text{Depression Score } (R_{depression}) = (\text{Sleep Deficit} \times 6) + (\text{Screen Excess} \times 4) + (\text{Academic pressure} \times 2)$$
+  *(Increments by $+20\%$ on melancholy mood selections, and $+20\%$ on hopeless/worthless keywords)*
+
+* **Blended Prediction**:
+  The system computes an overall wellness score based on these variables:
+  $$\text{Base Rule Wellness} = 100 - (R_{stress} \times 0.4 + R_{anxiety} \times 0.4 + R_{depression} \times 0.2)$$
+  The final output is computed by blending the rule-based wellness score ($80\%$) with the Ridge regression model prediction ($20\%$):
+  $$\text{Final Wellness Score} = \text{Clamp}(0.8 \times \text{Base Rule Wellness} + 0.2 \times \text{ML Ridge Prediction}, 0, 100)$$
+
+---
+
+## 5. Front-End Features & Cyberpunk UI Design
+The UI utilizes CSS Custom Properties to maintain design consistency and premium visual feedback:
+
+### Key Design Assets & Color Theme:
+* **Glassmorphism panels** (`.glass-panel`) with blur and subtle border shadows.
+* **Animated particle backdrop** (`#bg-canvas`) creating a responsive neural node system.
+* **30-Day Mood Stability Heatmap**:
+  Displays historical student cognitive trends over a 30-day period. Clicking any cell populates the side inspector with the logged score, date, and journal logs.
+* **Reversed Color Theme Legend**:
+  To align with branding guidelines, the heatmap uses the following reversed styling layout:
+  * **1-39 Wellness** (Critical/Lowest): **Emerald Green** (glow-emerald)
+  * **40-59 Wellness** (Low): **Orange** (glow-orange)
+  * **60-79 Wellness** (Moderate): **Rose Red** (glow-rose)
+  * **80-100 Wellness** (Healthy/Optimal): **Purple** (glow-purple)
+
+---
+
+## 6. How to Run the Project Locally
+
+### 1. Prerequisite Packages
+Install Python dependencies via `pip`:
 ```bash
-├── package.json          # Dev server commands ("dev": "npx http-server -c-1")
-├── index.html            # Main markup (preloader, login portal, dashboards)
-├── features.html         # Detailed technical capabilities catalog page
-├── doctor-support.html   # Geolocation doctor referrals page
-├── style.css             # Cyberpunk glowing styles & overlapping fixes
-└── script.js             # Core JS, animation canvases, ChartJS, NLP calculations
+pip install -r backend/requirements.txt
 ```
 
-### Authentication Credentials Summary
-* **Student ID / Email:** `student@aira.edu` *or* `AIRA-2026`
-* **Security Password Key:** `password`
-* * Demo Autocomplete automatically populates inputs instantly.
-* Session is persisted using standard `sessionStorage` in order to preserve development velocity.
+### 2. Configure Environment Variables
+Create a `.env` file inside the `backend/` directory:
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/aira_wellness
+JWT_SECRET=your_super_jwt_secret_token
+SMTP_EMAIL=your-gmail@gmail.com
+SMTP_PASSWORD=your-app-password
+```
+
+### 3. Spin Up Backend Server
+Run the Flask server:
+```bash
+python backend/app.py
+```
+*The server will start running on `http://127.0.0.1:5000/`.*
+
+### 4. Serve the Frontend Dashboard
+Run a local static server inside the root directory:
+```bash
+# Using Node package manager (if available)
+npx http-server -p 3000
+```
+*Open `http://localhost:3000` in your web browser.*
+
+### Default Authentication Credentials
+* **Username/Email**: `student@aira.edu` *or* `AIRA-2026`
+* **Password Key**: `password`
+*(Alternatively, click the **Demo Autocomplete** link to instantly autofill test credentials)*

@@ -5,6 +5,10 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Purge deprecated mock credentials from local storage
+    localStorage.removeItem("offline_user_student@aira.edu");
+    localStorage.removeItem("offline_user_AIRA-2026");
+
     // ==========================================================================
     // 0. FUTURISTIC AUTHENTICATION & PRELOADER SYSTEM
     // ==========================================================================
@@ -441,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.status === "success") {
                         if (data.otp_bypass) {
-                            alert(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
+                            console.log(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
                             if (forgotOtpInput) forgotOtpInput.value = data.otp_bypass;
                         }
                         if (forgotStep1) forgotStep1.style.display = "none";
@@ -579,7 +583,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.status === "success") {
                         if (data.otp_bypass) {
-                            alert(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
+                            console.log(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
                             if (otpCodeInput) otpCodeInput.value = data.otp_bypass;
                         }
                         // Reveal OTP code verify field input block with gorgeous fade
@@ -671,6 +675,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+                if (usernameVal.toLowerCase() === "student@aira.edu" || usernameVal.toUpperCase() === "AIRA-2026") {
+                    if (errorMsg) {
+                        errorMsg.querySelector("span").textContent = "Invalid credentials. Access Denied.";
+                        errorMsg.style.display = "flex";
+                        errorMsg.style.animation = "none";
+                        setTimeout(() => { errorMsg.style.animation = "shake 0.4s ease-in-out"; }, 10);
+                    }
+                    return;
+                }
+
                 if (loginSubmitBtn) {
                     loginSubmitBtn.disabled = true;
                     loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Neural Handshake...`;
@@ -697,14 +711,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.warn("[AUTH SYSTEM] Server login failed, checking secure client-side sandbox registry:", err);
 
                         const localPass = localStorage.getItem(`offline_user_${usernameVal}`);
-                        const isMockDefault = (usernameVal === "student@aira.edu" || usernameVal === "AIRA-2026") && passwordVal === "password";
                         const isLocalMatch = localPass && localPass === passwordVal;
 
-                        if (isMockDefault) {
-                            console.log("[SANDBOX AUTH] Sandbox student credentials verified locally.");
-                            if (laserScanner) laserScanner.style.display = "none";
-                            handleSuccessfulDecryption("mock_offline_token", { id: "mock_offline_student", name: "Anand Singh", email: "student@aira.edu" });
-                        } else if (isLocalMatch) {
+                        if (isLocalMatch) {
                             console.log("[SANDBOX AUTH] Locally registered account credentials verified locally.");
                             if (laserScanner) laserScanner.style.display = "none";
                             handleSuccessfulDecryption("mock_offline_token", { id: "mock_offline_user", name: usernameVal.split("@")[0].toUpperCase(), email: usernameVal });
@@ -812,7 +821,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then(data => {
                             if (data.status === "success") {
                                 if (data.otp_bypass) {
-                                    alert(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
+                                    console.log(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
                                     if (registerOtpCodeInput) registerOtpCodeInput.value = data.otp_bypass;
                                 }
                                 if (signupStage1) signupStage1.style.display = "none";

@@ -401,14 +401,6 @@ def seed_database():
     except Exception as e:
         logger.error(f"Failed to seed verified clinicians: {str(e)}")
 
-    # Seed demo users
-    try:
-        from database.user_model import UserModel
-        if not UserModel.find_by_email("student@aira.edu"):
-            UserModel.create_user("Student Advisor", "student@aira.edu", "password")
-            logger.info("Demo user 'student@aira.edu' successfully seeded.")
-    except Exception as e:
-        logger.error(f"Failed to seed demo user: {str(e)}")
 
 # Instantiate application node
 app = create_app()
