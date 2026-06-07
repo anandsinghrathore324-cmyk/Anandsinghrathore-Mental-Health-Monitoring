@@ -54,7 +54,7 @@
                         <i class="fa-solid fa-shield-halved brand-glow"></i>
                         <h3>AIRA PORTAL</h3>
                     </div>
-                    <p>Enter Student Credentials to Decrypt Neural Key</p>
+                    <p>Sign in to your AIRA account</p>
                 </div>
 
                 <!-- Glassmorphic Tab Navigation Bar -->
@@ -68,21 +68,25 @@
                     <!-- Tab 1: Password Auth Section -->
                     <div class="auth-fields-section active" id="auth-section-password">
                         <div class="login-form-group">
-                            <label for="login-student-id"><i class="fa-solid fa-id-card"></i> Student Email /
-                                Identifier</label>
-                            <input type="text" id="login-student-id" class="form-input" placeholder="your-email@example.com">
+                            <label for="login-student-id"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                            <input type="email" id="login-student-id" class="form-input" placeholder="Enter your email">
                         </div>
                         <div class="login-form-group">
-                            <label for="login-password"><i class="fa-solid fa-lock"></i> Security Password Key</label>
-                            <input type="password" id="login-password" class="form-input" placeholder="••••••••">
+                            <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                            <div class="password-field-wrapper">
+                                <input type="password" id="login-password" class="form-input" placeholder="Enter your password">
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
-                        <!-- Sleek helpers row (Remember Me & Forgot Pass) -->
+                        <!-- Sleek helpers row (Keep me signed in & Forgot Pass) -->
                         <div class="login-helpers-row">
                             <label class="login-remember-checkbox">
                                 <input type="checkbox" id="login-remember">
-                                <span>Remember Me</span>
+                                <span>Keep me signed in</span>
                             </label>
-                            <a href="javascript:void(0)" class="login-forgot-link">Forget Password</a>
+                            <a href="javascript:void(0)" class="login-forgot-link">Forgot Password?</a>
                         </div>
                     </div>
 
@@ -115,62 +119,75 @@
                         </div>
                     </div>
 
-                    <!-- Tab 3: Register New User Section -->
+                                      <!-- Tab 3: Register New User Section -->
                     <div class="auth-fields-section" id="auth-section-register" style="display: none;">
                         <!-- Signup Stage 1: Contact Details -->
                         <div id="signup-stage-1" style="animation: fadeIn 0.4s ease-in-out;">
                             <div class="login-form-group">
-                                <label for="register-name"><i class="fa-solid fa-user-tag"></i> Student Full
-                                    Name</label>
-                                <input type="text" id="register-name" class="form-input"
-                                    placeholder="e.g. Liam Johnson">
+                                <label for="register-name"><i class="fa-solid fa-user-tag"></i> Student Full Name</label>
+                                <input type="text" id="register-name" class="form-input" placeholder="Enter your full name">
                             </div>
                             <div class="login-form-group">
-                                <label for="register-email"><i class="fa-solid fa-envelope"></i> Academic / Gmail
-                                    Address</label>
-                                <input type="email" id="register-email" class="form-input"
-                                    placeholder="e.g. student@gmail.com">
+                                <label for="register-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                                <input type="email" id="register-email" class="form-input" placeholder="Enter your email">
                             </div>
                         </div>
 
                         <!-- Signup Stage 2: verification code (hidden initially) -->
                         <div id="signup-stage-2" style="display: none; animation: fadeIn 0.4s ease-in-out;">
-                            <div
-                                style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-cyan); font-size: 0.82rem; font-weight: 600;">
-                                <i class="fa-solid fa-envelope-open-text"></i> Verification OTP dispatched to Gmail
-                                address.
+                            <div style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-cyan); font-size: 0.82rem; font-weight: 600;">
+                                <i class="fa-solid fa-envelope-open-text"></i> Verification OTP dispatched to email address.
                             </div>
                             <div class="login-form-group">
-                                <label for="register-otp-code"><i class="fa-solid fa-shield-halved"></i> 6-Digit
-                                    Verification OTP</label>
-                                <input type="text" id="register-otp-code" class="form-input" placeholder="••••••"
-                                    maxlength="6"
+                                <label for="register-otp-code"><i class="fa-solid fa-shield-halved"></i> 6-Digit Verification OTP</label>
+                                <input type="text" id="register-otp-code" class="form-input" placeholder="••••••" maxlength="6"
                                     style="letter-spacing: 6px; text-align: center; font-family: monospace; font-size: 1.25rem;">
                             </div>
                         </div>
 
                         <!-- Signup Stage 3: Set Password (hidden initially) -->
                         <div id="signup-stage-3" style="display: none; animation: fadeIn 0.4s ease-in-out;">
-                            <div
-                                style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-emerald); font-size: 0.82rem; font-weight: 600;">
+                            <div style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-emerald); font-size: 0.82rem; font-weight: 600;">
                                 <i class="fa-solid fa-circle-check"></i> Email verified. Set your secure password key.
                             </div>
                             <div class="login-form-group">
-                                <label for="register-password"><i class="fa-solid fa-lock"></i> Set Security Password
-                                    Key</label>
-                                <input type="password" id="register-password" class="form-input" placeholder="••••••••">
+                                <label for="register-password"><i class="fa-solid fa-lock"></i> Password</label>
+                                <div class="password-field-wrapper">
+                                    <input type="password" id="register-password" class="form-input" placeholder="Enter your password">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('register-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength-container" style="display: none; margin-top: 0.5rem;">
+                                    <div class="password-strength-bar-wrapper" style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 0.3rem;">
+                                        <div id="password-strength-bar" style="width: 0%; height: 100%; transition: all 0.3s ease;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                        <span id="password-strength-text" style="font-size: 0.72rem; font-weight: 600; font-family: 'Space Grotesk', sans-serif;">Strength: Weak</span>
+                                    </div>
+                                    <ul id="password-checklist" style="list-style: none; padding: 0; margin: 0; font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); display: flex; flex-direction: column; gap: 4px; font-family: 'Space Grotesk', sans-serif;">
+                                        <li id="req-length" style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;"><i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> At least 8 characters</li>
+                                        <li id="req-capital" style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;"><i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> Capital letter (A-Z)</li>
+                                        <li id="req-small" style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;"><i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> Small letter (a-z)</li>
+                                        <li id="req-number" style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;"><i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> Number (0-9)</li>
+                                        <li id="req-special" style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;"><i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> Special character (e.g. !, @, #, $, %)</li>
+                                    </ul>
+                                </div>
                             </div>
                             <div class="login-form-group">
-                                <label for="register-confirm-password"><i class="fa-solid fa-lock"></i> Confirm Security
-                                    Password</label>
-                                <input type="password" id="register-confirm-password" class="form-input"
-                                    placeholder="••••••••">
+                                <label for="register-confirm-password"><i class="fa-solid fa-lock"></i> Confirm Password</label>
+                                <div class="password-field-wrapper">
+                                    <input type="password" id="register-confirm-password" class="form-input" placeholder="Confirm your password">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('register-confirm-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="login-error-message" id="login-error-msg" style="display: none;">
-                        <i class="fa-solid fa-triangle-exclamation"></i> <span>Invalid Neural Key. Access Denied.</span>
+                        <i class="fa-solid fa-triangle-exclamation"></i> <span>Invalid credentials. Access Denied.</span>
                     </div>
 
                     <button type="submit" class="neon-btn neon-btn-primary login-btn" id="login-submit-btn"
@@ -187,7 +204,7 @@
                 </div>
 
                 <div class="login-security-tag">
-                    <i class="fa-solid fa-fingerprint"></i> SECURE QUANTUM AUTHENTICATION NODE v2.5
+                    <i class="fa-solid fa-fingerprint"></i> Secure Login System
                 </div>
 
                 <!-- PREMIUM FORGOT PASSWORD GLASS MODAL -->
@@ -198,16 +215,15 @@
                             style="font-size: 2.2rem; color: var(--neon-cyan); margin-bottom: 0.8rem; display: inline-block;"></i>
                         <h3 style="color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem;">Password
                             Recovery</h3>
-                        <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.4rem;">Reset your student
-                            security key using Gmail verification.</p>
+                        <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.4rem;">Reset your password using email verification.</p>
                     </div>
 
                     <div id="forgot-step-1">
                         <div class="login-form-group" style="position: relative; margin-bottom: 2rem;">
                             <label for="forgot-email"
                                 style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
-                                    class="fa-solid fa-envelope"></i> Gmail Address</label>
-                            <input type="email" id="forgot-email" class="form-input" placeholder="student@gmail.com"
+                                    class="fa-solid fa-envelope"></i> Email Address</label>
+                            <input type="email" id="forgot-email" class="form-input" placeholder="Enter your email"
                                 style="border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; font-size: 0.98rem !important; color: #fff !important; width: 100%; outline: none !important; transition: all 0.3s ease;">
                         </div>
                         <button type="button" class="neon-btn neon-btn-primary" id="btn-forgot-send"
@@ -220,16 +236,21 @@
                         <div class="login-form-group" style="position: relative; margin-bottom: 1.2rem;">
                             <label for="forgot-otp"
                                 style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
-                                    class="fa-solid fa-shield-halved"></i> 6-Digit Verification OTP</label>
+                                    class="fa-solid fa-shield-halved"></i> 6-Digit OTP</label>
                             <input type="text" id="forgot-otp" class="form-input" placeholder="••••••" maxlength="6"
                                 style="letter-spacing: 6px; text-align: center; font-family: monospace; font-size: 1.2rem; border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; color: #fff !important; width: 100%; outline: none !important;">
                         </div>
                         <div class="login-form-group" style="position: relative; margin-bottom: 2rem;">
                             <label for="forgot-new-password"
                                 style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
-                                    class="fa-solid fa-lock"></i> Set New Password</label>
-                            <input type="password" id="forgot-new-password" class="form-input" placeholder="••••••••"
-                                style="border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; font-size: 0.98rem !important; color: #fff !important; width: 100%; outline: none !important;">
+                                    class="fa-solid fa-lock"></i> New Password</label>
+                            <div class="password-field-wrapper">
+                                <input type="password" id="forgot-new-password" class="form-input" placeholder="Enter your password"
+                                    style="border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; font-size: 0.98rem !important; color: #fff !important; width: 100%; outline: none !important;">
+                                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('forgot-new-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <button type="button" class="neon-btn neon-btn-primary" id="btn-forgot-verify"
                             style="width: 100%; border-radius: 12px; justify-content: center; margin-bottom: 1rem; padding: 0.75rem 1rem;">
@@ -1472,12 +1493,48 @@
         <div class="footer-bottom-bar">
             <span>&copy; 2026 AIRA Wellness Systems. Designed under Ethical AI Guidelines. All rights reserved.</span>
             <div class="footer-legal-links">
-                <a href="javascript:void(0)">Privacy Policy</a>
-                <a href="javascript:void(0)">Terms of Compliance</a>
-                <a href="javascript:void(0)">Ethical AI Code</a>
+                <a href="javascript:void(0)" id="footer-link-privacy">Privacy Policy</a>
+                <a href="javascript:void(0)" id="footer-link-terms">Terms & Conditions</a>
+                <a href="javascript:void(0)" id="footer-link-ai">AI Guidelines</a>
             </div>
         </div>
     </footer>
+
+    <!-- 11. GLOBAL POLICY MODAL OVERLAY -->
+    <div class="policy-modal" id="aira-policy-modal" role="dialog" aria-modal="true" aria-labelledby="policy-modal-title" tabindex="-1">
+        <div class="policy-modal-content glass-panel">
+            <div class="policy-modal-header">
+                <div class="policy-brand">
+                    <i class="fa-solid fa-shield-halved brand-glow" style="color: var(--neon-cyan); font-size: 1.15rem; margin-right: 6px;"></i>
+                    <span id="policy-modal-title" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff; letter-spacing: 0.5px;">AIRA Policy Hub</span>
+                </div>
+                <button class="policy-modal-close" id="policy-modal-close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            
+            <div class="policy-tabs">
+                <button class="policy-tab-btn active" data-policy="privacy">Privacy Policy</button>
+                <button class="policy-tab-btn" data-policy="terms">Terms & Conditions</button>
+                <button class="policy-tab-btn" data-policy="ai">AI Guidelines</button>
+            </div>
+
+            <div class="policy-search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 0.85rem;"></i>
+                <input type="text" id="policy-search-input" placeholder="Search policy guidelines..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.2rem; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff; font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; outline: none; transition: all 0.3s ease;">
+                <button id="policy-search-clear" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 1.15rem; outline: none; display: none;">&times;</button>
+            </div>
+
+            <div class="policy-content-body" id="policy-content-viewer">
+                <div class="policy-loading" style="text-align: center; padding: 3rem 0; color: var(--text-muted); font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px; color: var(--neon-cyan);"></i> Loading policy details...
+                </div>
+            </div>
+
+            <div class="policy-modal-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.8rem; margin-top: auto; font-size: 0.7rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif;">
+                <span id="policy-last-updated">Last Updated: June 7, 2026</span>
+                <span style="color: rgba(255,255,255,0.25);"><i class="fa-solid fa-fingerprint" style="margin-right: 4px;"></i> Secure Node Policy</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Script File -->
     <script src="script.js?v=2.0"></script>

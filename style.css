@@ -4086,3 +4086,377 @@ textarea.form-input {
     color: var(--neon-cyan);
     margin-right: 2px;
 }
+
+/* ==========================================================================
+   AUTHENTICATION PORTAL REDESIGN UPGRADES
+   ========================================================================== */
+
+/* Enlarge Inputs & Spacing */
+.auth-fields-section .form-input {
+    padding: 0.8rem 0 !important;
+    font-size: 1.05rem !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.auth-fields-section .form-input:focus {
+    border-bottom-color: var(--neon-cyan) !important;
+    box-shadow: 0 4px 12px -4px rgba(0, 242, 254, 0.35) !important;
+}
+
+.auth-fields-section .login-form-group {
+    margin-bottom: 2.2rem !important;
+}
+
+/* Password Toggle Wrapper */
+.password-field-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 5px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle-btn:hover {
+    color: var(--neon-cyan);
+    transform: scale(1.1);
+}
+
+/* Toast Notification Panels */
+#aira-toast-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.aira-toast {
+    background: rgba(13, 20, 38, 0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1.1rem 1.4rem;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: 'Space Grotesk', sans-serif;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 420px;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+}
+
+.aira-toast.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.aira-toast-success {
+    border-left: 4px solid var(--neon-emerald);
+    box-shadow: 0 0 20px rgba(0, 255, 135, 0.15);
+}
+
+.aira-toast-success i {
+    color: var(--neon-emerald);
+    font-size: 1.1rem;
+}
+
+.aira-toast-error {
+    border-left: 4px solid var(--neon-rose);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.15);
+}
+
+.aira-toast-error i {
+    color: var(--neon-rose);
+    font-size: 1.1rem;
+}
+
+.aira-toast-info {
+    border-left: 4px solid var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+.aira-toast-info i {
+    color: var(--neon-cyan);
+    font-size: 1.1rem;
+}
+
+/* Loading/Processing State for Buttons */
+.login-btn i.fa-spin {
+    margin-right: 8px;
+}
+
+/* ==========================================================================
+   GLOBAL POLICY MODAL STYLES (PRIVACY, TERMS, AI GUIDELINES)
+   ========================================================================== */
+
+/* Neon Cyan Hover Animation for Footer Legal Links */
+.footer-legal-links a {
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.footer-legal-links a:hover {
+    color: var(--neon-cyan) !important;
+    text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.policy-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 6, 14, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: none; /* Managed by JS (flex when visible) */
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.policy-modal.active {
+    opacity: 1;
+}
+
+.policy-modal-content {
+    width: 90%;
+    max-width: 750px;
+    height: 80vh;
+    background: rgba(13, 20, 38, 0.92);
+    border: 1px solid rgba(127, 0, 255, 0.25);
+    box-shadow: var(--glow-purple);
+    border-radius: 24px;
+    padding: 2.2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    transform: translateY(30px) scale(0.98);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    opacity: 0;
+}
+
+.policy-modal.active .policy-modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.policy-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.8rem;
+}
+
+.policy-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.policy-modal-close:hover {
+    color: var(--neon-rose);
+    transform: scale(1.15);
+}
+
+/* Tabs Navigation Styling */
+.policy-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 2px;
+}
+
+.policy-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.policy-tab-btn:hover {
+    color: #fff;
+}
+
+.policy-tab-btn.active {
+    color: var(--neon-cyan);
+    border-bottom-color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+}
+
+/* Policy Search Box Styling */
+.policy-search-box {
+    position: relative;
+    width: 100%;
+}
+
+.policy-search-box input:focus {
+    border-color: var(--neon-cyan) !important;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.25) !important;
+}
+
+/* Scrollable Content Body Area */
+.policy-content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+/* Custom Scrollbar for Content Viewer */
+.policy-content-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.policy-content-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 3px;
+}
+
+.policy-content-body::-webkit-scrollbar-thumb {
+    background: rgba(127, 0, 255, 0.3);
+    border-radius: 3px;
+}
+
+.policy-content-body::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-purple);
+}
+
+/* Policy Markdown-like Typography */
+.policy-content-body h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.policy-content-body p {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+}
+
+.policy-content-body ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.policy-content-body li {
+    font-size: 0.86rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.policy-content-body li strong {
+    color: #fff;
+}
+
+.policy-content-body mark {
+    background: rgba(0, 242, 254, 0.25);
+    color: #fff;
+    border-radius: 4px;
+    padding: 0 4px;
+    border: 1.5px solid rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 6px rgba(0, 242, 254, 0.2);
+}
+
+/* Policy Search Empty State & Loading State */
+.policy-empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.policy-empty-state i {
+    font-size: 2.2rem;
+    color: var(--neon-rose);
+    opacity: 0.85;
+}
+
+.policy-empty-state p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* Responsiveness on Mobile Viewports */
+@media (max-width: 600px) {
+    .policy-modal-content {
+        padding: 1.5rem;
+        height: 85vh;
+        border-radius: 20px;
+    }
+    .policy-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 6px;
+    }
+    .policy-tab-btn {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.82rem;
+    }
+    .policy-modal-header h4 {
+        font-size: 1.1rem;
+    }
+}

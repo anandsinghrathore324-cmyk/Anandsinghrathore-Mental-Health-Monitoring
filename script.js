@@ -9,6 +9,146 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("offline_user_student@aira.edu");
     localStorage.removeItem("offline_user_AIRA-2026");
 
+    // Password visibility toggle global function
+    window.togglePasswordVisibility = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector("i");
+        if (!input || !icon) return;
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+            btn.style.transform = "scale(0.85)";
+            setTimeout(() => { btn.style.transform = "scale(1)"; }, 150);
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+            btn.style.transform = "scale(0.85)";
+            setTimeout(() => { btn.style.transform = "scale(1)"; }, 150);
+        }
+    };
+
+    // Real-time password strength check
+    const regPassword = document.getElementById("register-password");
+    const strengthContainer = document.querySelector(".password-strength-container");
+    const strengthBar = document.getElementById("password-strength-bar");
+    const strengthText = document.getElementById("password-strength-text");
+
+    if (regPassword) {
+        regPassword.addEventListener("input", () => {
+            const val = regPassword.value;
+            if (!val) {
+                if (strengthContainer) strengthContainer.style.display = "none";
+                return;
+            }
+            if (strengthContainer) strengthContainer.style.display = "block";
+            
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[a-z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            let pct = "0%";
+            let color = "var(--neon-rose)";
+            let label = "Weak";
+
+            if (score <= 2) {
+                pct = "33%";
+                color = "var(--neon-rose)";
+                label = "Weak";
+            } else if (score <= 4) {
+                pct = "66%";
+                color = "var(--neon-orange)";
+                label = "Medium";
+            } else {
+                pct = "100%";
+                color = "var(--neon-emerald)";
+                label = "Strong";
+            }
+
+            if (strengthBar) {
+                strengthBar.style.width = pct;
+                strengthBar.style.backgroundColor = color;
+            }
+            if (strengthText) {
+                strengthText.textContent = `Strength: ${label}`;
+                strengthText.style.color = color;
+            }
+
+            // Checklist updates
+            const reqLength = document.getElementById("req-length");
+            const reqCapital = document.getElementById("req-capital");
+            const reqSmall = document.getElementById("req-small");
+            const reqNumber = document.getElementById("req-number");
+            const reqSpecial = document.getElementById("req-special");
+
+            const updateReq = (el, isValid) => {
+                if (!el) return;
+                const icon = el.querySelector("i");
+                if (isValid) {
+                    if (icon) {
+                        icon.className = "fa-solid fa-circle-check";
+                        icon.style.color = "var(--neon-emerald)";
+                    }
+                    el.style.color = "var(--neon-emerald)";
+                } else {
+                    if (icon) {
+                        icon.className = "fa-solid fa-circle-xmark";
+                        icon.style.color = "var(--neon-rose)";
+                    }
+                    el.style.color = "rgba(255, 255, 255, 0.6)";
+                }
+            };
+
+            updateReq(reqLength, val.length >= 8);
+            updateReq(reqCapital, /[A-Z]/.test(val));
+            updateReq(reqSmall, /[a-z]/.test(val));
+            updateReq(reqNumber, /[0-9]/.test(val));
+            updateReq(reqSpecial, /[^A-Za-z0-9]/.test(val));
+        });
+    }
+
+    // Toast Notification Dispatcher
+    window.showAiraToast = function(message, type = "info") {
+        let container = document.getElementById("aira-toast-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "aira-toast-container";
+            document.body.appendChild(container);
+        }
+        
+        const toast = document.createElement("div");
+        toast.className = `aira-toast aira-toast-${type}`;
+        
+        let icon = "fa-circle-info";
+        if (type === "success") icon = "fa-circle-check";
+        if (type === "error") icon = "fa-circle-exclamation";
+        
+        toast.innerHTML = `
+            <i class="fa-solid ${icon}"></i>
+            <span style="flex: 1;">${message}</span>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Force reflow
+        toast.offsetHeight;
+        
+        toast.classList.add("show");
+        
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        }, 4000);
+    };
+
+
     // ==========================================================================
     // 0. FUTURISTIC AUTHENTICATION & PRELOADER SYSTEM
     // ==========================================================================
@@ -352,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (selectedTab === "password") {
                     loginSubmitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i> Login`;
                 } else if (selectedTab === "register") {
-                    loginSubmitBtn.innerHTML = `<i class="fa-solid fa-envelope-circle-check" style="margin-right: 8px;"></i> Send Verification OTP`;
+                    loginSubmitBtn.innerHTML = `<i class="fa-solid fa-envelope-circle-check" style="margin-right: 8px;"></i> Send OTP`;
                 }
             }
 
@@ -363,7 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (selectedTab === "password") {
                         helperDiv.innerHTML = `Don't have an account? <a href="javascript:void(0)" id="footer-helper-link" data-target-tab="register">Signup</a>`;
                     } else if (selectedTab === "register") {
-                        helperDiv.innerHTML = `Already registered? <a href="javascript:void(0)" id="footer-helper-link" data-target-tab="password">Login</a>`;
+                        helperDiv.innerHTML = `Already have an account? <a href="javascript:void(0)" id="footer-helper-link" data-target-tab="password">Login</a>`;
                     }
                 }
             }
@@ -667,27 +807,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 const usernameVal = usernameInput ? usernameInput.value.trim() : "";
                 const passwordVal = passwordInput ? passwordInput.value : "";
 
-                if (!usernameVal || !passwordVal) {
-                    if (errorMsg) {
-                        errorMsg.querySelector("span").textContent = "Email and security password key are required inputs.";
-                        errorMsg.style.display = "flex";
-                    }
+                if (!usernameVal) {
+                    showAiraToast("Email address is a required field.", "error");
+                    return;
+                }
+                if (!passwordVal) {
+                    showAiraToast("Password is a required field.", "error");
+                    return;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(usernameVal)) {
+                    showAiraToast("Please enter a valid email address.", "error");
                     return;
                 }
 
                 if (usernameVal.toLowerCase() === "student@aira.edu" || usernameVal.toUpperCase() === "AIRA-2026") {
-                    if (errorMsg) {
-                        errorMsg.querySelector("span").textContent = "Invalid credentials. Access Denied.";
-                        errorMsg.style.display = "flex";
-                        errorMsg.style.animation = "none";
-                        setTimeout(() => { errorMsg.style.animation = "shake 0.4s ease-in-out"; }, 10);
-                    }
+                    showAiraToast("Invalid credentials. Access Denied.", "error");
                     return;
                 }
 
                 if (loginSubmitBtn) {
                     loginSubmitBtn.disabled = true;
-                    loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Neural Handshake...`;
+                    loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Signing in...`;
                 }
                 if (laserScanner) laserScanner.style.display = "block";
 
@@ -697,11 +839,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify({ email: usernameVal, password: passwordVal })
                 })
                     .then(res => {
-                        if (!res.ok) throw new Error("Invalid signatures. Access Denied.");
+                        if (!res.ok) throw new Error("Invalid credentials. Access Denied.");
                         return res.json();
                     })
                     .then(data => {
                         if (data.status === "success") {
+                            showAiraToast("Login successful! Redirecting...", "success");
                             handleSuccessfulDecryption(data.token, data.user);
                         } else {
                             throw new Error(data.message || "Access Denied.");
@@ -714,6 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const isLocalMatch = localPass && localPass === passwordVal;
 
                         if (isLocalMatch) {
+                            showAiraToast("Offline session loaded successfully.", "success");
                             console.log("[SANDBOX AUTH] Locally registered account credentials verified locally.");
                             if (laserScanner) laserScanner.style.display = "none";
                             handleSuccessfulDecryption("mock_offline_token", { id: "mock_offline_user", name: usernameVal.split("@")[0].toUpperCase(), email: usernameVal });
@@ -723,6 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 loginSubmitBtn.disabled = false;
                                 loginSubmitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i> Login`;
                             }
+                            showAiraToast("Invalid credentials. Access Denied.", "error");
                             if (errorMsg) {
                                 errorMsg.querySelector("span").textContent = "Invalid credentials. Access Denied.";
                                 errorMsg.style.display = "flex";
@@ -738,11 +883,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const emailVal = otpEmailInput ? otpEmailInput.value.trim() : "";
                 const otpVal = otpCodeInput ? otpCodeInput.value.trim() : "";
 
-                if (!emailVal || !otpVal) {
-                    if (errorMsg) {
-                        errorMsg.querySelector("span").textContent = "Please request an OTP and enter the 6-digit code.";
-                        errorMsg.style.display = "flex";
-                    }
+                if (!emailVal) {
+                    showAiraToast("Email address is required.", "error");
+                    return;
+                }
+                if (!otpVal) {
+                    showAiraToast("Please enter the 6-digit verification code.", "error");
+                    return;
+                }
+                if (otpVal.length !== 6) {
+                    showAiraToast("Please enter a valid 6-digit OTP code.", "error");
                     return;
                 }
 
@@ -775,12 +925,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             loginSubmitBtn.disabled = false;
                             loginSubmitBtn.innerHTML = `<i class="fa-solid fa-shield-halved" style="margin-right: 8px;"></i> Verify OTP &amp; Decrypt`;
                         }
-                        if (errorMsg) {
-                            errorMsg.querySelector("span").textContent = err.message || "Invalid verification OTP code.";
-                            errorMsg.style.display = "flex";
-                            errorMsg.style.animation = "none";
-                            setTimeout(() => { errorMsg.style.animation = "shake 0.4s ease-in-out"; }, 10);
-                        }
+                        showAiraToast(err.message || "Invalid verification OTP code.", "error");
                     });
             }
 
@@ -791,11 +936,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Stage 1: Send Registration OTP
                 if (signupStage === 1) {
-                    if (!nameVal || !emailVal) {
-                        if (errorMsg) {
-                            errorMsg.querySelector("span").textContent = "Full name and Gmail address are required to start registration.";
-                            errorMsg.style.display = "flex";
-                        }
+                    if (!nameVal) {
+                        showAiraToast("Full name is required.", "error");
+                        return;
+                    }
+                    if (!emailVal) {
+                        showAiraToast("Email address is required.", "error");
+                        return;
+                    }
+
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(emailVal)) {
+                        showAiraToast("Please enter a valid email address.", "error");
                         return;
                     }
 
@@ -824,6 +976,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     console.log(`[DEVELOPMENT MODE] Verification OTP code: ${data.otp_bypass}`);
                                     if (registerOtpCodeInput) registerOtpCodeInput.value = data.otp_bypass;
                                 }
+                                showAiraToast("Verification code sent to your email.", "success");
                                 if (signupStage1) signupStage1.style.display = "none";
                                 if (signupStage2) signupStage2.style.display = "block";
                                 signupStage = 2;
@@ -842,14 +995,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (laserScanner) laserScanner.style.display = "none";
                             if (loginSubmitBtn) {
                                 loginSubmitBtn.disabled = false;
-                                loginSubmitBtn.innerHTML = `<i class="fa-solid fa-envelope-circle-check" style="margin-right: 8px;"></i> Send Verification OTP`;
+                                loginSubmitBtn.innerHTML = `<i class="fa-solid fa-envelope-circle-check" style="margin-right: 8px;"></i> Send OTP`;
                             }
-                            if (errorMsg) {
-                                errorMsg.querySelector("span").textContent = err.message || "Signup OTP dispatch failed.";
-                                errorMsg.style.display = "flex";
-                                errorMsg.style.animation = "none";
-                                setTimeout(() => { errorMsg.style.animation = "shake 0.4s ease-in-out"; }, 10);
-                            }
+                            showAiraToast(err.message || "Signup OTP dispatch failed.", "error");
                         });
                 }
 
@@ -858,10 +1006,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const otpVal = registerOtpCodeInput ? registerOtpCodeInput.value.trim() : "";
 
                     if (!otpVal || otpVal.length !== 6) {
-                        if (errorMsg) {
-                            errorMsg.querySelector("span").textContent = "Please enter the 6-digit verification code sent to your Gmail.";
-                            errorMsg.style.display = "flex";
-                        }
+                        showAiraToast("Please enter the 6-digit verification code sent to your email.", "error");
                         return;
                     }
 
@@ -886,6 +1031,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         })
                         .then(data => {
                             if (data.status === "success") {
+                                showAiraToast("OTP verified successfully.", "success");
                                 if (signupStage2) signupStage2.style.display = "none";
                                 if (signupStage3) signupStage3.style.display = "block";
                                 signupStage = 3;
@@ -906,12 +1052,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 loginSubmitBtn.disabled = false;
                                 loginSubmitBtn.innerHTML = `<i class="fa-solid fa-shield-halved" style="margin-right: 8px;"></i> Verify Code`;
                             }
-                            if (errorMsg) {
-                                errorMsg.querySelector("span").textContent = err.message || "Verification code mismatch.";
-                                errorMsg.style.display = "flex";
-                                errorMsg.style.animation = "none";
-                                setTimeout(() => { errorMsg.style.animation = "shake 0.4s ease-in-out"; }, 10);
-                            }
+                            showAiraToast(err.message || "Verification code mismatch.", "error");
                         });
                 }
 
@@ -921,18 +1062,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     const confirmPasswordVal = registerConfirmPasswordInput ? registerConfirmPasswordInput.value : "";
 
                     if (!passwordVal || !confirmPasswordVal) {
-                        if (errorMsg) {
-                            errorMsg.querySelector("span").textContent = "Please fill in both password fields.";
-                            errorMsg.style.display = "flex";
-                        }
+                        showAiraToast("Please fill in both password fields.", "error");
+                        return;
+                    }
+
+                    if (passwordVal.length < 8) {
+                        showAiraToast("Password must be at least 8 characters long.", "error");
                         return;
                     }
 
                     if (passwordVal !== confirmPasswordVal) {
-                        if (errorMsg) {
-                            errorMsg.querySelector("span").textContent = "Passwords do not match. Please verify.";
-                            errorMsg.style.display = "flex";
-                        }
+                        showAiraToast("Passwords do not match. Please verify.", "error");
                         return;
                     }
 
@@ -957,6 +1097,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         })
                         .then(data => {
                             if (data.status === "success") {
+                                showAiraToast("Account created successfully!", "success");
                                 if (loginSubmitBtn) {
                                     loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Auto Login...`;
                                 }
@@ -994,6 +1135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             setTimeout(() => {
                                 if (laserScanner) laserScanner.style.display = "none";
+                                showAiraToast("Offline sandbox session created.", "success");
                                 handleSuccessfulDecryption("mock_offline_token", { id: "mock_offline_new", name: nameVal, email: emailVal });
                                 signupStage = 1;
                             }, 1000);
@@ -4637,4 +4779,325 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initialize defaults on start
     resetBreathingVisuals();
+
+    // ==========================================================================
+    // GLOBAL POLICY MODAL LOGIC (PRIVACY, TERMS, AI GUIDELINES)
+    // ==========================================================================
+    const POLICY_DATA = {
+        privacy: {
+            title: "Privacy Policy",
+            lastUpdated: "June 7, 2026",
+            sections: [
+                {
+                    title: "1. Information Collected",
+                    content: "We collect user information necessary to calculate student wellness indicators. This includes your name, email address, digital interaction parameters (assessment feedback scores, digital strain ratios), self-reported mood values, and clinical referral preferences."
+                },
+                {
+                    title: "2. Data Protection and Hashing Protocols",
+                    content: "All collected credentials and details are stored securely. Personal email addresses and passwords are encrypted in transit using SSL/TLS, and passwords are salt-hashed using bcrypt before persistent storage in our MongoDB node."
+                },
+                {
+                    title: "3. Selling Exclusions",
+                    content: "We enforce a strict confidentiality guarantee. Under no circumstances will AIRA sell, trade, rent, or lease your private information, metadata, or activity records to third-party advertisers or brokers."
+                },
+                {
+                    title: "4. Usage Scope",
+                    content: "Your data is used strictly for authentication, personalized dashboard analytics, account configuration, mental wellness tracking, and locating local emergency therapist helplines."
+                },
+                {
+                    title: "5. Security Standards",
+                    content: "We implement advanced server-side firewall rules, strict JSON Web Token (JWT) signature verification, database parameter sanitization, and automatic token expiration to shield your account from unauthorized intrusions."
+                },
+                {
+                    title: "6. Data Deletion Right",
+                    content: "Students retain full authority over their account histories. You may request complete erasure of your profile and historical records from our database by contacting support at support@aira-wellness.ai."
+                },
+                {
+                    title: "7. Cookies and Local Vaults",
+                    content: "We use browser local and session storage (sessionStorage) to retain secure login state and preserve interface preferences. Traditional persistent tracking cookies are not deployed."
+                },
+                {
+                    title: "8. Update Announcements",
+                    content: "If major amendments are made to these privacy protocols, users will be notified immediately through notification toast banners on their next login session."
+                }
+            ]
+        },
+        terms: {
+            title: "Terms & Conditions",
+            lastUpdated: "June 7, 2026",
+            sections: [
+                {
+                    title: "1. Registration Integrity",
+                    content: "To register on the AIRA Portal, students must provide accurate, current, and true contact details. Provision of fraudulent details will result in account restriction."
+                },
+                {
+                    title: "2. Password Security",
+                    content: "You are solely responsible for protecting your secure password signature. AIRA is not liable for unauthorized sessions resulting from negligent credential sharing."
+                },
+                {
+                    title: "3. Prohibited Exploits",
+                    content: "Users must not misuse, exploit, spam, attack, DDoS, reverse engineer, or perform security vulnerability scans on the platform systems or backend endpoints."
+                },
+                {
+                    title: "4. Abuse and Conduct",
+                    content: "Spamming conversation flows, submitting abusive text to chatbots, and attempting unauthorized access to admin metrics are strictly prohibited and subject to immediate ban."
+                },
+                {
+                    title: "5. Account Termination",
+                    content: "We reserve the right to temporarily suspend or permanently terminate student profiles if terms of compliance are breached."
+                },
+                {
+                    title: "6. Service Uptime Limits",
+                    content: "The platform is provided 'as is'. Services may be updated, modified, or temporarily offline for scheduled system maintenance or database synchronization."
+                },
+                {
+                    title: "7. Utilization of AI Output",
+                    content: "AIRA provides cognitive summaries and referral suggestions. Students assume full responsibility for how they use, share, or act upon AI-generated analysis or predictions."
+                },
+                {
+                    title: "8. Agreement Updates",
+                    content: "By continuing to access the AIRA Portal and its dashboard tools, you explicitly accept and agree to these Terms & Conditions."
+                }
+            ]
+        },
+        ai: {
+            title: "AI Guidelines",
+            lastUpdated: "June 7, 2026",
+            sections: [
+                {
+                    title: "1. Purpose of AIRA",
+                    content: "AIRA is built as a supportive, non-clinical tool to assist students in tracking wellness, evaluating academic stress, and discovering nearby therapist contacts. It does not replace professional care."
+                },
+                {
+                    title: "2. Inaccuracy Disclaimer",
+                    content: "As with all machine learning models, AI-generated predictions, post-sentiment tags, and conversational responses may occasionally contain inaccuracies or hallucinations."
+                },
+                {
+                    title: "3. Professional Verification",
+                    content: "Users should verify critical academic, technical, medical, financial, or professional guidance from certified human professionals before making important life decisions."
+                },
+                {
+                    title: "4. Ethical Guidelines",
+                    content: "We adhere strictly to non-discriminatory, transparent, and user-centric AI practices. Algorithms are optimized to minimize bias and maximize helpfulness."
+                },
+                {
+                    title: "5. Privacy Architecture",
+                    content: "All input text sent to the semantic analysis systems is parsed securely. We do not use user text logs to train public model weights."
+                },
+                {
+                    title: "6. Critical Thinking Support",
+                    content: "AIRA recommendations should serve as constructive resources to support learning and critical reflection, not replace individual judgment."
+                },
+                {
+                    title: "7. Avoid Sensitive Inputs",
+                    content: "Users are strongly advised not to paste sensitive personal identifiers (such as national ID keys, passwords, or credit card numbers) into any AI chat fields."
+                },
+                {
+                    title: "8. Decision Precaution",
+                    content: "Always consult academic counselors or licensed therapists to validate significant mental health decisions or academic plan changes."
+                },
+                {
+                    title: "9. Academic Honesty",
+                    content: "We encourage students to utilize chatbot resources responsibly and ensure compliance with their university's academic integrity guidelines."
+                }
+            ]
+        }
+    };
+
+    let currentPolicyTab = "privacy";
+    const policyModal = document.getElementById("aira-policy-modal");
+    const policySearchInput = document.getElementById("policy-search-input");
+    const policySearchClear = document.getElementById("policy-search-clear");
+    const policyCloseBtn = document.getElementById("policy-modal-close-btn");
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function highlightText(text, query) {
+        if (!query) return text;
+        const escapedQuery = escapeRegExp(query);
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+    }
+
+    function renderPolicy(policyKey, searchQuery = "") {
+        const viewer = document.getElementById("policy-content-viewer");
+        const lastUpdatedEl = document.getElementById("policy-last-updated");
+        if (!viewer) return;
+
+        const policy = POLICY_DATA[policyKey];
+        if (!policy) {
+            viewer.innerHTML = '<div class="policy-empty-state"><i class="fa-solid fa-circle-exclamation"></i><p>Failed to load policy.</p></div>';
+            return;
+        }
+
+        if (lastUpdatedEl) {
+            lastUpdatedEl.textContent = `Last Updated: ${policy.lastUpdated}`;
+        }
+
+        const query = searchQuery.trim().toLowerCase();
+        let htmlContent = "";
+        let matchCount = 0;
+
+        policy.sections.forEach(sec => {
+            const hasTitleMatch = sec.title.toLowerCase().includes(query);
+            const hasContentMatch = sec.content.toLowerCase().includes(query);
+
+            if (!query || hasTitleMatch || hasContentMatch) {
+                matchCount++;
+                const titleHtml = highlightText(sec.title, query);
+                const contentHtml = highlightText(sec.content, query);
+                
+                htmlContent += `
+                    <div class="policy-section" style="margin-bottom: 1.5rem;">
+                        <h2 style="font-size: 1.05rem; color: #fff; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px;">${titleHtml}</h2>
+                        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6;">${contentHtml}</p>
+                    </div>
+                `;
+            }
+        });
+
+        if (matchCount === 0) {
+            viewer.innerHTML = `
+                <div class="policy-empty-state">
+                    <i class="fa-solid fa-file-circle-question" style="font-size: 2rem; color: var(--neon-rose); margin-bottom: 0.8rem;"></i>
+                    <p style="font-weight: 700; color: #fff; margin: 0;">No matches found for "${escapeHtml(searchQuery)}"</p>
+                    <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 4px;">Check your spelling or search for another term.</p>
+                </div>
+            `;
+        } else {
+            viewer.innerHTML = htmlContent;
+        }
+    }
+
+    function openPolicyModal(tabKey) {
+        if (!policyModal) return;
+        currentPolicyTab = tabKey;
+        
+        // Reset Search
+        if (policySearchInput) policySearchInput.value = "";
+        if (policySearchClear) policySearchClear.style.display = "none";
+
+        // Set Active Tab Button
+        const tabBtns = document.querySelectorAll(".policy-tab-btn");
+        tabBtns.forEach(btn => {
+            if (btn.getAttribute("data-policy") === tabKey) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        // Render Active Policy
+        renderPolicy(tabKey);
+
+        // Display Modal
+        policyModal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // lock screen scroll
+        
+        // Trigger transitions
+        setTimeout(() => {
+            policyModal.classList.add("active");
+            policyModal.focus();
+        }, 10);
+    }
+
+    function closePolicyModal() {
+        if (!policyModal) return;
+        policyModal.classList.remove("active");
+        
+        // Restore scrolling
+        document.body.style.overflow = "";
+
+        setTimeout(() => {
+            policyModal.style.display = "none";
+        }, 400);
+    }
+
+    // Attach footer click events
+    const footerLinkPrivacy = document.getElementById("footer-link-privacy");
+    const footerLinkTerms = document.getElementById("footer-link-terms");
+    const footerLinkAi = document.getElementById("footer-link-ai");
+
+    if (footerLinkPrivacy) {
+        footerLinkPrivacy.addEventListener("click", (e) => {
+            e.preventDefault();
+            openPolicyModal("privacy");
+        });
+    }
+    if (footerLinkTerms) {
+        footerLinkTerms.addEventListener("click", (e) => {
+            e.preventDefault();
+            openPolicyModal("terms");
+        });
+    }
+    if (footerLinkAi) {
+        footerLinkAi.addEventListener("click", (e) => {
+            e.preventDefault();
+            openPolicyModal("ai");
+        });
+    }
+
+    // Attach tab buttons
+    const policyTabBtns = document.querySelectorAll(".policy-tab-btn");
+    policyTabBtns.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const targetPolicy = e.target.getAttribute("data-policy");
+            if (targetPolicy) {
+                policyTabBtns.forEach(b => b.classList.remove("active"));
+                e.target.classList.add("active");
+                currentPolicyTab = targetPolicy;
+                
+                // Clear search on tab switch
+                if (policySearchInput) policySearchInput.value = "";
+                if (policySearchClear) policySearchClear.style.display = "none";
+                
+                renderPolicy(currentPolicyTab);
+            }
+        });
+    });
+
+    if (policyCloseBtn) {
+        policyCloseBtn.addEventListener("click", closePolicyModal);
+    }
+
+    if (policyModal) {
+        policyModal.addEventListener("click", (e) => {
+            if (e.target === policyModal) {
+                closePolicyModal();
+            }
+        });
+
+        policyModal.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closePolicyModal();
+            }
+        });
+    }
+
+    if (policySearchInput) {
+        policySearchInput.addEventListener("input", (e) => {
+            const query = e.target.value;
+            if (query.trim().length > 0) {
+                if (policySearchClear) policySearchClear.style.display = "block";
+            } else {
+                if (policySearchClear) policySearchClear.style.display = "none";
+            }
+            renderPolicy(currentPolicyTab, query);
+        });
+    }
+
+    if (policySearchClear) {
+        policySearchClear.addEventListener("click", () => {
+            if (policySearchInput) policySearchInput.value = "";
+            policySearchClear.style.display = "none";
+            renderPolicy(currentPolicyTab);
+            if (policySearchInput) policySearchInput.focus();
+        });
+    }
 });
