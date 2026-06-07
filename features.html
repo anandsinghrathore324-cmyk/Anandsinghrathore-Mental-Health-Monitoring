@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AIRA Platform Features - Explore cutting-edge AI mental health features including stress detection, NLP emotion analysis, burnout tracking, and wellness recommendations.">
+    <title>AIRA | Platform Features &amp; AI Capabilities</title>
+    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <style>
+        .page-hero {
+            min-height: 42vh; display: flex; align-items: center;
+            justify-content: center; text-align: center;
+            padding: 8rem 2rem 4rem; position: relative; overflow: hidden;
+        }
+        .page-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(180,0,255,0.09) 0%, transparent 70%),
+                        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(0,255,200,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .page-hero-content { max-width: 750px; position: relative; z-index: 1; }
+        .page-hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(180,0,255,0.08); border: 1px solid rgba(180,0,255,0.25);
+            border-radius: 50px; padding: 0.4rem 1.2rem; font-size: 0.78rem;
+            font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--neon-purple); margin-bottom: 1.5rem;
+        }
+        .page-hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--neon-purple); animation: pulse 1.5s infinite; }
+        .page-hero-title { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.15; margin-bottom: 1rem; color: var(--text-primary); }
+        .page-hero-desc { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; max-width: 620px; margin: 0 auto 2rem; }
+        .page-hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        .feature-stats-row { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        .feat-stat-item { text-align: center; }
+        .feat-stat-num { display: block; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .feat-stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        .feature-tabs-section { padding: 2rem 2rem 0; max-width: 1200px; margin: 0 auto; }
+        .feature-tabs { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+        .ftab { padding: 0.55rem 1.3rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--text-muted); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.06em; }
+        .ftab:hover, .ftab.active { background: rgba(180,0,255,0.12); border-color: rgba(180,0,255,0.35); color: var(--neon-purple); }
+
+        .features-page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.8rem; padding: 0 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+        .feature-page-card { border-radius: 22px; padding: 2rem; transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; overflow: hidden; }
+        .feature-page-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
+        .fpc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; }
+        .fpc-icon { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.4rem; }
+        .fpc-badge { padding: 0.22rem 0.75rem; border-radius: 50px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; height: fit-content; }
+        .feature-page-card h3 { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.7rem; }
+        .feature-page-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.2rem; }
+        .fpc-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.3rem; }
+        .fpc-tag { padding: 0.2rem 0.65rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+        .fpc-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 700; text-decoration: none; transition: gap 0.3s; }
+        .fpc-link:hover { gap: 0.7rem; }
+
+        .how-section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .how-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+        .how-step { text-align: center; padding: 2rem 1.5rem; border-radius: 20px; }
+        .how-step-num { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; margin: 0 auto 1.2rem; background: linear-gradient(135deg, rgba(180,0,255,0.2), rgba(0,255,200,0.1)); border: 2px solid rgba(180,0,255,0.3); color: var(--neon-purple); }
+        .how-step h4 { font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .how-step p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+
+        .tech-section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; margin-top: 2.5rem; }
+        .tech-card { padding: 1.5rem; border-radius: 16px; text-align: center; transition: transform 0.3s ease; }
+        .tech-card:hover { transform: translateY(-4px); }
+        .tech-card i { font-size: 1.8rem; margin-bottom: 0.8rem; display: block; }
+        .tech-card h5 { font-size: 0.9rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.3rem; }
+        .tech-card p { font-size: 0.78rem; color: var(--text-muted); }
+
+        .features-cta { text-align: center; padding: 5rem 2rem; position: relative; overflow: hidden; }
+        .features-cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(180,0,255,0.07) 0%, transparent 70%); }
+        .features-cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+        .features-cta h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; margin-bottom: 1rem; }
+        .features-cta p { color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 2rem; }
+        .features-cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        @media (max-width: 640px) {
+            .features-page-grid { grid-template-columns: 1fr; padding: 0 1rem 3rem; }
+            .how-steps { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="navbar" id="main-navbar">
+        <div class="navbar-container">
+            <a href="index.html#home" class="nav-logo">
+                <svg class="brand-svg-logo" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan); margin-right: 0.5rem; filter: drop-shadow(0 0 5px var(--neon-cyan));"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"/></svg> AIRA
+            </a>
+            <ul class="nav-links" id="navbar-links">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#analysis" class="nav-link">AI Analysis</a></li>
+                <li><a href="index.html#dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="index.html#mindfulness" class="nav-link">Mindfulness</a></li>
+                <li><a href="doctor-support.html" class="nav-link">Doctor Support</a></li>
+                <li><a href="features.html" class="nav-link active">Features</a></li>
+                <li><a href="javascript:void(0)" class="nav-link" id="nav-chat-trigger">AI Chatbot</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#footer" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-hamburger" id="nav-hamburger-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-hero" id="home">
+        <div class="page-hero-content">
+            <div class="page-hero-badge"><span></span> AI-Powered Platform</div>
+            <h1 class="page-hero-title">Sophisticated <span class="gradient-text">Mental Health</span> Features</h1>
+            <p class="page-hero-desc">Explore AIRA's cutting-edge AI architecture built specifically to identify, monitor, and alleviate emotional and academic struggles in student life — powered by DistilBERT NLP.</p>
+            <div class="page-hero-actions">
+                <a href="index.html#analysis" class="neon-btn neon-btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Try AI Analysis</a>
+                <a href="doctor-support.html" class="neon-btn neon-btn-secondary"><i class="fa-solid fa-hospital-user"></i> Find a Doctor</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature-stats-row">
+        <div class="feat-stat-item"><span class="feat-stat-num">10+</span><span class="feat-stat-label">AI Features</span></div>
+        <div class="feat-stat-item"><span class="feat-stat-num">99.2%</span><span class="feat-stat-label">NLP Accuracy</span></div>
+        <div class="feat-stat-item"><span class="feat-stat-num">6</span><span class="feat-stat-label">Emotion Classes</span></div>
+        <div class="feat-stat-item"><span class="feat-stat-num">Real-Time</span><span class="feat-stat-label">Analysis</span></div>
+    </div>
+
+    <section class="feature-tabs-section" id="features">
+        <div class="section-header">
+            <span class="section-tag" style="color: var(--neon-purple);">System Protocols</span>
+            <h2 class="section-title">All Platform Capabilities</h2>
+            <p class="section-desc">Every feature is purpose-built for student mental wellness, powered by state-of-the-art machine learning and clinical insights.</p>
+        </div>
+        <div class="feature-tabs">
+            <span class="ftab active" data-filter="all">All Features</span>
+            <span class="ftab" data-filter="ai">AI &amp; NLP</span>
+            <span class="ftab" data-filter="analytics">Analytics</span>
+            <span class="ftab" data-filter="wellness">Wellness</span>
+            <span class="ftab" data-filter="support">Support</span>
+        </div>
+    </section>
+
+    <div class="features-page-grid" id="feature-cards-container">
+        <!-- Card 1 -->
+        <div class="feature-page-card glass-panel" data-cat="ai analytics">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-cyan),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(0,255,200,0.1);border:1px solid rgba(0,255,200,0.2);color:var(--neon-cyan);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(0,255,200,0.1);color:var(--neon-cyan);border:1px solid rgba(0,255,200,0.2);">Core AI</span>
+            </div>
+            <h3>Stress Detection Engine</h3>
+            <p>Cross-references physiological estimates, sleep records, and academic workload to compute acute cognitive exhaustion indexes in real-time using multi-label classification.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(0,255,200,0.08);color:var(--neon-cyan);">DistilBERT</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Multi-label</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Real-time</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-cyan);">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 2 -->
+        <div class="feature-page-card glass-panel" data-cat="ai analytics">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-rose),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(255,0,128,0.1);border:1px solid rgba(255,0,128,0.2);color:var(--neon-rose);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="16" y1="16" x2="16" y2="22"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(255,0,128,0.1);color:var(--neon-rose);border:1px solid rgba(255,0,128,0.2);">Predictive</span>
+            </div>
+            <h3>Depression Prediction</h3>
+            <p>Monitors long-term behavioral drops, persistent low moods, and withdrawal trends over structured timelines to flag early-stage clinical risk before it escalates.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(255,0,128,0.08);color:var(--neon-rose);">Longitudinal</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Behavioral</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Early Warning</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-rose);">Run Analysis <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 3 -->
+        <div class="feature-page-card glass-panel" data-cat="ai analytics">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-orange),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(255,120,0,0.1);border:1px solid rgba(255,120,0,0.2);color:var(--neon-orange);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(255,120,0,0.1);color:var(--neon-orange);border:1px solid rgba(255,120,0,0.2);">Scanner</span>
+            </div>
+            <h3>Anxiety Analysis</h3>
+            <p>Gathers qualitative anxiety assessments and isolates acute nervous behaviors under exam stress periods. Maps anxiety vectors against academic event calendars.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(255,120,0,0.08);color:var(--neon-orange);">Pattern Match</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Qualitative AI</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Exam Aware</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-orange);">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 4 -->
+        <div class="feature-page-card glass-panel" data-cat="ai">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-purple),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.2);color:var(--neon-purple);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(180,0,255,0.12);color:var(--neon-purple);border:1px solid rgba(180,0,255,0.25);">NLP Core</span>
+            </div>
+            <h3>DistilBERT Emotion NLP</h3>
+            <p>Parses linguistic triggers from journal entries, extracting emotional sentiments across 6 classes — Joy, Sadness, Anger, Fear, Love, Surprise — with 99.2% classification accuracy.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(180,0,255,0.1);color:var(--neon-purple);">DistilBERT-v3</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">6-Class</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">99.2% Acc.</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-purple);">NLP Details <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 5 -->
+        <div class="feature-page-card glass-panel" data-cat="wellness ai">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-emerald),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(0,255,100,0.1);border:1px solid rgba(0,255,100,0.2);color:var(--neon-emerald);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22C2 12 10 4 22 2M22 2c-10 0-18 8-18 18M11 11a5 5 0 0 1 7-7"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(0,255,100,0.1);color:var(--neon-emerald);border:1px solid rgba(0,255,100,0.2);">Smart</span>
+            </div>
+            <h3>AI Wellness Recommendations</h3>
+            <p>Generates tailored bio-behavioral recovery protocols, coping exercises, micro-break schedules, and mindfulness routines based on computed stress and anxiety scores.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(0,255,100,0.08);color:var(--neon-emerald);">Personalized</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Bio-Behavioral</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Dynamic</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-emerald);">Analyze Now <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 6 -->
+        <div class="feature-page-card glass-panel" data-cat="analytics">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-orange),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(255,120,0,0.1);border:1px solid rgba(255,120,0,0.2);color:var(--neon-orange);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(255,120,0,0.1);color:var(--neon-orange);border:1px solid rgba(255,120,0,0.2);">Tracker</span>
+            </div>
+            <h3>Burnout Analytics</h3>
+            <p>Calculates the exact ratio of social activity and screen time relative to sleep patterns to map academic saturation risk levels. Surfaces burnout before physical collapse.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(255,120,0,0.08);color:var(--neon-orange);">Risk Ratio</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Sleep Analysis</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Saturation Map</span>
+            </div>
+            <a href="index.html#analysis" class="fpc-link" style="color:var(--neon-orange);">Check Indicators <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 7 -->
+        <div class="feature-page-card glass-panel" data-cat="analytics wellness">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(0,255,200,0.1);border:1px solid rgba(0,255,200,0.2);color:var(--neon-cyan);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 14.5c-.83-.75-2.5-2.08-2.5-3.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0c0 1.42-1.67 2.75-2.5 3.5z"/></svg></div>
+                <span class="fpc-badge" style="background:linear-gradient(135deg,rgba(0,255,200,0.1),rgba(180,0,255,0.1));color:var(--neon-cyan);border:1px solid rgba(0,255,200,0.2);">Live</span>
+            </div>
+            <h3>Emotional Tracking Dashboard</h3>
+            <p>Provides interactive mood metrics, 30-day historical heatmap tracking, emoji stability patterns, and trend analytics across weekly and bi-weekly intervals.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(0,255,200,0.08);color:var(--neon-cyan);">Heatmap</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">30-Day History</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Trend Lines</span>
+            </div>
+            <a href="index.html#dashboard" class="fpc-link" style="color:var(--neon-cyan);">View Charts <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 8 -->
+        <div class="feature-page-card glass-panel" data-cat="support">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-rose),transparent);border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(255,0,128,0.1);border:1px solid rgba(255,0,128,0.2);color:var(--neon-rose);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(255,0,128,0.1);color:var(--neon-rose);border:1px solid rgba(255,0,128,0.2);">Geo-AI</span>
+            </div>
+            <h3>Counselor Recommendation</h3>
+            <p>Leverages native geolocation Haversine distance algorithms to connect you with the nearest verified psychologists, sorted by specialty, rating, and availability.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(255,0,128,0.08);color:var(--neon-rose);">Geolocation</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">200+ Doctors</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Verified</span>
+            </div>
+            <a href="doctor-support.html" class="fpc-link" style="color:var(--neon-rose);">Find Doctor <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 9 -->
+        <div class="feature-page-card glass-panel" data-cat="support wellness">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-purple),var(--neon-pink));border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(180,0,255,0.1);border:1px solid rgba(180,0,255,0.2);color:var(--neon-purple);"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <span class="fpc-badge" style="background:rgba(180,0,255,0.1);color:var(--neon-purple);border:1px solid rgba(180,0,255,0.2);">Empathetic</span>
+            </div>
+            <h3>AI Gen-Z Friend (AIRA)</h3>
+            <p>A conversational AI bot built with high emotional intelligence and Gen-Z communication patterns. Vents with you, hypes you up, and guides you through breathing and coping exercises.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(180,0,255,0.1);color:var(--neon-purple);">Emotionally Aware</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">24/7</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Gen-Z Tone</span>
+            </div>
+            <a href="javascript:void(0)" class="fpc-link feature-chat-open" style="color:var(--neon-purple);">Talk to AIRA <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <!-- Card 10 -->
+        <div class="feature-page-card glass-panel" data-cat="wellness">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-emerald));border-radius:22px 22px 0 0;"></div>
+            <div class="fpc-top">
+                <div class="fpc-icon" style="background:rgba(0,255,200,0.1);border:1px solid rgba(0,255,200,0.2);color:var(--neon-cyan);"><i class="fa-solid fa-wind"></i></div>
+                <span class="fpc-badge" style="background:rgba(0,255,200,0.1);color:var(--neon-cyan);border:1px solid rgba(0,255,200,0.2);">Interactive</span>
+            </div>
+            <h3>Guided Breathing &amp; Mindfulness</h3>
+            <p>Three clinically-backed breathing protocols (Box Breathing, 4-7-8, Coherent) with animated bubble visualizer to pace your nervous system and restore cognitive clarity.</p>
+            <div class="fpc-tags">
+                <span class="fpc-tag" style="background:rgba(0,255,200,0.08);color:var(--neon-cyan);">Box Breathing</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">4-7-8 Method</span>
+                <span class="fpc-tag" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">Visual Guide</span>
+            </div>
+            <a href="index.html#mindfulness" class="fpc-link" style="color:var(--neon-cyan);">Start Session <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section">
+        <div class="section-header">
+            <span class="section-tag">Workflow</span>
+            <h2 class="section-title">How AIRA Works</h2>
+            <p class="section-desc">A seamless four-step pipeline from data input to personalized wellness action plan.</p>
+        </div>
+        <div class="how-steps">
+            <div class="how-step glass-panel"><div class="how-step-num">1</div><h4>Input Your Data</h4><p>Fill in academic load, sleep hours, mood state, and a journal entry describing how you feel today.</p></div>
+            <div class="how-step glass-panel"><div class="how-step-num">2</div><h4>AI Processes</h4><p>DistilBERT NLP parses your journal for emotional markers while our stress model computes risk ratios.</p></div>
+            <div class="how-step glass-panel"><div class="how-step-num">3</div><h4>Results Generated</h4><p>Stress, Anxiety, and Depression scores appear with detailed NLP breakdowns and your Wellness Index.</p></div>
+            <div class="how-step glass-panel"><div class="how-step-num">4</div><h4>Take Action</h4><p>Follow your personalized wellness plan, connect with a doctor, or open the mindfulness breathing module.</p></div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="tech-section">
+        <div class="section-header">
+            <span class="section-tag">Under the Hood</span>
+            <h2 class="section-title">Technology Stack</h2>
+            <p class="section-desc">Built on a robust foundation of modern AI research and clinical data science tools.</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-card glass-panel"><i class="fa-solid fa-brain" style="color:var(--neon-purple);"></i><h5>DistilBERT NLP</h5><p>Transformer-based emotion classification</p></div>
+            <div class="tech-card glass-panel"><i class="fa-solid fa-chart-line" style="color:var(--neon-cyan);"></i><h5>Chart.js</h5><p>Interactive real-time data visualization</p></div>
+            <div class="tech-card glass-panel"><i class="fa-solid fa-location-dot" style="color:var(--neon-rose);"></i><h5>Haversine Geo</h5><p>Proximity-matching for nearby doctors</p></div>
+            <div class="tech-card glass-panel"><i class="fa-solid fa-shield-heart" style="color:var(--neon-emerald);"></i><h5>HIPAA Compliance</h5><p>Healthcare-grade data encryption</p></div>
+            <div class="tech-card glass-panel"><i class="fa-solid fa-robot" style="color:var(--neon-orange);"></i><h5>Gen-Z AI Chat</h5><p>Emotionally intelligent conversation engine</p></div>
+            <div class="tech-card glass-panel"><i class="fa-solid fa-lungs" style="color:var(--neon-cyan);"></i><h5>Bio-Rhythm Engine</h5><p>Clinical breathing pattern visualizer</p></div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="features-cta">
+        <div class="features-cta-inner">
+            <span class="section-tag">Get Started</span>
+            <h2 class="section-title">Ready to Analyze Your <span class="gradient-text">Mental Health?</span></h2>
+            <p>Run your first AI-powered mental health scan in under 2 minutes. No account required. Fully anonymous.</p>
+            <div class="features-cta-btns">
+                <a href="index.html#analysis" class="neon-btn neon-btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Start Free Analysis</a>
+                <a href="doctor-support.html" class="neon-btn neon-btn-secondary"><i class="fa-solid fa-hospital-user"></i> Talk to a Doctor</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FLOATING CHATBOT -->
+    <div class="chatbot-widget" id="chatbot-wrapper">
+        <div class="chatbot-panel glass-panel" id="chat-panel">
+            <div class="chatbot-header">
+                <div class="chatbot-identity">
+                    <div class="chatbot-avatar-ring"><div class="chatbot-avatar-inner"><i class="fa-solid fa-robot"></i></div></div>
+                    <div class="chatbot-info"><h4>Aira <span></span></h4><span class="chatbot-status">AI Bestie &bull; Online</span></div>
+                </div>
+                <button class="chatbot-close-btn" id="close-chat-widget"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-msg-container">
+                <div class="chat-msg chat-msg-bot">Hey! 👋 I'm Aira, your digital bestie! Want to know more about any feature? Ask me! 💙</div>
+                <div class="typing-indicator" id="chat-typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+            </div>
+            <div class="chatbot-chips-container" id="chatbot-quick-chips">
+                <span class="chat-chip" data-msg="I feel super stressed by exams">😫 Exam Panic</span>
+                <span class="chat-chip" data-msg="I am burnt out and exhausted">🔥 Burnout</span>
+                <span class="chat-chip" data-msg="Can you help me focus?">📚 Focus Help</span>
+                <span class="chat-chip" data-msg="Teach me a breathing exercise">😌 Calm Me</span>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" class="chatbot-input" id="chatbot-input-field" placeholder="Vent to Aira...">
+                <button class="chatbot-send-btn" id="chatbot-submit-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="chatbot-toggle-btn" id="open-chat-widget" title="Vent to Aira"><i class="fa-solid fa-comment-dots"></i></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-info-column">
+                <a href="index.html#home" class="footer-info-logo"><i class="fa-solid fa-brain"></i> AIRA</a>
+                <p class="footer-info-desc">Futuristic Student Mental Health Monitoring &amp; support protocols.</p>
+                <div class="footer-socials">
+                    <a href="https://github.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://twitter.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://discord.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://linkedin.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>Protocols</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="index.html#home">Quantum Home</a></li>
+                    <li class="footer-link-item"><a href="features.html">Platform Features</a></li>
+                    <li class="footer-link-item"><a href="index.html#analysis">Neuro Assessment</a></li>
+                    <li class="footer-link-item"><a href="index.html#dashboard">Stability Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Sourcing</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="doctor-support.html">Therapist Locator</a></li>
+                    <li class="footer-link-item"><a href="index.html#about">Technical Manifesto</a></li>
+                    <li class="footer-link-item"><a href="tel:988">988 Emergency Crisis</a></li>
+                    <li class="footer-link-item"><a href="index.html#analysis">NLP Confidence Scale</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Quantum Node</h4>
+                <ul class="footer-contact-details">
+                    <li><i class="fa-solid fa-square-envelope"></i> support@aira-wellness.ai</li>
+                    <li><i class="fa-solid fa-square-phone"></i> +1 (800) 555-AIRA</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Silicon Valley Tech Hub, California, USA</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-bar">
+            <span>&copy; 2026 AIRA Wellness Systems. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="javascript:void(0)">Privacy Policy</a>
+                <a href="javascript:void(0)">Terms of Compliance</a>
+                <a href="javascript:void(0)">Ethical AI Code</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2.0"></script>
+    <script>
+        const tabs = document.querySelectorAll('.ftab');
+        const cards = document.querySelectorAll('.feature-page-card');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const filter = tab.dataset.filter;
+                cards.forEach(card => {
+                    const cats = card.dataset.cat || '';
+                    if (filter === 'all' || cats.includes(filter)) { card.style.display = ''; }
+                    else { card.style.display = 'none'; }
+                });
+            });
+        });
+        document.querySelectorAll('.feature-chat-open').forEach(el => {
+            el.addEventListener('click', () => {
+                document.getElementById('chatbot-wrapper').classList.add('active');
+                document.getElementById('chat-panel').style.display = 'flex';
+            });
+        });
+    </script>
+</body>
+</html>

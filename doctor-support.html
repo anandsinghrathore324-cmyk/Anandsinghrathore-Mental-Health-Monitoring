@@ -1,0 +1,647 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AIRA Doctor Support - Find verified mental health professionals, psychologists and therapists near you. Book a session and access crisis helplines 24/7.">
+    <title>AIRA | Doctor Support & Mental Health Professionals</title>
+    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <style>
+        /* ===== DOCTOR SUPPORT PAGE SPECIFIC STYLES ===== */
+        .page-hero {
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0, 255, 200, 0.08) 0%, transparent 70%),
+                        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(180, 0, 255, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .page-hero-content {
+            max-width: 700px;
+            position: relative;
+            z-index: 1;
+        }
+        .page-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 255, 200, 0.08);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            margin-bottom: 1.5rem;
+        }
+        .page-hero-badge span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            animation: pulse 1.5s infinite;
+        }
+        .page-hero-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        .page-hero-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        .page-hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Telehealth cards */
+        .telehealth-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .telehealth-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+        .telehealth-card {
+            padding: 2rem;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .telehealth-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .telehealth-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .telehealth-card h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 0.6rem;
+            color: var(--text-primary);
+        }
+        .telehealth-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+        .telehealth-tag {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Booking form */
+        .booking-section {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .booking-card {
+            padding: 3rem;
+            border-radius: 24px;
+        }
+        .booking-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .booking-header-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(0,255,200,0.15), rgba(0,255,200,0.05));
+            border: 1px solid rgba(0,255,200,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        .booking-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .booking-group.full {
+            grid-column: span 2;
+        }
+        .booking-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .booking-group label i {
+            color: var(--neon-cyan);
+            margin-right: 0.4rem;
+        }
+        .booking-input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 0.85rem 1.1rem;
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            font-family: inherit;
+            width: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+        .booking-input:focus {
+            border-color: rgba(0,255,200,0.3);
+            box-shadow: 0 0 0 3px rgba(0,255,200,0.07);
+        }
+        .booking-input option {
+            background: #0d1117;
+        }
+        .booking-submit-btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-radius: 14px;
+            padding: 1rem;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+        }
+        .booking-success {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 16px;
+            background: rgba(0,255,200,0.06);
+            border: 1px solid rgba(0,255,200,0.2);
+            margin-top: 1.5rem;
+        }
+        .booking-success i {
+            font-size: 2.5rem;
+            color: var(--neon-emerald);
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+        .booking-success h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+        }
+        .booking-success p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Stats row */
+        .support-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 2rem;
+            margin: 0 auto;
+            max-width: 900px;
+        }
+        .support-stat-item {
+            text-align: center;
+        }
+        .support-stat-num {
+            display: block;
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .support-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        @media (max-width: 640px) {
+            .booking-grid { grid-template-columns: 1fr; }
+            .booking-group.full { grid-column: span 1; }
+            .booking-card { padding: 1.5rem; }
+            .telehealth-section, .booking-section { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="main-navbar">
+        <div class="navbar-container">
+            <a href="index.html#home" class="nav-logo">
+                <svg class="brand-svg-logo" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan); margin-right: 0.5rem; filter: drop-shadow(0 0 5px var(--neon-cyan));"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"/></svg> AIRA
+            </a>
+            <ul class="nav-links" id="navbar-links">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#analysis" class="nav-link">AI Analysis</a></li>
+                <li><a href="index.html#dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="index.html#mindfulness" class="nav-link">Mindfulness</a></li>
+                <li><a href="doctor-support.html" class="nav-link active">Doctor Support</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+                <li><a href="javascript:void(0)" class="nav-link" id="nav-chat-trigger">AI Chatbot</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#footer" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="nav-hamburger" id="nav-hamburger-toggle">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HERO -->
+    <div class="page-hero" id="home">
+        <div class="page-hero-content">
+            <div class="page-hero-badge"><span></span> Verified Clinical Network</div>
+            <h1 class="page-hero-title">
+                Find Your <span class="gradient-text">Mental Health</span> Professional
+            </h1>
+            <p class="page-hero-desc">
+                Connect with credentialed psychologists, therapists, and counselors. Our AI-powered proximity engine surfaces the right specialist for your unique profile.
+            </p>
+            <div class="page-hero-actions">
+                <a href="#doctor-directory" class="neon-btn neon-btn-primary">
+                    <i class="fa-solid fa-hospital-user"></i> Browse Specialists
+                </a>
+                <a href="#book-session" class="neon-btn neon-btn-secondary">
+                    <i class="fa-solid fa-calendar-check"></i> Book a Session
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="support-stats">
+        <div class="support-stat-item">
+            <span class="support-stat-num">200+</span>
+            <span class="support-stat-label">Verified Specialists</span>
+        </div>
+        <div class="support-stat-item">
+            <span class="support-stat-num">24/7</span>
+            <span class="support-stat-label">Crisis Support</span>
+        </div>
+        <div class="support-stat-item">
+            <span class="support-stat-num">98%</span>
+            <span class="support-stat-label">Satisfaction Rate</span>
+        </div>
+        <div class="support-stat-item">
+            <span class="support-stat-num">50+</span>
+            <span class="support-stat-label">Countries Covered</span>
+        </div>
+    </div>
+
+    <!-- TELEHEALTH OPTIONS -->
+    <section class="telehealth-section">
+        <div class="section-header">
+            <span class="section-tag">Support Modalities</span>
+            <h2 class="section-title">How Would You Like to Connect?</h2>
+            <p class="section-desc">Choose the type of support that works best for you — from live video consultations to in-person visits.</p>
+        </div>
+        <div class="telehealth-grid">
+            <div class="telehealth-card glass-panel">
+                <div class="telehealth-card-icon" style="background: rgba(0,255,200,0.1); border: 1px solid rgba(0,255,200,0.2); color: var(--neon-cyan);">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <h4>Online Video Sessions</h4>
+                <p>Real-time private video consultations with licensed therapists from the comfort of your space. Encrypted, HIPAA-compliant, zero judgment.</p>
+                <span class="telehealth-tag" style="background: rgba(0,255,200,0.1); color: var(--neon-cyan); border: 1px solid rgba(0,255,200,0.2);">Available Now</span>
+            </div>
+            <div class="telehealth-card glass-panel">
+                <div class="telehealth-card-icon" style="background: rgba(180,0,255,0.1); border: 1px solid rgba(180,0,255,0.2); color: var(--neon-purple);">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <h4>In-Person Visits</h4>
+                <p>Find psychologists and counselors physically near you. AIRA uses geolocation Haversine algorithms to rank proximity-matched specialists.</p>
+                <span class="telehealth-tag" style="background: rgba(180,0,255,0.1); color: var(--neon-purple); border: 1px solid rgba(180,0,255,0.2);">Geo-Matched</span>
+            </div>
+            <div class="telehealth-card glass-panel">
+                <div class="telehealth-card-icon" style="background: rgba(255,0,128,0.1); border: 1px solid rgba(255,0,128,0.2); color: var(--neon-rose);">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <h4>Crisis Text Support</h4>
+                <p>Immediate human-backed crisis text lines for when you need fast emotional support. Connects you to trained crisis counselors within minutes.</p>
+                <span class="telehealth-tag" style="background: rgba(255,0,128,0.1); color: var(--neon-rose); border: 1px solid rgba(255,0,128,0.2);">Emergency Ready</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOCTOR DIRECTORY -->
+    <section class="doctor-section" id="doctor-directory">
+        <div class="section-header">
+            <span class="section-tag">Clinical Referrals</span>
+            <h2 class="section-title">Nearby Verified Psychologists</h2>
+            <p class="section-desc">Connect immediately with credentialed mental health specialists. Allowing location services ranks psychologists relative to your physical proximity.</p>
+        </div>
+
+        <div class="doctor-filter-bar">
+            <div class="geolocation-info">
+                <div class="geolocation-status-light" id="geo-status-light"></div>
+                <span id="geo-text-status">Proximity matching: Active Fallback Mode</span>
+                <button class="geolocation-btn" id="trigger-geo-api">
+                    <i class="fa-solid fa-city"></i> Change City
+                </button>
+            </div>
+            <div class="doctor-filters">
+                <span class="filter-tab active" data-filter="all">All Specialists</span>
+                <span class="filter-tab" data-filter="stress">Stress &amp; Burnout</span>
+                <span class="filter-tab" data-filter="anxiety">General Anxiety</span>
+                <span class="filter-tab" data-filter="depression">Clinical Depression</span>
+            </div>
+        </div>
+
+        <div class="doctor-grid" id="doctor-results-grid">
+            <!-- Cards generated dynamically in script.js -->
+        </div>
+
+        <!-- Crisis Banner -->
+        <div class="crisis-banner-container glass-panel" id="crisis-banner">
+            <div class="crisis-banner-left">
+                <h3>
+                    <span class="crisis-badge-blink"><i class="fa-solid fa-triangle-exclamation"></i> LIVE PROTOCOL</span>
+                    Immediate Crisis Assistance Required?
+                </h3>
+                <p class="crisis-explanation">
+                    If you are experiencing severe emotional distress, panic, suicidal thoughts, or self-harm triggers, connect immediately. Professional support is available 24/7.
+                </p>
+                <div class="crisis-indicator-row">
+                    <div class="crisis-currently-showing">
+                        <span class="showing-label">Currently Showing Support For:</span>
+                        <div class="showing-country-box">
+                            <img id="crisis-flag-img" class="crisis-country-flag" src="https://flagcdn.com/w40/in.png" alt="Country Flag" onerror="this.style.display='none'">
+                            <span id="crisis-country-name" class="showing-country-name">India</span>
+                        </div>
+                    </div>
+                    <button class="neon-btn neon-btn-purple change-country-trigger-btn" id="change-country-btn">
+                        <i class="fa-solid fa-earth-americas"></i> Change Country
+                    </button>
+                </div>
+            </div>
+            <div class="crisis-banner-right">
+                <div class="crisis-skeleton-loader" id="crisis-skeleton">
+                    <div class="skeleton-shimmer"></div>
+                </div>
+                <div class="crisis-helpline-content" id="crisis-helpline-display" style="display: none;">
+                    <span class="helpline-title" id="crisis-support-desc">Tele-MANAS Support Line</span>
+                    <a href="tel:14416" class="crisis-main-number" id="crisis-phone-link">14416</a>
+                    <div class="crisis-subline-box">
+                        <span class="crisis-subline-item"><strong>National Emergency:</strong> <span id="crisis-emergency-num">112</span></span>
+                        <span class="crisis-subline-meta">Free &bull; Confidential &bull; 24/7 Support</span>
+                    </div>
+                    <div class="crisis-actions">
+                        <a href="tel:14416" class="crisis-action-call-btn" id="crisis-call-action-btn">
+                            <i class="fa-solid fa-phone-volume"></i> Connect Now
+                        </a>
+                        <button class="crisis-action-copy-btn" id="crisis-copy-action-btn" title="Copy Number">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="country-selector-modal" id="country-selector-modal">
+                <div class="country-modal-content glass-panel">
+                    <div class="country-modal-header">
+                        <h4>Select Your Location</h4>
+                        <button class="country-modal-close" id="country-modal-close-btn">&times;</button>
+                    </div>
+                    <p class="country-modal-desc">Search and select a country to view local emergency mental health helplines.</p>
+                    <div class="country-search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="country-search-input" placeholder="Search country by name or code (e.g. Canada)...">
+                    </div>
+                    <div class="country-list-scroll" id="country-list-container"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOK A SESSION -->
+    <section class="booking-section" id="book-session">
+        <div class="section-header">
+            <span class="section-tag" style="color: var(--neon-purple);">Appointment Scheduler</span>
+            <h2 class="section-title">Book a Session</h2>
+            <p class="section-desc">Schedule your consultation with a verified specialist. Our system routes your request to the best-matched professional.</p>
+        </div>
+        <div class="booking-card glass-panel">
+            <div class="booking-header">
+                <div class="booking-header-icon"><i class="fa-solid fa-calendar-plus"></i></div>
+                <div>
+                    <h3 style="color: var(--text-primary); font-size: 1.2rem; font-weight: 800;">Consultation Request Form</h3>
+                    <p style="color: var(--text-muted); font-size: 0.88rem;">All details are encrypted and handled under our Ethical AI data protocols.</p>
+                </div>
+            </div>
+            <form id="booking-form" onsubmit="handleBooking(event)">
+                <div class="booking-grid">
+                    <div class="booking-group">
+                        <label for="book-name"><i class="fa-solid fa-user"></i> Full Name</label>
+                        <input class="booking-input" type="text" id="book-name" placeholder="e.g. Priya Sharma" required>
+                    </div>
+                    <div class="booking-group">
+                        <label for="book-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                        <input class="booking-input" type="email" id="book-email" placeholder="e.g. priya@gmail.com" required>
+                    </div>
+                    <div class="booking-group">
+                        <label for="book-phone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                        <input class="booking-input" type="tel" id="book-phone" placeholder="e.g. +91 98765 43210">
+                    </div>
+                    <div class="booking-group">
+                        <label for="book-time"><i class="fa-solid fa-clock"></i> Preferred Time Slot</label>
+                        <select class="booking-input" id="book-time" required>
+                            <option value="" disabled selected>Select Preferred Time</option>
+                            <option>Morning (9 AM – 12 PM)</option>
+                            <option>Afternoon (12 PM – 4 PM)</option>
+                            <option>Evening (4 PM – 8 PM)</option>
+                            <option>Late Night (8 PM – 11 PM)</option>
+                        </select>
+                    </div>
+                    <div class="booking-group">
+                        <label for="book-type"><i class="fa-solid fa-stethoscope"></i> Session Type</label>
+                        <select class="booking-input" id="book-type" required>
+                            <option value="" disabled selected>Select Session Type</option>
+                            <option>Online Video Call</option>
+                            <option>In-Person Visit</option>
+                            <option>Crisis Text Support</option>
+                            <option>Follow-up Consultation</option>
+                        </select>
+                    </div>
+                    <div class="booking-group">
+                        <label for="book-concern"><i class="fa-solid fa-heart-pulse"></i> Primary Concern</label>
+                        <select class="booking-input" id="book-concern" required>
+                            <option value="" disabled selected>Select Your Concern</option>
+                            <option>Stress Management</option>
+                            <option>Anxiety Disorder</option>
+                            <option>Depression Support</option>
+                            <option>Academic Burnout</option>
+                            <option>Relationship Issues</option>
+                            <option>Crisis Intervention</option>
+                            <option>General Wellness</option>
+                        </select>
+                    </div>
+                    <div class="booking-group full">
+                        <label for="book-notes"><i class="fa-solid fa-note-sticky"></i> Additional Notes (Optional)</label>
+                        <textarea class="booking-input" id="book-notes" rows="3" placeholder="Share any additional context about your situation or preferred therapist type..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="neon-btn neon-btn-primary booking-submit-btn">
+                    <i class="fa-solid fa-calendar-check"></i> Confirm Booking Request
+                </button>
+            </form>
+            <div class="booking-success" id="booking-success-msg">
+                <i class="fa-solid fa-circle-check"></i>
+                <h4>Booking Request Submitted! 🎉</h4>
+                <p>Our team will reach out within 24 hours to confirm your appointment. Check your email for confirmation details.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FLOATING CHATBOT -->
+    <div class="chatbot-widget" id="chatbot-wrapper">
+        <div class="chatbot-panel glass-panel" id="chat-panel">
+            <div class="chatbot-header">
+                <div class="chatbot-identity">
+                    <div class="chatbot-avatar-ring"><div class="chatbot-avatar-inner"><i class="fa-solid fa-robot"></i></div></div>
+                    <div class="chatbot-info">
+                        <h4>Aira <span></span></h4>
+                        <span class="chatbot-status">AI Bestie &bull; Online</span>
+                    </div>
+                </div>
+                <button class="chatbot-close-btn" id="close-chat-widget"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-msg-container">
+                <div class="chat-msg chat-msg-bot">Hey! 👋 I'm Aira! Need help finding a doctor or want to talk? I'm here for you! 💙</div>
+                <div class="typing-indicator" id="chat-typing-dots">
+                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                </div>
+            </div>
+            <div class="chatbot-chips-container" id="chatbot-quick-chips">
+                <span class="chat-chip" data-msg="Help me find a therapist">🏥 Find Therapist</span>
+                <span class="chat-chip" data-msg="I need crisis support right now">🆘 Crisis Help</span>
+                <span class="chat-chip" data-msg="How do I book a session?">📅 Book Session</span>
+                <span class="chat-chip" data-msg="I feel super stressed by exams">😫 Exam Stress</span>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" class="chatbot-input" id="chatbot-input-field" placeholder="Ask about doctor support...">
+                <button class="chatbot-send-btn" id="chatbot-submit-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="chatbot-toggle-btn" id="open-chat-widget" title="Chat with Aira">
+            <i class="fa-solid fa-comment-dots"></i>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-info-column">
+                <a href="index.html#home" class="footer-info-logo"><i class="fa-solid fa-brain"></i> AIRA</a>
+                <p class="footer-info-desc">Futuristic Student Mental Health Monitoring &amp; support protocols. Merging cognitive classification logic with geolocation medical referrals.</p>
+                <div class="footer-socials">
+                    <a href="https://github.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://twitter.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://discord.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-discord"></i></a>
+                    <a href="https://linkedin.com" class="social-icon-btn" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>Protocols</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="index.html#home">Quantum Home</a></li>
+                    <li class="footer-link-item"><a href="features.html">Platform Features</a></li>
+                    <li class="footer-link-item"><a href="index.html#analysis">Neuro Assessment</a></li>
+                    <li class="footer-link-item"><a href="index.html#dashboard">Stability Dashboard</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Sourcing</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="doctor-support.html">Therapist Locator</a></li>
+                    <li class="footer-link-item"><a href="index.html#about">Technical Manifesto</a></li>
+                    <li class="footer-link-item"><a href="tel:988">988 Emergency Crisis</a></li>
+                    <li class="footer-link-item"><a href="index.html#analysis">NLP Confidence Scale</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Quantum Node</h4>
+                <ul class="footer-contact-details">
+                    <li><i class="fa-solid fa-square-envelope"></i> support@aira-wellness.ai</li>
+                    <li><i class="fa-solid fa-square-phone"></i> +1 (800) 555-AIRA</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Silicon Valley Tech Hub, California, USA</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom-bar">
+            <span>&copy; 2026 AIRA Wellness Systems. Designed under Ethical AI Guidelines. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="javascript:void(0)">Privacy Policy</a>
+                <a href="javascript:void(0)">Terms of Compliance</a>
+                <a href="javascript:void(0)">Ethical AI Code</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2.0"></script>
+    <script>
+        function handleBooking(e) {
+            e.preventDefault();
+            document.getElementById('booking-form').style.display = 'none';
+            document.getElementById('booking-success-msg').style.display = 'block';
+        }
+        // Set nav active state
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === 'doctor-support.html') link.classList.add('active');
+            else link.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
+
