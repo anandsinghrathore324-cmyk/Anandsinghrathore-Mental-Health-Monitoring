@@ -64,6 +64,17 @@ class DatabaseManager:
             self.db.otp_codes.create_index("created_at", expireAfterSeconds=300)
             self.db.otp_codes.create_index("email")
             
+            # Geo Location Indexes
+            self.db.geo_countries.create_index("iso2", unique=True)
+            self.db.geo_countries.create_index("name")
+            self.db.geo_states.create_index("country_code")
+            self.db.geo_states.create_index([("country_code", 1), ("name", 1)])
+            self.db.geo_states.create_index([("country_code", 1), ("state_code", 1)])
+            self.db.geo_cities.create_index([("country_code", 1), ("state_code", 1)])
+            self.db.geo_cities.create_index([("country_code", 1), ("state_code", 1), ("name", 1)])
+            self.db.geo_cities.create_index("state_id")
+            self.db.geo_cities.create_index("name")
+            
             logger.info("MongoDB indexing completed successfully.")
         except Exception as e:
             logger.warning(f"Indexes deployment failed or already existed: {str(e)}")

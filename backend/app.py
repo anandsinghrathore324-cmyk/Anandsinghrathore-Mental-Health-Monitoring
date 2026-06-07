@@ -5,6 +5,8 @@ from flask_cors import CORS
 from config import Config
 from database.db import db_manager
 from database.doctor_model import DoctorModel
+from database.hotline_model import HotlineModel
+from database.geo_model import GeoModel
 
 # Blueprints
 from routes.auth_routes import auth_bp
@@ -12,6 +14,8 @@ from routes.prediction_routes import prediction_bp
 from routes.chatbot_routes import chatbot_bp
 from routes.doctor_routes import doctor_bp
 from routes.dashboard_routes import dashboard_bp
+from routes.hotline_routes import hotline_bp
+from routes.geo_routes import geo_bp
 
 # Configure logging
 logging.basicConfig(
@@ -52,6 +56,8 @@ def create_app():
     app.register_blueprint(chatbot_bp, url_prefix="/api")
     app.register_blueprint(doctor_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
+    app.register_blueprint(hotline_bp, url_prefix="/api")
+    app.register_blueprint(geo_bp, url_prefix="/api")
     
     # Centralized fallback route error handlers
     @app.errorhandler(404)
@@ -398,8 +404,11 @@ def seed_database():
     try:
         DoctorModel.seed_doctors(doctors)
         logger.info(f"Verified profiles database successfully seeded with {len(doctors)} entries.")
+        HotlineModel.seed_hotlines()
+        logger.info("Mental health crisis hotlines database successfully seeded.")
+        GeoModel.seed_check()
     except Exception as e:
-        logger.error(f"Failed to seed verified clinicians: {str(e)}")
+        logger.error(f"Failed to seed database contents: {str(e)}")
 
 
 # Instantiate application node

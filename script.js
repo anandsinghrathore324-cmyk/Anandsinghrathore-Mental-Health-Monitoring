@@ -347,18 +347,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     // Update Mini-dashboard cards text values from latest summary
                     if (dashboardRawMetrics.summary) {
-                        document.getElementById("stat-stability").textContent = `${dashboardRawMetrics.summary.stability_index}%`;
-                        document.getElementById("stat-sleep").textContent = dashboardRawMetrics.summary.sleep_quality;
-                        document.getElementById("stat-burnout").textContent = dashboardRawMetrics.summary.burnout_threat;
-                        document.getElementById("stat-academic").textContent = dashboardRawMetrics.summary.academic_strain;
-                        document.getElementById("stat-social").textContent = dashboardRawMetrics.summary.social_balance;
+                        const statStability = document.getElementById("stat-stability");
+                        const statSleep = document.getElementById("stat-sleep");
+                        const statBurnout = document.getElementById("stat-burnout");
+                        const statAcademic = document.getElementById("stat-academic");
+                        const statSocial = document.getElementById("stat-social");
+                        const statPrimaryEmo = document.getElementById("stat-primary-emo");
 
-                        let dominantText = "Calm";
-                        if (dashboardRawMetrics.summary.primary_emotion === "Joy") dominantText = "Joy 😊";
-                        if (dashboardRawMetrics.summary.primary_emotion === "Melancholy") dominantText = "Melancholy 😭";
-                        if (dashboardRawMetrics.summary.primary_emotion === "Burnout") dominantText = "Exhaustion 😫";
-                        if (dashboardRawMetrics.summary.primary_emotion === "Anxiety") dominantText = "Anxiety 🥺";
-                        document.getElementById("stat-primary-emo").textContent = dominantText;
+                        if (statStability) statStability.textContent = `${dashboardRawMetrics.summary.stability_index}%`;
+                        if (statSleep) statSleep.textContent = dashboardRawMetrics.summary.sleep_quality;
+                        if (statBurnout) statBurnout.textContent = dashboardRawMetrics.summary.burnout_threat;
+                        if (statAcademic) statAcademic.textContent = dashboardRawMetrics.summary.academic_strain;
+                        if (statSocial) statSocial.textContent = dashboardRawMetrics.summary.social_balance;
+
+                        if (statPrimaryEmo) {
+                            let dominantText = "Calm";
+                            if (dashboardRawMetrics.summary.primary_emotion === "Joy") dominantText = "Joy 😊";
+                            if (dashboardRawMetrics.summary.primary_emotion === "Melancholy") dominantText = "Melancholy 😭";
+                            if (dashboardRawMetrics.summary.primary_emotion === "Burnout") dominantText = "Exhaustion 😫";
+                            if (dashboardRawMetrics.summary.primary_emotion === "Anxiety") dominantText = "Anxiety 🥺";
+                            statPrimaryEmo.textContent = dominantText;
+                        }
                     }
                 }
             })
@@ -386,14 +395,16 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.style.overflow = "";
         setTimeout(loadDashboardData, 800);
     } else {
-        // Lock body scrolling while authenticating
-        document.body.style.overflow = "hidden";
-        if (logoutTrigger) logoutTrigger.style.display = "none";
+        // Lock body scrolling while authenticating only if login portal is on the page
         if (loginPortal) {
+            document.body.style.overflow = "hidden";
             loginPortal.style.display = "flex";
             loginPortal.style.opacity = "0";
             loginPortal.style.visibility = "hidden";
+        } else {
+            document.body.style.overflow = "";
         }
+        if (logoutTrigger) logoutTrigger.style.display = "none";
 
         // Preloader simulation
         if (preloader) {
@@ -1354,25 +1365,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const hamburger = document.getElementById("nav-hamburger-toggle");
 
     // Hamburger active toggle
-    hamburger.addEventListener("click", () => {
-        hamburger.classList.toggle("active");
-        navLinks.classList.toggle("active");
-    });
+    if (hamburger && navLinks) {
+        hamburger.addEventListener("click", () => {
+            hamburger.classList.toggle("active");
+            navLinks.classList.toggle("active");
+        });
+    }
 
     // Smooth navigation active states
     document.querySelectorAll(".nav-link").forEach(link => {
         link.addEventListener("click", () => {
-            hamburger.classList.remove("active");
-            navLinks.classList.remove("active");
+            if (hamburger) hamburger.classList.remove("active");
+            if (navLinks) navLinks.classList.remove("active");
         });
     });
 
     // Navbar glass style on scroll
     window.addEventListener("scroll", () => {
-        if (window.scrollY > 40) {
-            navbar.classList.add("scrolled");
-        } else {
-            navbar.classList.remove("scrolled");
+        if (navbar) {
+            if (window.scrollY > 40) {
+                navbar.classList.add("scrolled");
+            } else {
+                navbar.classList.remove("scrolled");
+            }
         }
     });
 
@@ -1428,8 +1443,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let emotionProfileChart = null;
 
     function initAnalyticsCharts() {
-        const lineCtx = document.getElementById("stressTrendChart").getContext("2d");
-        const radarCtx = document.getElementById("emotionProfileChart").getContext("2d");
+        const lineEl = document.getElementById("stressTrendChart");
+        const radarEl = document.getElementById("emotionProfileChart");
+        if (!lineEl || !radarEl) return;
+
+        const lineCtx = lineEl.getContext("2d");
+        const radarCtx = radarEl.getContext("2d");
 
         // Custom Glowing Gradients for Line Chart
         const stressGradient = lineCtx.createLinearGradient(0, 0, 0, 300);
@@ -1641,111 +1660,111 @@ document.addEventListener("DOMContentLoaded", () => {
     // Default city: Jaipur. User can select country → then city.
     // ==========================================================================
 
-    // City database: country → cities with lat/lon
+    // City database: country → cities with lat/lon and state/province
     const cityDatabase = {
         "India": {
             cities: [
-                { name: "Jaipur", lat: 26.9124, lon: 75.7873 },
-                { name: "Delhi", lat: 28.6139, lon: 77.2090 },
-                { name: "Mumbai", lat: 19.0760, lon: 72.8777 },
-                { name: "Bangalore", lat: 12.9716, lon: 77.5946 },
-                { name: "Hyderabad", lat: 17.3850, lon: 78.4867 },
-                { name: "Chennai", lat: 13.0827, lon: 80.2707 },
-                { name: "Kolkata", lat: 22.5726, lon: 88.3639 },
-                { name: "Pune", lat: 18.5204, lon: 73.8567 },
-                { name: "Ahmedabad", lat: 23.0225, lon: 72.5714 },
-                { name: "Lucknow", lat: 26.8467, lon: 80.9462 },
-                { name: "Chandigarh", lat: 30.7333, lon: 76.7794 },
-                { name: "Kota", lat: 25.2138, lon: 75.8648 },
-                { name: "Jodhpur", lat: 26.2389, lon: 73.0243 },
-                { name: "Udaipur", lat: 24.5854, lon: 73.7125 },
-                { name: "Bhopal", lat: 23.2599, lon: 77.4126 },
-                { name: "Indore", lat: 22.7196, lon: 75.8577 },
-                { name: "Nagpur", lat: 21.1458, lon: 79.0882 },
-                { name: "Patna", lat: 25.5941, lon: 85.1376 },
-                { name: "Bhubaneswar", lat: 20.2961, lon: 85.8245 },
-                { name: "Surat", lat: 21.1702, lon: 72.8311 }
+                { name: "Jaipur", lat: 26.9124, lon: 75.7873, state: "Rajasthan" },
+                { name: "Delhi", lat: 28.6139, lon: 77.2090, state: "Delhi" },
+                { name: "Mumbai", lat: 19.0760, lon: 72.8777, state: "Maharashtra" },
+                { name: "Bangalore", lat: 12.9716, lon: 77.5946, state: "Karnataka" },
+                { name: "Hyderabad", lat: 17.3850, lon: 78.4867, state: "Telangana" },
+                { name: "Chennai", lat: 13.0827, lon: 80.2707, state: "Tamil Nadu" },
+                { name: "Kolkata", lat: 22.5726, lon: 88.3639, state: "West Bengal" },
+                { name: "Pune", lat: 18.5204, lon: 73.8567, state: "Maharashtra" },
+                { name: "Ahmedabad", lat: 23.0225, lon: 72.5714, state: "Gujarat" },
+                { name: "Lucknow", lat: 26.8467, lon: 80.9462, state: "Uttar Pradesh" },
+                { name: "Chandigarh", lat: 30.7333, lon: 76.7794, state: "Chandigarh" },
+                { name: "Kota", lat: 25.2138, lon: 75.8648, state: "Rajasthan" },
+                { name: "Jodhpur", lat: 26.2389, lon: 73.0243, state: "Rajasthan" },
+                { name: "Udaipur", lat: 24.5854, lon: 73.7125, state: "Rajasthan" },
+                { name: "Bhopal", lat: 23.2599, lon: 77.4126, state: "Madhya Pradesh" },
+                { name: "Indore", lat: 22.7196, lon: 75.8577, state: "Madhya Pradesh" },
+                { name: "Nagpur", lat: 21.1458, lon: 79.0882, state: "Maharashtra" },
+                { name: "Patna", lat: 25.5941, lon: 85.1376, state: "Bihar" },
+                { name: "Bhubaneswar", lat: 20.2961, lon: 85.8245, state: "Odisha" },
+                { name: "Surat", lat: 21.1702, lon: 72.8311, state: "Gujarat" }
             ]
         },
         "USA": {
             cities: [
-                { name: "New York", lat: 40.7128, lon: -74.0060 },
-                { name: "Los Angeles", lat: 34.0522, lon: -118.2437 },
-                { name: "Chicago", lat: 41.8781, lon: -87.6298 },
-                { name: "Houston", lat: 29.7604, lon: -95.3698 },
-                { name: "San Francisco", lat: 37.7749, lon: -122.4194 },
-                { name: "Boston", lat: 42.3601, lon: -71.0589 },
-                { name: "Seattle", lat: 47.6062, lon: -122.3321 },
-                { name: "Austin", lat: 30.2672, lon: -97.7431 },
-                { name: "Denver", lat: 39.7392, lon: -104.9903 },
-                { name: "Miami", lat: 25.7617, lon: -80.1918 }
+                { name: "New York", lat: 40.7128, lon: -74.0060, state: "New York" },
+                { name: "Los Angeles", lat: 34.0522, lon: -118.2437, state: "California" },
+                { name: "Chicago", lat: 41.8781, lon: -87.6298, state: "Illinois" },
+                { name: "Houston", lat: 29.7604, lon: -95.3698, state: "Texas" },
+                { name: "San Francisco", lat: 37.7749, lon: -122.4194, state: "California" },
+                { name: "Boston", lat: 42.3601, lon: -71.0589, state: "Massachusetts" },
+                { name: "Seattle", lat: 47.6062, lon: -122.3321, state: "Washington" },
+                { name: "Austin", lat: 30.2672, lon: -97.7431, state: "Texas" },
+                { name: "Denver", lat: 39.7392, lon: -104.9903, state: "Colorado" },
+                { name: "Miami", lat: 25.7617, lon: -80.1918, state: "Florida" }
             ]
         },
         "UK": {
             cities: [
-                { name: "London", lat: 51.5074, lon: -0.1278 },
-                { name: "Manchester", lat: 53.4808, lon: -2.2426 },
-                { name: "Birmingham", lat: 52.4862, lon: -1.8904 },
-                { name: "Edinburgh", lat: 55.9533, lon: -3.1883 },
-                { name: "Glasgow", lat: 55.8642, lon: -4.2518 },
-                { name: "Liverpool", lat: 53.4084, lon: -2.9916 },
-                { name: "Bristol", lat: 51.4545, lon: -2.5879 },
-                { name: "Leeds", lat: 53.8008, lon: -1.5491 }
+                { name: "London", lat: 51.5074, lon: -0.1278, state: "England" },
+                { name: "Manchester", lat: 53.4808, lon: -2.2426, state: "England" },
+                { name: "Birmingham", lat: 52.4862, lon: -1.8904, state: "England" },
+                { name: "Edinburgh", lat: 55.9533, lon: -3.1883, state: "Scotland" },
+                { name: "Glasgow", lat: 55.8642, lon: -4.2518, state: "Scotland" },
+                { name: "Liverpool", lat: 53.4084, lon: -2.9916, state: "England" },
+                { name: "Bristol", lat: 51.4545, lon: -2.5879, state: "England" },
+                { name: "Leeds", lat: 53.8008, lon: -1.5491, state: "England" }
             ]
         },
         "Canada": {
             cities: [
-                { name: "Toronto", lat: 43.6532, lon: -79.3832 },
-                { name: "Vancouver", lat: 49.2827, lon: -123.1207 },
-                { name: "Montreal", lat: 45.5017, lon: -73.5673 },
-                { name: "Calgary", lat: 51.0447, lon: -114.0719 },
-                { name: "Ottawa", lat: 45.4215, lon: -75.6972 },
-                { name: "Edmonton", lat: 53.5461, lon: -113.4938 }
+                { name: "Toronto", lat: 43.6532, lon: -79.3832, state: "Ontario" },
+                { name: "Vancouver", lat: 49.2827, lon: -123.1207, state: "British Columbia" },
+                { name: "Montreal", lat: 45.5017, lon: -73.5673, state: "Quebec" },
+                { name: "Calgary", lat: 51.0447, lon: -114.0719, state: "Alberta" },
+                { name: "Ottawa", lat: 45.4215, lon: -75.6972, state: "Ontario" },
+                { name: "Edmonton", lat: 53.5461, lon: -113.4938, state: "Alberta" }
             ]
         },
         "Australia": {
             cities: [
-                { name: "Sydney", lat: -33.8688, lon: 151.2093 },
-                { name: "Melbourne", lat: -37.8136, lon: 144.9631 },
-                { name: "Brisbane", lat: -27.4698, lon: 153.0251 },
-                { name: "Perth", lat: -31.9505, lon: 115.8605 },
-                { name: "Adelaide", lat: -34.9285, lon: 138.6007 }
+                { name: "Sydney", lat: -33.8688, lon: 151.2093, state: "New South Wales" },
+                { name: "Melbourne", lat: -37.8136, lon: 144.9631, state: "Victoria" },
+                { name: "Brisbane", lat: -27.4698, lon: 153.0251, state: "Queensland" },
+                { name: "Perth", lat: -31.9505, lon: 115.8605, state: "Western Australia" },
+                { name: "Adelaide", lat: -34.9285, lon: 138.6007, state: "South Australia" }
             ]
         },
         "Germany": {
             cities: [
-                { name: "Berlin", lat: 52.5200, lon: 13.4050 },
-                { name: "Munich", lat: 48.1351, lon: 11.5820 },
-                { name: "Hamburg", lat: 53.5753, lon: 10.0153 },
-                { name: "Frankfurt", lat: 50.1109, lon: 8.6821 },
-                { name: "Cologne", lat: 50.9333, lon: 6.9500 }
+                { name: "Berlin", lat: 52.5200, lon: 13.4050, state: "Berlin" },
+                { name: "Munich", lat: 48.1351, lon: 11.5820, state: "Bavaria" },
+                { name: "Hamburg", lat: 53.5753, lon: 10.0153, state: "Hamburg" },
+                { name: "Frankfurt", lat: 50.1109, lon: 8.6821, state: "Hesse" },
+                { name: "Cologne", lat: 50.9333, lon: 6.9500, state: "North Rhine-Westphalia" }
             ]
         },
         "France": {
             cities: [
-                { name: "Paris", lat: 48.8566, lon: 2.3522 },
-                { name: "Lyon", lat: 45.7640, lon: 4.8357 },
-                { name: "Marseille", lat: 43.2965, lon: 5.3698 },
-                { name: "Toulouse", lat: 43.6047, lon: 1.4442 }
+                { name: "Paris", lat: 48.8566, lon: 2.3522, state: "Île-de-France" },
+                { name: "Lyon", lat: 45.7640, lon: 4.8357, state: "Auvergne-Rhône-Alpes" },
+                { name: "Marseille", lat: 43.2965, lon: 5.3698, state: "Provence-Alpes-Côte d'Azur" },
+                { name: "Toulouse", lat: 43.6047, lon: 1.4442, state: "Occitanie" }
             ]
         },
         "UAE": {
             cities: [
-                { name: "Dubai", lat: 25.2048, lon: 55.2708 },
-                { name: "Abu Dhabi", lat: 24.4539, lon: 54.3773 },
-                { name: "Sharjah", lat: 25.3462, lon: 55.4211 }
+                { name: "Dubai", lat: 25.2048, lon: 55.2708, state: "Dubai" },
+                { name: "Abu Dhabi", lat: 24.4539, lon: 54.3773, state: "Abu Dhabi" },
+                { name: "Sharjah", lat: 25.3462, lon: 55.4211, state: "Sharjah" }
             ]
         },
         "Singapore": {
             cities: [
-                { name: "Singapore City", lat: 1.3521, lon: 103.8198 }
+                { name: "Singapore City", lat: 1.3521, lon: 103.8198, state: "Singapore" }
             ]
         },
         "Japan": {
             cities: [
-                { name: "Tokyo", lat: 35.6762, lon: 139.6503 },
-                { name: "Osaka", lat: 34.6937, lon: 135.5023 },
-                { name: "Kyoto", lat: 35.0116, lon: 135.7681 }
+                { name: "Tokyo", lat: 35.6762, lon: 139.6503, state: "Tokyo" },
+                { name: "Osaka", lat: 34.6937, lon: 135.5023, state: "Osaka" },
+                { name: "Kyoto", lat: 35.0116, lon: 135.7681, state: "Kyoto" }
             ]
         }
     };
@@ -1994,6 +2013,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---- CITY/COUNTRY SELECTOR MODAL ----
+    // Geolocation API helper
+    const GeoAPI = {
+        baseUrl: "http://127.0.0.1:5000/api",
+        
+        async fetchCountries() {
+            try {
+                const res = await fetch(`${this.baseUrl}/countries`);
+                if (!res.ok) throw new Error("Failed to fetch countries");
+                return await res.json();
+            } catch (err) {
+                console.error("GeoAPI fetchCountries error:", err);
+                return null;
+            }
+        },
+        
+        async fetchStates(countryCode) {
+            try {
+                const res = await fetch(`${this.baseUrl}/states/${countryCode}`);
+                if (!res.ok) throw new Error(`Failed to fetch states for ${countryCode}`);
+                return await res.json();
+            } catch (err) {
+                console.error("GeoAPI fetchStates error:", err);
+                return null;
+            }
+        },
+        
+        async fetchCities(countryCode, stateCode) {
+            try {
+                const res = await fetch(`${this.baseUrl}/cities/${countryCode}/${stateCode}`);
+                if (!res.ok) throw new Error(`Failed to fetch cities for ${countryCode}/${stateCode}`);
+                return await res.json();
+            } catch (err) {
+                console.error("GeoAPI fetchCities error:", err);
+                return null;
+            }
+        }
+    };
+
+    // State variables for dynamic geographic matching
+    let tempSelectedCountry = "India";
+    let tempSelectedCountryCode = "IN";
+    let tempSelectedState = "Rajasthan";
+    let tempSelectedStateCode = "RJ";
+
+    let cachedCountries = [];
+    let cachedStates = [];
+    let cachedCities = [];
+
     // Inject the city selector modal HTML into the page
     function injectCityModal() {
         if (document.getElementById("city-selector-modal")) return;
@@ -2005,11 +2072,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <div>
                     <span style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--neon-cyan);">Location Selector</span>
-                    <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin-top:0.2rem;">Select Your Country &amp; City</h3>
+                    <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin-top:0.2rem;">Select Your Country, State &amp; City</h3>
                 </div>
                 <button id="city-modal-close" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.4rem;cursor:pointer;padding:0.3rem;">&times;</button>
             </div>
-            <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.5;margin:0;">Choose your country first, then select a city. Doctors will be filtered to your selected location.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.5;margin:0;">Choose your country, state, and finally your city to filter nearby psychologists.</p>
 
             <!-- Step 1: Country -->
             <div id="city-step-country">
@@ -2018,21 +2085,35 @@ document.addEventListener("DOMContentLoaded", () => {
                     <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--neon-cyan);font-size:0.85rem;pointer-events:none;"></i>
                     <input id="city-country-search" type="text" placeholder="Search country..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.75rem 1rem 0.75rem 2.5rem;color:#fff;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;" />
                 </div>
-                <div id="city-country-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.8rem;max-height:220px;overflow-y:auto;padding-right:4px;"></div>
+                <div id="city-country-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.8rem;max-height:200px;overflow-y:auto;padding-right:4px;"></div>
             </div>
 
-            <!-- Step 2: City (hidden until country selected) -->
-            <div id="city-step-city" style="display:none;">
+            <!-- Step 2: State -->
+            <div id="city-step-state" style="display:none;">
                 <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.7rem;">
-                    <button id="city-back-btn" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.8rem;color:rgba(255,255,255,0.6);font-size:0.78rem;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                    <button id="city-state-back-btn" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.8rem;color:rgba(255,255,255,0.6);font-size:0.78rem;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i> Back</button>
                     <span id="city-selected-country-label" style="font-size:0.82rem;font-weight:700;color:var(--neon-cyan);"></span>
                 </div>
-                <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.5);display:block;margin-bottom:0.5rem;">Step 2 — Select City</label>
+                <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.5);display:block;margin-bottom:0.5rem;">Step 2 — Select State / UT / Province</label>
+                <div style="position:relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--neon-purple);font-size:0.85rem;pointer-events:none;"></i>
+                    <input id="city-state-search" type="text" placeholder="Search state..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.75rem 1rem 0.75rem 2.5rem;color:#fff;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;" />
+                </div>
+                <div id="city-state-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.8rem;max-height:200px;overflow-y:auto;padding-right:4px;"></div>
+            </div>
+
+            <!-- Step 3: City -->
+            <div id="city-step-city" style="display:none;">
+                <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.7rem;">
+                    <button id="city-city-back-btn" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.8rem;color:rgba(255,255,255,0.6);font-size:0.78rem;cursor:pointer;"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                    <span id="city-selected-state-label" style="font-size:0.82rem;font-weight:700;color:var(--neon-cyan);"></span>
+                </div>
+                <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,0.5);display:block;margin-bottom:0.5rem;">Step 3 — Select City</label>
                 <div style="position:relative;">
                     <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--neon-purple);font-size:0.85rem;pointer-events:none;"></i>
                     <input id="city-city-search" type="text" placeholder="Search city..." style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.75rem 1rem 0.75rem 2.5rem;color:#fff;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;" />
                 </div>
-                <div id="city-city-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.8rem;max-height:220px;overflow-y:auto;padding-right:4px;"></div>
+                <div id="city-city-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.8rem;max-height:200px;overflow-y:auto;padding-right:4px;"></div>
             </div>
 
             <!-- Current selection display -->
@@ -2051,54 +2132,169 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("city-modal-close").addEventListener("click", () => { modal.style.display = "none"; });
         modal.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
 
-        // Back button
-        document.getElementById("city-back-btn").addEventListener("click", () => {
+        // Back buttons
+        document.getElementById("city-state-back-btn").addEventListener("click", () => {
             document.getElementById("city-step-country").style.display = "";
+            document.getElementById("city-step-state").style.display = "none";
+            document.getElementById("city-country-search").value = "";
+            renderCountryList("");
+        });
+        document.getElementById("city-city-back-btn").addEventListener("click", () => {
+            document.getElementById("city-step-state").style.display = "";
             document.getElementById("city-step-city").style.display = "none";
+            document.getElementById("city-state-search").value = "";
+            renderStateList(tempSelectedCountryCode, tempSelectedCountry, "");
         });
 
-        // Country search filter
+        // Search filters (live client-side filter for lag-free typing)
         document.getElementById("city-country-search").addEventListener("input", function () {
-            renderCountryList(this.value.toLowerCase());
+            renderCountryList(this.value);
         });
-
-        // City search filter
+        document.getElementById("city-state-search").addEventListener("input", function () {
+            renderStateList(tempSelectedCountryCode, tempSelectedCountry, this.value);
+        });
         document.getElementById("city-city-search").addEventListener("input", function () {
-            renderCityList(tempSelectedCountry, this.value.toLowerCase());
+            renderCityList(tempSelectedCountryCode, tempSelectedStateCode, this.value);
         });
-
-        renderCountryList("");
     }
 
-    let tempSelectedCountry = "";
-
-    function renderCountryList(filter = "") {
-        const container = document.getElementById("city-country-list");
-        if (!container) return;
-        const countries = Object.keys(cityDatabase).filter(c => c.toLowerCase().includes(filter));
-        container.innerHTML = countries.map(country => `
-            <button onclick="window._selectCountry('${country}')" style="background:${country === currentCountry ? 'rgba(0,242,254,0.12)' : 'rgba(255,255,255,0.04)'};border:1px solid ${country === currentCountry ? 'rgba(0,242,254,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:0.6rem 0.8rem;color:${country === currentCountry ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.7)'};font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all 0.2s;">
-                <i class="fa-solid fa-globe" style="margin-right:0.4rem;font-size:0.75rem;"></i>${country}
-            </button>`).join("");
-    }
-
-    window._selectCountry = function (country) {
-        tempSelectedCountry = country;
-        document.getElementById("city-step-country").style.display = "none";
-        document.getElementById("city-step-city").style.display = "";
-        document.getElementById("city-selected-country-label").textContent = "📍 " + country;
-        document.getElementById("city-city-search").value = "";
-        renderCityList(country, "");
+    const countryToCode = {
+        "India": "IN", "USA": "US", "UK": "GB", "Canada": "CA", "Australia": "AU",
+        "Germany": "DE", "France": "FR", "UAE": "AE", "Singapore": "SG", "Japan": "JP"
     };
 
-    function renderCityList(country, filter = "") {
+    async function renderCountryList(filterText = "") {
+        const container = document.getElementById("city-country-list");
+        if (!container) return;
+
+        if (cachedCountries.length === 0) {
+            container.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:1rem;color:rgba(255,255,255,0.4);"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</div>`;
+            const apiCountries = await GeoAPI.fetchCountries();
+            if (apiCountries && apiCountries.length > 0) {
+                cachedCountries = apiCountries;
+            } else {
+                // local fallback mapping
+                cachedCountries = Object.keys(cityDatabase).map(name => ({
+                    name: name,
+                    iso2: countryToCode[name] || "IN",
+                    emoji: "🌐"
+                }));
+            }
+        }
+
+        const q = filterText.toLowerCase().trim();
+        const filtered = cachedCountries.filter(c => c.name.toLowerCase().includes(q) || c.iso2.toLowerCase().includes(q));
+
+        container.innerHTML = filtered.map(c => `
+            <button onclick="window._selectCountry('${c.name.replace(/'/g, "\\'")}', '${c.iso2}')" style="background:${c.iso2 === tempSelectedCountryCode ? 'rgba(0,242,254,0.12)' : 'rgba(255,255,255,0.04)'};border:1px solid ${c.iso2 === tempSelectedCountryCode ? 'rgba(0,242,254,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:0.6rem 0.8rem;color:${c.iso2 === tempSelectedCountryCode ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.7)'};font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:0.4rem;overflow:hidden;">
+                <span style="font-size:1.15rem;line-height:1;flex-shrink:0;">${c.emoji || '🌐'}</span>
+                <span style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${c.name}</span>
+            </button>
+        `).join("");
+    }
+
+    window._selectCountry = async function (countryName, countryCode) {
+        tempSelectedCountry = countryName;
+        tempSelectedCountryCode = countryCode;
+
+        // Auto-update crisis support hotline banner when country changes
+        if (window.updateCrisisUI) {
+            window.updateCrisisUI(countryCode);
+        }
+
+        document.getElementById("city-step-country").style.display = "none";
+        document.getElementById("city-step-state").style.display = "";
+        document.getElementById("city-selected-country-label").textContent = `📍 ${countryName}`;
+        document.getElementById("city-state-search").value = "";
+
+        cachedStates = []; // Reset states cache to fetch new
+        await renderStateList(countryCode, countryName, "");
+    };
+
+    async function renderStateList(countryCode, countryName, filterText = "") {
+        const container = document.getElementById("city-state-list");
+        if (!container) return;
+
+        if (cachedStates.length === 0) {
+            container.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:1rem;color:rgba(255,255,255,0.4);"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</div>`;
+            const apiStates = await GeoAPI.fetchStates(countryCode);
+            if (apiStates && apiStates.length > 0) {
+                cachedStates = apiStates;
+            } else {
+                // fallback using local database
+                const fallbackCities = cityDatabase[countryName]?.cities || [];
+                const stateNames = [...new Set(fallbackCities.map(c => c.state))];
+                cachedStates = stateNames.map(name => ({
+                    name: name,
+                    state_code: name.slice(0, 3).toUpperCase(),
+                    country_code: countryCode
+                }));
+            }
+        }
+
+        const q = filterText.toLowerCase().trim();
+        const filtered = cachedStates.filter(s => s.name.toLowerCase().includes(q));
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:1rem;color:rgba(255,255,255,0.4);">No states/provinces found.</div>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(s => `
+            <button onclick="window._selectState('${s.name.replace(/'/g, "\\'")}', '${s.state_code}')" style="background:${s.state_code === tempSelectedStateCode ? 'rgba(180,0,255,0.12)' : 'rgba(255,255,255,0.04)'};border:1px solid ${s.state_code === tempSelectedStateCode ? 'rgba(180,0,255,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:0.6rem 0.8rem;color:${s.state_code === tempSelectedStateCode ? 'var(--neon-purple)' : 'rgba(255,255,255,0.7)'};font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:0.4rem;overflow:hidden;">
+                <i class="fa-solid fa-map" style="font-size:0.75rem;color:var(--neon-purple);flex-shrink:0;"></i>
+                <span style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${s.name}</span>
+            </button>
+        `).join("");
+    }
+
+    window._selectState = async function (stateName, stateCode) {
+        tempSelectedState = stateName;
+        tempSelectedStateCode = stateCode;
+
+        document.getElementById("city-step-state").style.display = "none";
+        document.getElementById("city-step-city").style.display = "";
+        document.getElementById("city-selected-state-label").textContent = `📍 ${stateName}`;
+        document.getElementById("city-city-search").value = "";
+
+        cachedCities = []; // Reset cities cache
+        await renderCityList(tempSelectedCountryCode, stateCode, "");
+    };
+
+    async function renderCityList(countryCode, stateCode, filterText = "") {
         const container = document.getElementById("city-city-list");
         if (!container) return;
-        const cities = (cityDatabase[country]?.cities || []).filter(c => c.name.toLowerCase().includes(filter));
-        container.innerHTML = cities.map(city => `
-            <button onclick="window._selectCity('${city.name}','${city.lat}','${city.lon}','${tempSelectedCountry}')" style="background:${city.name === currentCity ? 'rgba(180,0,255,0.12)' : 'rgba(255,255,255,0.04)'};border:1px solid ${city.name === currentCity ? 'rgba(180,0,255,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:0.6rem 0.8rem;color:${city.name === currentCity ? 'var(--neon-purple)' : 'rgba(255,255,255,0.7)'};font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all 0.2s;">
-                <i class="fa-solid fa-city" style="margin-right:0.4rem;font-size:0.75rem;"></i>${city.name}
-            </button>`).join("");
+
+        if (cachedCities.length === 0) {
+            container.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:1rem;color:rgba(255,255,255,0.4);"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</div>`;
+            const apiCities = await GeoAPI.fetchCities(countryCode, stateCode);
+            if (apiCities && apiCities.length > 0) {
+                cachedCities = apiCities;
+            } else {
+                // fallback using local database
+                const fallbackCities = cityDatabase[tempSelectedCountry]?.cities || [];
+                cachedCities = fallbackCities.filter(c => c.state === tempSelectedState);
+            }
+        }
+
+        const q = filterText.toLowerCase().trim();
+        const filtered = cachedCities.filter(c => c.name.toLowerCase().includes(q));
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:1rem;color:rgba(255,255,255,0.4);">No cities found.</div>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(c => {
+            const lat = c.latitude || 26.9124;
+            const lon = c.longitude || 75.7873;
+            return `
+                <button onclick="window._selectCity('${c.name.replace(/'/g, "\\'")}', '${lat}', '${lon}', '${tempSelectedCountry.replace(/'/g, "\\'")}')" style="background:${c.name === currentCity ? 'rgba(0,255,200,0.12)' : 'rgba(255,255,255,0.04)'};border:1px solid ${c.name === currentCity ? 'rgba(0,255,200,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:0.6rem 0.8rem;color:${c.name === currentCity ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.7)'};font-size:0.82rem;font-weight:700;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:0.4rem;overflow:hidden;">
+                    <i class="fa-solid fa-city" style="font-size:0.75rem;color:var(--neon-cyan);flex-shrink:0;"></i>
+                    <span style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${c.name}</span>
+                </button>
+            `;
+        }).join("");
     }
 
     window._selectCity = function (cityName, lat, lon, country) {
@@ -2113,7 +2309,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const geoBtn = document.getElementById("trigger-geo-api");
         if (geoText) geoText.textContent = `📍 Showing doctors for ${cityName}, ${country}`;
         if (geoLight) geoLight.classList.add("active");
-        if (geoBtn) { geoBtn.innerHTML = `<i class="fa-solid fa-city"></i> ${cityName}`; geoBtn.style.borderColor = "var(--neon-purple)"; }
+        if (geoBtn) { 
+            geoBtn.innerHTML = `<i class="fa-solid fa-city"></i> ${cityName}`; 
+            geoBtn.style.borderColor = "var(--neon-purple)"; 
+        }
 
         const currentLabel = document.getElementById("city-current-label");
         if (currentLabel) currentLabel.textContent = `${cityName}, ${country}`;
@@ -2143,17 +2342,29 @@ document.addEventListener("DOMContentLoaded", () => {
     if (geoLight) geoLight.classList.add("active");
     if (geoBtn) {
         geoBtn.innerHTML = `<i class="fa-solid fa-city"></i> Change City`;
-        geoBtn.addEventListener("click", () => {
+        geoBtn.addEventListener("click", async () => {
             injectCityModal();
             const modal = document.getElementById("city-selector-modal");
             if (modal) {
-                // Reset to country step
-                document.getElementById("city-step-country").style.display = "";
-                document.getElementById("city-step-city").style.display = "none";
-                document.getElementById("city-country-search").value = "";
-                renderCountryList("");
+                // If we already have a selected country/state/city, load the step 3 city selector
+                if (tempSelectedCountryCode && tempSelectedStateCode) {
+                    document.getElementById("city-step-country").style.display = "none";
+                    document.getElementById("city-step-state").style.display = "none";
+                    document.getElementById("city-step-city").style.display = "";
+                    document.getElementById("city-selected-state-label").textContent = `📍 ${tempSelectedState}`;
+                    document.getElementById("city-city-search").value = "";
+                    modal.style.display = "flex";
+                    await renderCityList(tempSelectedCountryCode, tempSelectedStateCode, "");
+                } else {
+                    // Fallback to start with country step
+                    document.getElementById("city-step-country").style.display = "";
+                    document.getElementById("city-step-state").style.display = "none";
+                    document.getElementById("city-step-city").style.display = "none";
+                    document.getElementById("city-country-search").value = "";
+                    modal.style.display = "flex";
+                    await renderCountryList("");
+                }
                 document.getElementById("city-current-label").textContent = `${currentCity}, ${currentCountry}`;
-                modal.style.display = "flex";
             }
         });
     }
@@ -3120,36 +3331,42 @@ document.addEventListener("DOMContentLoaded", () => {
     function resetBreathingVisuals() {
         currentPhaseIndex = 0;
         const config = rhythmsConfig[selectedRhythm];
-        currentSecondsRemaining = config[0].duration;
+        currentSecondsRemaining = config ? config[0].duration : 4;
 
         // Reset bubble classes
-        bubbleOuter.className = "breath-bubble-outer";
-        labelIndicator.textContent = "Paced";
-        countdown.textContent = currentSecondsRemaining;
+        if (bubbleOuter) bubbleOuter.className = "breath-bubble-outer";
+        if (labelIndicator) labelIndicator.textContent = "Paced";
+        if (countdown) countdown.textContent = currentSecondsRemaining;
 
-        if (selectedRhythm === "box") {
-            instructions.textContent = "Box Breathing: 4s Inhale, 4s Hold, 4s Exhale, 4s Hold. Click Start.";
-        } else if (selectedRhythm === "relax") {
-            instructions.textContent = "4-7-8 Relax: Clinically proven sequence for grounding. Click Start.";
-        } else {
-            instructions.textContent = "Coherent Breathing: Slow, even 5s cycles to balance blood flow. Click Start.";
+        if (instructions) {
+            if (selectedRhythm === "box") {
+                instructions.textContent = "Box Breathing: 4s Inhale, 4s Hold, 4s Exhale, 4s Hold. Click Start.";
+            } else if (selectedRhythm === "relax") {
+                instructions.textContent = "4-7-8 Relax: Clinically proven sequence for grounding. Click Start.";
+            } else {
+                instructions.textContent = "Coherent Breathing: Slow, even 5s cycles to balance blood flow. Click Start.";
+            }
         }
     }
 
     function startBreathingSession() {
         isBreathingActive = true;
-        playBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Session`;
-        playBtn.style.borderColor = "var(--neon-pink)";
-        playBtn.className = "neon-btn neon-btn-secondary";
-        resetBtn.disabled = false;
+        if (playBtn) {
+            playBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause Session`;
+            playBtn.style.borderColor = "var(--neon-pink)";
+            playBtn.className = "neon-btn neon-btn-secondary";
+        }
+        if (resetBtn) resetBtn.disabled = false;
 
         runBreathingCycleStep();
     }
 
     function pauseBreathingSession() {
         isBreathingActive = false;
-        playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume Session`;
-        playBtn.className = "neon-btn neon-btn-primary";
+        if (playBtn) {
+            playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume Session`;
+            playBtn.className = "neon-btn neon-btn-primary";
+        }
 
         clearInterval(breathInterval);
         clearTimeout(breathTimeout);
@@ -3157,10 +3374,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function stopBreathingSession() {
         isBreathingActive = false;
-        playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start Session`;
-        playBtn.className = "neon-btn neon-btn-primary";
-        playBtn.style.borderColor = "transparent";
-        resetBtn.disabled = true;
+        if (playBtn) {
+            playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start Session`;
+            playBtn.className = "neon-btn neon-btn-primary";
+            playBtn.style.borderColor = "transparent";
+        }
+        if (resetBtn) resetBtn.disabled = true;
 
         clearInterval(breathInterval);
         clearTimeout(breathTimeout);
@@ -3172,17 +3391,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const phase = config[currentPhaseIndex];
 
         // Apply visual classes
-        bubbleOuter.className = `breath-bubble-outer ${phase.state}`;
-        labelIndicator.textContent = phase.text;
+        if (bubbleOuter) bubbleOuter.className = `breath-bubble-outer ${phase.state}`;
+        if (labelIndicator) labelIndicator.textContent = phase.text;
         currentSecondsRemaining = phase.duration;
-        countdown.textContent = currentSecondsRemaining;
-        instructions.textContent = phase.desc;
+        if (countdown) countdown.textContent = currentSecondsRemaining;
+        if (instructions) instructions.textContent = phase.desc;
 
         // Timer countdown loop
         breathInterval = setInterval(() => {
             currentSecondsRemaining--;
             if (currentSecondsRemaining > 0) {
-                countdown.textContent = currentSecondsRemaining;
+                if (countdown) countdown.textContent = currentSecondsRemaining;
             } else {
                 clearInterval(breathInterval);
             }
@@ -3198,17 +3417,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Bind playback controls
-    playBtn.addEventListener("click", () => {
-        if (isBreathingActive) {
-            pauseBreathingSession();
-        } else {
-            startBreathingSession();
-        }
-    });
+    if (playBtn) {
+        playBtn.addEventListener("click", () => {
+            if (isBreathingActive) {
+                pauseBreathingSession();
+            } else {
+                startBreathingSession();
+            }
+        });
+    }
 
-    resetBtn.addEventListener("click", () => {
-        stopBreathingSession();
-    });
+    if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+            stopBreathingSession();
+        });
+    }
 
     // ==========================================================================
     // 9. SMART GLOBAL CRISIS-SUPPORT BANNER SYSTEM
@@ -4595,47 +4818,116 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Helper to update crisis UI elements with animation
         function updateCrisisUI(code) {
-            const data = globalHelplineDb[code] || globalHelplineDb["IN"];
-
             // Render loading transition
             if (skeleton && displayContainer) {
                 skeleton.style.display = "flex";
                 displayContainer.style.display = "none";
             }
 
-            setTimeout(() => {
-                activeCountryCode = code;
-                localStorage.setItem("aira_crisis_country", code);
+            // Remove any existing fallback notice to start clean
+            const existingFallback = document.getElementById("crisis-fallback-notice");
+            if (existingFallback) existingFallback.remove();
 
-                // Update text fields
-                if (flagImg) {
-                    flagImg.src = `https://flagcdn.com/w40/${data.flag}.png`;
-                    flagImg.alt = `${data.name} Flag`;
-                    flagImg.style.display = "block";
-                }
-                if (countryNameEl) countryNameEl.textContent = data.name;
-                if (supportDescEl) supportDescEl.textContent = data.title;
-                if (emergencyNumEl) emergencyNumEl.textContent = data.emergency;
+            // Fetch hotline details from API
+            fetch(`http://127.0.0.1:5000/api/hotlines/${code}`)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`API returned status ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    activeCountryCode = code;
+                    localStorage.setItem("aira_crisis_country", code);
 
-                if (phoneLink) {
-                    phoneLink.textContent = data.helpline;
-                    phoneLink.href = `tel:${data.helpline.replace(/\s+/g, '')}`;
-                    // Scale animation visual cue
-                    phoneLink.style.transform = "scale(1.15)";
-                    setTimeout(() => phoneLink.style.transform = "scale(1)", 200);
-                }
+                    // Update UI elements with retrieved data
+                    if (flagImg) {
+                        flagImg.src = `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+                        flagImg.alt = `${data.country} Flag`;
+                        flagImg.style.display = "block";
+                    }
+                    if (countryNameEl) countryNameEl.textContent = data.country;
+                    if (supportDescEl) supportDescEl.textContent = data.organization;
+                    if (emergencyNumEl) emergencyNumEl.textContent = data.emergency_number;
 
-                if (callActionBtn) {
-                    callActionBtn.href = `tel:${data.helpline.replace(/\s+/g, '')}`;
-                }
+                    if (phoneLink) {
+                        phoneLink.textContent = data.mental_health_hotline;
+                        phoneLink.href = `tel:${data.mental_health_hotline.replace(/\s+/g, '')}`;
+                        // Scale animation visual cue
+                        phoneLink.style.transform = "scale(1.15)";
+                        setTimeout(() => phoneLink.style.transform = "scale(1)", 200);
+                    }
 
-                // Remove loading skeleton
-                if (skeleton && displayContainer) {
-                    skeleton.style.display = "none";
-                    displayContainer.style.display = "flex";
-                }
-            }, 300);
+                    if (callActionBtn) {
+                        callActionBtn.href = `tel:${data.mental_health_hotline.replace(/\s+/g, '')}`;
+                        callActionBtn.style.display = "inline-flex";
+                    }
+
+                    // Remove loading skeleton
+                    if (skeleton && displayContainer) {
+                        skeleton.style.display = "none";
+                        displayContainer.style.display = "flex";
+                    }
+                })
+                .catch(err => {
+                    console.warn(`Failed to fetch hotline for ${code} from API, utilizing fallback:`, err);
+                    
+                    // Fallback behavior:
+                    // Use local globalHelplineDb to query the emergency number for the country code,
+                    // defaulting to standard 112 if not recognized.
+                    const localData = globalHelplineDb[code] || {
+                        name: code,
+                        flag: code.toLowerCase(),
+                        emergency: "112",
+                        helpline: "112",
+                        title: "Local Emergency Services"
+                    };
+
+                    activeCountryCode = code;
+                    localStorage.setItem("aira_crisis_country", code);
+
+                    if (flagImg) {
+                        flagImg.src = `https://flagcdn.com/w40/${localData.flag}.png`;
+                        flagImg.alt = `${localData.name} Flag`;
+                        flagImg.style.display = "block";
+                    }
+                    if (countryNameEl) countryNameEl.textContent = localData.name;
+                    if (supportDescEl) supportDescEl.textContent = "Local Emergency Services";
+                    if (emergencyNumEl) emergencyNumEl.textContent = localData.emergency;
+
+                    // Direct the main phone link to call the national emergency number
+                    if (phoneLink) {
+                        phoneLink.textContent = localData.emergency;
+                        phoneLink.href = `tel:${localData.emergency.replace(/[^0-9]/g, '')}`;
+                        phoneLink.style.transform = "scale(1.15)";
+                        setTimeout(() => phoneLink.style.transform = "scale(1)", 200);
+                    }
+
+                    if (callActionBtn) {
+                        callActionBtn.href = `tel:${localData.emergency.replace(/[^0-9]/g, '')}`;
+                        callActionBtn.style.display = "inline-flex";
+                    }
+
+                    // Create and inject a fallback message
+                    const bannerContent = document.querySelector(".crisis-banner-left");
+                    if (bannerContent) {
+                        const fallbackMsg = document.createElement("div");
+                        fallbackMsg.id = "crisis-fallback-notice";
+                        fallbackMsg.style.cssText = "margin-top: 0.8rem; padding: 0.6rem 1rem; background: rgba(255, 0, 128, 0.08); border: 1px solid rgba(255, 0, 128, 0.25); border-radius: 8px; font-size: 0.82rem; color: var(--neon-rose); display: flex; align-items: center; gap: 0.5rem; animation: pulse 2s infinite;";
+                        fallbackMsg.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>No country-specific mental health hotline is available. Please contact local emergency services.</span>`;
+                        bannerContent.appendChild(fallbackMsg);
+                    }
+
+                    // Remove loading skeleton
+                    if (skeleton && displayContainer) {
+                        skeleton.style.display = "none";
+                        displayContainer.style.display = "flex";
+                    }
+                });
         }
+
+        // Expose updateCrisisUI globally so _selectCountry (city modal) can call it
+        window.updateCrisisUI = updateCrisisUI;
 
         // Copy helpline to clipboard action
         if (copyActionBtn && phoneLink) {

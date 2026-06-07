@@ -513,7 +513,7 @@
                 <h3>Counselor Recommendation</h3>
                 <p>Leverages native geolocation metrics to connect you immediately with verified psychologists and
                     advisors.</p>
-                <a href="#doctors" class="feature-link">Find doctor <i class="fa-solid fa-chevron-right"></i></a>
+                <a href="doctor-support.html" class="feature-link">Find doctor <i class="fa-solid fa-chevron-right"></i></a>
             </div>
 
             <!-- Card 9: AI Gen-Z Chatbot -->
@@ -1058,7 +1058,7 @@
                 </div>
                 <div class="status-action-box">
                     <div class="status-score-bubble" id="status-score-display">Wellness score: 85</div>
-                    <a href="#doctors" class="neon-btn neon-btn-primary"
+                    <a href="doctor-support.html" class="neon-btn neon-btn-primary"
                         style="padding: 0.6rem 1.4rem; border-radius: 12px; font-size: 0.85rem;">
                         <i class="fa-solid fa-hospital-user"></i> View Counselors
                     </a>
@@ -1183,114 +1183,6 @@
         </div>
     </section>
 
-    <!-- 7. COUNSELOR & THERAPIST RECOMMENDATION SYSTEM -->
-    <section class="doctor-section" id="doctors">
-        <div class="section-header">
-            <span class="section-tag">Clinical Referrals</span>
-            <h2 class="section-title">Nearby Verified Psychologists</h2>
-            <p class="section-desc">Connect immediately with credentialed mental health specialists. Allowing location
-                services ranks psychologists relative to your physical proximity.</p>
-        </div>
-
-        <div class="doctor-filter-bar">
-            <!-- Geolocation trigger info -->
-            <div class="geolocation-info">
-                <div class="geolocation-status-light" id="geo-status-light"></div>
-                <span id="geo-text-status">Proximity matching: Active Fallback Mode</span>
-                <button class="geolocation-btn" id="trigger-geo-api">
-                    <i class="fa-solid fa-city"></i> Change City
-                </button>
-            </div>
-
-            <!-- Category filter selectors -->
-            <div class="doctor-filters">
-                <span class="filter-tab active" data-filter="all">All Specialists</span>
-                <span class="filter-tab" data-filter="stress">Stress & Burnout</span>
-                <span class="filter-tab" data-filter="anxiety">General Anxiety</span>
-                <span class="filter-tab" data-filter="depression">Clinical Depression</span>
-            </div>
-        </div>
-
-        <!-- Doctor Cards Grid -->
-        <div class="doctor-grid" id="doctor-results-grid">
-            <!-- Cards are generated dynamically in script.js to support proximity ordering and diagnostic filters -->
-        </div>
-
-        <!-- Smart Global Crisis support Banner -->
-        <div class="crisis-banner-container glass-panel" id="crisis-banner">
-            <!-- Left Side: Informational Context -->
-            <div class="crisis-banner-left">
-                <h3>
-                    <span class="crisis-badge-blink"><i class="fa-solid fa-triangle-exclamation"></i> LIVE
-                        PROTOCOL</span>
-                    Immediate Crisis Assistance Required?
-                </h3>
-                <p class="crisis-explanation">
-                    If you are experiencing severe emotional distress, panic, suicidal thoughts, or self-harm triggers,
-                    connect immediately. Professional support is available 24/7.
-                </p>
-                <div class="crisis-indicator-row">
-                    <div class="crisis-currently-showing">
-                        <span class="showing-label">Currently Showing Support For:</span>
-                        <div class="showing-country-box">
-                            <img id="crisis-flag-img" class="crisis-country-flag" src="https://flagcdn.com/w40/in.png"
-                                alt="Country Flag" onerror="this.style.display='none'">
-                            <span id="crisis-country-name" class="showing-country-name">India</span>
-                        </div>
-                    </div>
-                    <button class="neon-btn neon-btn-purple change-country-trigger-btn" id="change-country-btn">
-                        <i class="fa-solid fa-earth-americas"></i> Change Country
-                    </button>
-                </div>
-            </div>
-
-            <!-- Right Side: Big helpline number & call trigger -->
-            <div class="crisis-banner-right">
-                <div class="crisis-skeleton-loader" id="crisis-skeleton">
-                    <div class="skeleton-shimmer"></div>
-                </div>
-                <div class="crisis-helpline-content" id="crisis-helpline-display" style="display: none;">
-                    <span class="helpline-title" id="crisis-support-desc">Tele-MANAS Support Line</span>
-                    <a href="tel:14416" class="crisis-main-number" id="crisis-phone-link">14416</a>
-
-                    <div class="crisis-subline-box">
-                        <span class="crisis-subline-item"><strong>National Emergency:</strong> <span
-                                id="crisis-emergency-num">112</span></span>
-                        <span class="crisis-subline-meta">Free • Confidential • 24/7 Support</span>
-                    </div>
-
-                    <div class="crisis-actions">
-                        <a href="tel:14416" class="crisis-action-call-btn" id="crisis-call-action-btn">
-                            <i class="fa-solid fa-phone-volume"></i> Connect Now
-                        </a>
-                        <button class="crisis-action-copy-btn" id="crisis-copy-action-btn" title="Copy Number">
-                            <i class="fa-solid fa-copy"></i> Copy
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Global Searchable Country Selector Modal Overlay -->
-            <div class="country-selector-modal" id="country-selector-modal">
-                <div class="country-modal-content glass-panel">
-                    <div class="country-modal-header">
-                        <h4>Select Your Location</h4>
-                        <button class="country-modal-close" id="country-modal-close-btn">&times;</button>
-                    </div>
-                    <p class="country-modal-desc">Search and select a country to view local emergency mental health
-                        helplines.</p>
-                    <div class="country-search-box">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="country-search-input"
-                            placeholder="Search country by name or code (e.g. Canada)...">
-                    </div>
-                    <div class="country-list-scroll" id="country-list-container">
-                        <!-- Countries generated dynamically in JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- 8. DETAILED ABOUT PLATFORM SECTION -->
     <section class="about-section" id="about">
@@ -1471,7 +1363,7 @@
             <div class="footer-column">
                 <h4>Sourcing</h4>
                 <ul class="footer-links">
-                    <li class="footer-link-item"><a href="#doctors">Therapist Locator</a></li>
+                    <li class="footer-link-item"><a href="doctor-support.html">Therapist Locator</a></li>
                     <li class="footer-link-item"><a href="#about">Technical Manifesto</a></li>
                     <li class="footer-link-item"><a href="tel:988">988 Emergency Crisis</a></li>
                     <li class="footer-link-item"><a href="#analysis">NLP Confidence Scale</a></li>
