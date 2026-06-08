@@ -1,4 +1,5 @@
 import logging
+from nlp.gibberish_detector import GibberishDetector
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,8 @@ class DistilBertClassifier:
     def analyze_sentiment(self, text: str) -> dict:
         """Runs text analysis returning emotion ratios, sentiment tags, and confidence scores."""
         clean_text = text.strip()
+        
+        # 1. Base Bounds & Word Validation
         if not clean_text:
             return {
                 "sentiment": "Neutral",
@@ -56,28 +59,25 @@ class DistilBertClassifier:
                 "scores": {"Joy": 0.2, "Melancholy": 0.2, "Burnout/Frustration": 0.2, "Anxiety": 0.2, "Neutral": 0.2}
             }
             
-        # Verify word count minimum (Issue 2)
         words = [w for w in clean_text.split() if w]
-        if len(words) < 5:
-            return {
-                "sentiment": "Neutral",
-                "emotion": "Neutral",
-                "confidence": 0.0,
-                "scores": {
-                    "Joy": 0.2,
-                    "Melancholy": 0.2,
-                    "Burnout/Frustration": 0.2,
-                    "Anxiety": 0.2,
-                    "Neutral": 0.2
-                },
-                "insufficient": True
-            }
+        
+        # Minimum Requirements: Reject if < 20 characters OR < 5 words
+        if len(clean_text) < 20 or len(words) < 5:
+            return {"error": "Journal text must be at least 20 characters and contain at least 5 words."}
+            
+        # Maximum Requirements: Reject if > 1000 characters
+        if len(clean_text) > 1000:
+            return {"error": "Journal text must not exceed 1000 characters."}
 
-        # 1. Hugging Face Inference Flow
+        # 2. Gibberish Pre-Processing Guard
+        if GibberishDetector.is_gibberish(clean_text):
+            return {"error": "Please enter meaningful journal content."}
+
+        # 3. Hugging Face Inference Flow
         if self.pipeline:
             try:
                 raw_predictions = self.pipeline(clean_text)[0]
-                # Map Bhadresh Savani emotion outputs (sadness, joy, love, anger, fear, surprise) (Issue 7)
+                # Map Bhadresh Savani emotion outputs (sadness, joy, love, anger, fear, surprise)
                 raw_scores = {pred["label"]: float(pred["score"]) for pred in raw_predictions}
                 
                 scores = {
@@ -93,9 +93,19 @@ class DistilBertClassifier:
                 if total_sum > 0:
                     scores = {k: v / total_sum for k, v in scores.items()}
                 
-                # Determine dominant emotion (Issue 1)
+                # Determine dominant emotion
                 dominant_emotion = max(scores, key=scores.get)
                 confidence = scores[dominant_emotion]
+                
+                # Confidence Threshold check (< 0.60)
+                if confidence < 0.60:
+                    return {
+                        "sentiment": "Uncertain",
+                        "emotion": "Insufficient Information",
+                        "confidence": round(confidence, 3),
+                        "scores": {"Joy": 0.0, "Melancholy": 0.0, "Anxiety": 0.0, "Burnout/Frustration": 0.0, "Neutral": 0.0},
+                        "message": "Unable to confidently analyze journal entry."
+                    }
                 
                 sentiment_map = {
                     "Joy": "Positive",
@@ -114,7 +124,7 @@ class DistilBertClassifier:
             except Exception as e:
                 logger.error(f"Inference crash: {str(e)}. Enforcing fallback lexicon...")
                 
-        # 2. High-Fidelity Rule-Based Lexicon Fallback
+        # 4. High-Fidelity Rule-Based Lexicon Fallback
         text_lower = clean_text.lower()
         
         # Scoring variables using mapped keys
@@ -148,6 +158,16 @@ class DistilBertClassifier:
         dominant = max(normalized_scores, key=normalized_scores.get)
         confidence = normalized_scores[dominant]
         
+        # Confidence Threshold check for Lexicon Fallback (< 0.60)
+        if confidence < 0.60:
+            return {
+                "sentiment": "Uncertain",
+                "emotion": "Insufficient Information",
+                "confidence": round(confidence, 3),
+                "scores": {"Joy": 0.0, "Melancholy": 0.0, "Anxiety": 0.0, "Burnout/Frustration": 0.0, "Neutral": 0.0},
+                "message": "Unable to confidently analyze journal entry."
+            }
+            
         sentiment_map = {
             "Joy": "Positive",
             "Melancholy": "Negative",

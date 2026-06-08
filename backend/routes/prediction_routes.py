@@ -2,12 +2,14 @@ from flask import Blueprint, request, jsonify
 from database.report_model import ReportModel
 from database.mood_model import MoodModel
 from middleware.auth_middleware import token_required
+from middleware.validation import validate_prediction_input
 from services.prediction_service import prediction_service
 
 prediction_bp = Blueprint("prediction", __name__)
 
 @prediction_bp.route("/predict", methods=["POST"])
 @token_required
+@validate_prediction_input
 def predict(current_user):
     """Endpoint that runs the hybrid ML/rule-based diagnostic assessment and records the result."""
     data = request.get_json() or {}
@@ -15,6 +17,14 @@ def predict(current_user):
     try:
         # Run prediction diagnostic service
         metrics = prediction_service.run_assessment(data)
+        
+        # Explainability data
+        explainability = {
+            "top_positive_factors": metrics.get("top_positive_factors", []),
+            "top_negative_factors": metrics.get("top_negative_factors", []),
+            "prediction_reliability": metrics.get("prediction_reliability", "High"),
+            "crisis_triggered": metrics.get("crisis_triggered", False)
+        }
         
         # Save to mental_health_reports database
         report = ReportModel.create_report(
@@ -27,7 +37,8 @@ def predict(current_user):
             emotion=metrics["emotion"],
             risk=metrics["risk"],
             sleep_hours=float(data.get("sleep_hours", 7.0)),
-            emotion_scores=metrics.get("emotion_scores")
+            emotion_scores=metrics.get("emotion_scores"),
+            explainability=explainability
         )
         
         # Log mood heatmap entry for today

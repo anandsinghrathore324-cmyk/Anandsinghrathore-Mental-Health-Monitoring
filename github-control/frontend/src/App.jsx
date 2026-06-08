@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ShieldAlert, 
-  Terminal, 
-  FileCode, 
-  MessageSquare, 
-  PlusCircle, 
-  Send, 
-  Users, 
-  Clock, 
-  Lock, 
-  CheckCircle, 
+import {
+  ShieldAlert,
+  Terminal,
+  FileCode,
+  MessageSquare,
+  PlusCircle,
+  Send,
+  Users,
+  Clock,
+  Lock,
+  CheckCircle,
   XCircle,
   Database,
   RefreshCw
@@ -23,7 +23,7 @@ export default function App() {
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState(null); // { type: 'success'|'error', message: '' }
-  
+
   // Tab/Active Panel State
   const [activeTab, setActiveTab] = useState('comment'); // comment, issue, pr, commit
 
@@ -91,7 +91,7 @@ export default function App() {
       showToast('error', 'Please fill out all comment parameters.');
       return;
     }
-    
+
     handleActionTrigger(
       'comment on GitHub',
       { type: 'Post Comment', target: `Issue/PR #${commentData.issueNumber}`, preview: commentData.commentText },
@@ -218,14 +218,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none antialiased selection:bg-rose-500 selection:text-white">
-      
+
       {/* Dynamic Toast Feedback Overlay */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-2xl transition-all duration-300 transform scale-100 ${
-          toast.type === 'success' 
-            ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-emerald-950/50' 
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl border backdrop-blur-md shadow-2xl transition-all duration-300 transform scale-100 ${toast.type === 'success'
+            ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300 shadow-emerald-950/50'
             : 'bg-rose-950/80 border-rose-500 text-rose-300 shadow-rose-950/50'
-        }`}>
+          }`}>
           {toast.type === 'success' ? <CheckCircle size={20} className="text-emerald-400" /> : <XCircle size={20} className="text-rose-400" />}
           <span className="text-sm font-semibold tracking-wide">{toast.message}</span>
         </div>
@@ -235,7 +234,7 @@ export default function App() {
       {confirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
           <div className="bg-slate-900 border border-rose-500/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl shadow-rose-950/20 animate-in fade-in zoom-in duration-200">
-            
+
             {/* Modal Header Warning Alert Banner */}
             <div className="bg-gradient-to-r from-rose-900/50 to-orange-900/30 border-b border-rose-500/20 px-6 py-5 flex items-center gap-4">
               <div className="p-2 bg-rose-500/10 rounded-lg text-rose-400 animate-pulse">
@@ -363,32 +362,30 @@ export default function App() {
 
       {/* Main Grid Layout Dashboard */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
-        
+
         {/* Left Side Column: Action Workspace panels (7 columns) */}
         <section className="lg:col-span-7 flex flex-col gap-6">
           <div className="bg-slate-900/40 border border-slate-900/80 backdrop-blur-md rounded-2xl p-6 flex flex-col flex-1 shadow-2xl relative overflow-hidden">
-            
+
             {/* Tab navigation headers */}
             <div className="flex border-b border-slate-950 pb-4 mb-6 gap-2 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('comment')}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${
-                  activeTab === 'comment'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${activeTab === 'comment'
                     ? 'bg-rose-950/20 border-rose-500/30 text-rose-300 shadow-inner'
                     : 'bg-slate-950/30 border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <MessageSquare size={14} />
                 Post Comment
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('issue')}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${
-                  activeTab === 'issue'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${activeTab === 'issue'
                     ? 'bg-rose-950/20 border-rose-500/30 text-rose-300 shadow-inner'
                     : 'bg-slate-950/30 border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <PlusCircle size={14} />
                 Create Issue
@@ -396,11 +393,10 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab('pr')}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${
-                  activeTab === 'pr'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${activeTab === 'pr'
                     ? 'bg-rose-950/20 border-rose-500/30 text-rose-300 shadow-inner'
                     : 'bg-slate-950/30 border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <MessageSquare size={14} />
                 PR Comment
@@ -408,11 +404,10 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab('commit')}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${
-                  activeTab === 'commit'
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 border cursor-pointer ${activeTab === 'commit'
                     ? 'bg-rose-950/20 border-rose-500/30 text-rose-300 shadow-inner'
                     : 'bg-slate-950/30 border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <FileCode size={14} />
                 Push Changes
@@ -421,7 +416,7 @@ export default function App() {
 
             {/* Tab Panels Contents */}
             <div className="flex-1 flex flex-col justify-between">
-              
+
               {/* TAB 1: Post Comment Panel */}
               {activeTab === 'comment' && (
                 <div className="space-y-5 animate-in fade-in duration-200">
@@ -429,7 +424,7 @@ export default function App() {
                     <h2 className="text-base font-bold text-slate-200 uppercase tracking-wider">Comment Workspace</h2>
                     <p className="text-xs text-slate-400">Post a comment directly to a specific Issue or PR thread.</p>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="md:col-span-1 space-y-1.5">
@@ -452,7 +447,7 @@ export default function App() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Comment Markdown Text:</label>
                       <textarea
@@ -482,7 +477,7 @@ export default function App() {
                     <h2 className="text-base font-bold text-slate-200 uppercase tracking-wider">Create Issue Workspace</h2>
                     <p className="text-xs text-slate-400">Open a new ticket issue on your GitHub repository tracker.</p>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="md:col-span-2 space-y-1.5">
@@ -546,7 +541,7 @@ export default function App() {
                     <h2 className="text-base font-bold text-slate-200 uppercase tracking-wider">PR Comment Workspace</h2>
                     <p className="text-xs text-slate-400">Add operational comments or feedback on open Pull Requests.</p>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="md:col-span-1 space-y-1.5">
@@ -569,7 +564,7 @@ export default function App() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">PR Comment Markdown:</label>
                       <textarea
@@ -599,7 +594,7 @@ export default function App() {
                     <h2 className="text-base font-bold text-slate-200 uppercase tracking-wider">Push Changes Workspace</h2>
                     <p className="text-xs text-slate-400">Push updates directly to a specific repository path via the REST Commit APIs.</p>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-1.5">
@@ -673,7 +668,7 @@ export default function App() {
         {/* Right Side Column: Real-Time Audit Logs Trail (5 columns) */}
         <section className="lg:col-span-5 flex flex-col gap-6">
           <div className="bg-slate-900/40 border border-slate-900/80 backdrop-blur-md rounded-2xl p-6 flex flex-col h-[650px] shadow-2xl relative">
-            
+
             {/* Sidebar header */}
             <div className="flex items-center justify-between border-b border-slate-950 pb-4 mb-4">
               <div className="flex items-center gap-2 text-slate-200">
@@ -699,15 +694,14 @@ export default function App() {
                 </div>
               ) : (
                 logs.map((log, index) => (
-                  <div 
+                  <div
                     key={index}
-                    className={`border rounded-xl p-3.5 space-y-2.5 transition-all bg-slate-950/50 ${
-                      !log.success 
-                        ? 'border-rose-500/20 shadow-inner' 
+                    className={`border rounded-xl p-3.5 space-y-2.5 transition-all bg-slate-950/50 ${!log.success
+                        ? 'border-rose-500/20 shadow-inner'
                         : log.actionType.startsWith('BLOCKED')
                           ? 'border-amber-500/25'
                           : 'border-slate-850'
-                    }`}
+                      }`}
                   >
                     {/* Log Entry Title Line */}
                     <div className="flex items-start justify-between gap-2">
@@ -721,13 +715,12 @@ export default function App() {
                           {log.actionType}
                         </span>
                       </div>
-                      
+
                       {/* Success/Error Badges */}
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-widest ${
-                        log.success 
-                          ? 'bg-emerald-950/50 border border-emerald-500/20 text-emerald-400' 
+                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-widest ${log.success
+                          ? 'bg-emerald-950/50 border border-emerald-500/20 text-emerald-400'
                           : 'bg-rose-950/50 border border-rose-500/20 text-rose-400'
-                      }`}>
+                        }`}>
                         {log.success ? 'Success' : 'Rejected'}
                       </span>
                     </div>

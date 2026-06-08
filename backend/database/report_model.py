@@ -8,7 +8,8 @@ class ReportModel:
     @staticmethod
     def create_report(user_id: str, stress: int, anxiety: int, depression: int, 
                       burnout: int, wellness: int, emotion: str, risk: str,
-                      sleep_hours: float = None, emotion_scores: dict = None) -> dict:
+                      sleep_hours: float = None, emotion_scores: dict = None,
+                      explainability: dict = None) -> dict:
         """Inserts a new diagnostic mental health report for a student user."""
         report_doc = {
             "user_id": ObjectId(user_id) if user_id else None,
@@ -25,6 +26,8 @@ class ReportModel:
             report_doc["sleep_hours"] = float(sleep_hours)
         if emotion_scores is not None:
             report_doc["emotion_scores"] = emotion_scores
+        if explainability is not None:
+            report_doc["explainability"] = explainability
             
         result = db_manager.db.mental_health_reports.insert_one(report_doc)
         report_doc["_id"] = str(result.inserted_id)
