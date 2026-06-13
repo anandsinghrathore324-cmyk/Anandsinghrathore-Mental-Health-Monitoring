@@ -42,6 +42,19 @@ def validate_prediction_input(f):
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
+        # Study Satisfaction
+        satisfaction, err = check_bound("Study satisfaction", data.get("study_satisfaction"), 1, 10, is_int=True)
+        if err:
+            return jsonify({"status": "error", "message": err}), 400
+
+        # Dietary Habits
+        diet = data.get("dietary_habits")
+        if diet is None:
+            return jsonify({"status": "error", "message": "Dietary habits is required."}), 400
+        valid_diets = ["Healthy", "Moderate", "Unhealthy"]
+        if diet not in valid_diets:
+            return jsonify({"status": "error", "message": f"Dietary habits must be one of {valid_diets}."}), 400
+
         # Anxiety Level
         anx, err = check_bound("Anxiety level", data.get("anxiety_level"), 1, 10, is_int=True)
         if err:
@@ -51,6 +64,19 @@ def validate_prediction_input(f):
         str_lvl, err = check_bound("Stress level", data.get("stress_level"), 1, 10, is_int=True)
         if err:
             return jsonify({"status": "error", "message": err}), 400
+
+        # Financial Stress
+        fin_stress, err = check_bound("Financial stress", data.get("financial_stress"), 1, 10, is_int=True)
+        if err:
+            return jsonify({"status": "error", "message": err}), 400
+
+        # Family History of Mental Illness
+        fam_history = data.get("family_history")
+        if fam_history is None:
+            return jsonify({"status": "error", "message": "Family history of mental illness is required."}), 400
+        valid_history = ["Yes", "No"]
+        if fam_history not in valid_history:
+            return jsonify({"status": "error", "message": f"Family history of mental illness must be one of {valid_history}."}), 400
 
         # Study Hours
         study, err = check_bound("Study hours", data.get("study_hours"), 0.0, 16.0, is_int=False)
@@ -67,11 +93,16 @@ def validate_prediction_input(f):
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
+        # Work Hours
+        work, err = check_bound("Work hours", data.get("work_hours"), 0.0, 16.0, is_int=False)
+        if err:
+            return jsonify({"status": "error", "message": err}), 400
+
         # Combined workload limit
-        if (study + sleep + screen) > 24.0:
+        if (study + sleep + screen + work) > 24.0:
             return jsonify({
                 "status": "error",
-                "message": "Combined study hours, sleep hours, and screen time cannot exceed 24 hours."
+                "message": "Combined study hours, sleep hours, screen time, and work hours cannot exceed 24 hours."
             }), 400
 
         # Text input validation checks (gibberish, text length, word bounds)

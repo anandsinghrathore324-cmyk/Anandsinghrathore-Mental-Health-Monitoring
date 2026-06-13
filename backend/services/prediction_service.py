@@ -45,6 +45,13 @@ class PredictionService:
         mood = data.get("mood", "calm").strip().lower()
         diary_text = data.get("text", "").strip()
 
+        # Capture new variables
+        study_satisfaction = int(data.get("study_satisfaction", 5))
+        dietary_habits = data.get("dietary_habits", "Moderate")
+        financial_stress = int(data.get("financial_stress", 5))
+        family_history = data.get("family_history", "No")
+        work_hours = float(data.get("work_hours", 0.0))
+
         # 2. Math Risk Equations
         sleep_deficit = self.preprocessor.calculate_sleep_deficit(sleep_hours)
         screen_excess = self.preprocessor.calculate_screen_excess(screen_time)
@@ -55,7 +62,7 @@ class PredictionService:
         sentiment = nlp_res.get("sentiment", "Neutral")
 
         # 2a. Stress score
-        base_stress = (input_stress * 6) + (academic_pressure * 3) + (sleep_deficit * 5)
+        base_stress = (input_stress * 5) + (academic_pressure * 2.5) + (sleep_deficit * 4) + (financial_stress * 2.5) + ((10 - study_satisfaction) * 1.5) + (work_hours * 1.5)
         if sentiment == "Negative":
             base_stress += 8
         if "exam" in diary_text.lower() or "deadline" in diary_text.lower():
@@ -63,13 +70,21 @@ class PredictionService:
         final_stress = min(98, max(8, int(base_stress)))
 
         # 2b. Anxiety score
-        base_anxiety = (input_anxiety * 7) + (academic_pressure * 2) + (sleep_deficit * 3)
+        base_anxiety = (input_anxiety * 5.5) + (academic_pressure * 1.5) + (sleep_deficit * 2) + (financial_stress * 2.5)
+        if family_history == "Yes":
+            base_anxiety += 10
         if "panic" in diary_text.lower() or "scared" in diary_text.lower():
             base_anxiety += 12
         final_anxiety = min(99, max(5, int(base_anxiety)))
 
         # 2c. Depression score
-        base_depression = (sleep_deficit * 6) + (screen_excess * 4) + (academic_pressure * 2)
+        base_depression = (sleep_deficit * 5) + (screen_excess * 3) + ((10 - study_satisfaction) * 2.5) + (financial_stress * 2) + (work_hours * 1.0)
+        if family_history == "Yes":
+            base_depression += 12
+        if dietary_habits == "Unhealthy":
+            base_depression += 8
+        elif dietary_habits == "Moderate":
+            base_depression += 4
         if mood in ["sad", "melancholy"]:
             base_depression += 20
         if "hopeless" in diary_text.lower() or "worthless" in diary_text.lower():
@@ -77,7 +92,7 @@ class PredictionService:
         final_depression = min(98, max(4, int(base_depression)))
 
         # 2d. Burnout score
-        base_burnout = (final_stress * 0.6) + (screen_excess * 3) + (sleep_deficit * 4)
+        base_burnout = (final_stress * 0.5) + (screen_excess * 2.5) + (sleep_deficit * 3.5) + ((10 - study_satisfaction) * 2) + (work_hours * 1.5)
         final_burnout = min(98, max(5, int(base_burnout)))
 
         # 3. Overall Wellness Index (Option B: ML-primary baseline)
@@ -91,7 +106,12 @@ class PredictionService:
             "Academic pressure",
             "Social media usage",
             "Sleep deficit",
-            "Screen excess"
+            "Screen excess",
+            "Study satisfaction",
+            "Dietary habits",
+            "Financial stress",
+            "Family history",
+            "Work hours"
         ]
         
         top_positive_factors = []

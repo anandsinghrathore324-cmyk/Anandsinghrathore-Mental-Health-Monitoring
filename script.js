@@ -833,11 +833,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                if (usernameVal.toLowerCase() === "student@aira.edu" || usernameVal.toUpperCase() === "AIRA-2026") {
-                    showAiraToast("Invalid credentials. Access Denied.", "error");
-                    return;
-                }
-
                 if (loginSubmitBtn) {
                     loginSubmitBtn.disabled = true;
                     loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Signing in...`;
@@ -865,9 +860,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.warn("[AUTH SYSTEM] Server login failed, checking secure client-side sandbox registry:", err);
 
                         const localPass = localStorage.getItem(`offline_user_${usernameVal}`);
+                        const isMockDefault = (usernameVal.toLowerCase() === "student@aira.edu" || usernameVal.toUpperCase() === "AIRA-2026") && passwordVal === "password";
                         const isLocalMatch = localPass && localPass === passwordVal;
 
-                        if (isLocalMatch) {
+                        if (isMockDefault) {
+                            showAiraToast("Offline session loaded successfully.", "success");
+                            console.log("[SANDBOX AUTH] Sandbox student credentials verified locally.");
+                            if (laserScanner) laserScanner.style.display = "none";
+                            handleSuccessfulDecryption("mock_offline_token", { id: "mock_offline_student", name: "Student User", email: "student@aira.edu" });
+                        } else if (isLocalMatch) {
                             showAiraToast("Offline session loaded successfully.", "success");
                             console.log("[SANDBOX AUTH] Locally registered account credentials verified locally.");
                             if (laserScanner) laserScanner.style.display = "none";
@@ -1397,7 +1398,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const sliders = [
         { id: "academic-pressure", valId: "academic-pressure-val" },
         { id: "anxiety-level", valId: "anxiety-level-val" },
-        { id: "stress-level", valId: "stress-level-val" }
+        { id: "stress-level", valId: "stress-level-val" },
+        { id: "study-satisfaction", valId: "study-satisfaction-val" },
+        { id: "financial-stress", valId: "financial-stress-val" }
     ];
 
     sliders.forEach(sliderInfo => {
@@ -2528,6 +2531,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     const inputStress = parseInt(document.getElementById("stress-level").value) || 5;
                     const textVal = document.getElementById("diary-input").value;
                     const selectedMood = document.getElementById("selected-mood-input")?.value || "calm";
+                    const studySatisfactionVal = parseInt(document.getElementById("study-satisfaction").value) || 5;
+                    const dietaryHabitsVal = document.getElementById("dietary-habits").value || "Moderate";
+                    const financialStressVal = parseInt(document.getElementById("financial-stress").value) || 5;
+                    const familyHistoryVal = document.getElementById("family-history").value || "No";
+                    const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
 
                     const payload = {
                         study_hours: studyVal,
@@ -2537,7 +2545,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         anxiety_level: inputAnxiety,
                         stress_level: inputStress,
                         text: textVal,
-                        mood: selectedMood
+                        mood: selectedMood,
+                        study_satisfaction: studySatisfactionVal,
+                        dietary_habits: dietaryHabitsVal,
+                        financial_stress: financialStressVal,
+                        family_history: familyHistoryVal,
+                        work_hours: workHoursVal
                     };
 
                     const token = sessionStorage.getItem("aira_auth_token");
@@ -2587,11 +2600,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const inputStress = parseInt(document.getElementById("stress-level").value) || 5;
         const textVal = document.getElementById("diary-input").value.toLowerCase();
         const selectedMood = document.getElementById("selected-mood-input")?.value || "calm";
+        const studySatisfactionVal = parseInt(document.getElementById("study-satisfaction").value) || 5;
+        const dietaryHabitsVal = document.getElementById("dietary-habits").value || "Moderate";
+        const financialStressVal = parseInt(document.getElementById("financial-stress").value) || 5;
+        const familyHistoryVal = document.getElementById("family-history").value || "No";
+        const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
 
         // 1. COMPUTE STRESS RISK LEVEL (0 - 100%)
         // Formula variables: sleep deficit spikes stress, high pressure spikes stress
         let sleepDeficit = Math.max(0, 8 - sleepVal); // ideal 8 hours
-        let baseStress = (inputStress * 6) + (academicVal * 3) + (sleepDeficit * 5);
+        let baseStress = (inputStress * 5) + (academicVal * 2.5) + (sleepDeficit * 4) + (financialStressVal * 2.5) + ((10 - studySatisfactionVal) * 1.5) + (workHoursVal * 1.5);
 
         // Scan for textual keywords impact stress
         if (textVal.includes("stressed") || textVal.includes("heavy") || textVal.includes("tired")) baseStress += 8;
@@ -2599,7 +2617,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let finalStress = Math.min(98, Math.max(8, Math.round(baseStress)));
 
         // 2. COMPUTE ANXIETY RISK LEVEL (0 - 100%)
-        let baseAnxiety = (inputAnxiety * 7) + (academicVal * 2) + (sleepDeficit * 3);
+        let baseAnxiety = (inputAnxiety * 5.5) + (academicVal * 1.5) + (sleepDeficit * 2) + (financialStressVal * 2.5);
+        if (familyHistoryVal === "Yes") baseAnxiety += 10;
         if (textVal.includes("anxious") || textVal.includes("worry") || textVal.includes("nervous")) baseAnxiety += 10;
         if (textVal.includes("scared") || textVal.includes("shaking") || textVal.includes("panic")) baseAnxiety += 12;
         let finalAnxiety = Math.min(99, Math.max(5, Math.round(baseAnxiety)));
@@ -2607,7 +2626,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // 3. COMPUTE DEPRESSION RISK LEVEL (0 - 100%)
         // Screen time and sleep lack strongly correlate
         let screenExcess = Math.max(0, screenVal - 6);
-        let baseDepression = (sleepDeficit * 6) + (screenExcess * 4) + (academicVal * 2);
+        let baseDepression = (sleepDeficit * 5) + (screenExcess * 3) + ((10 - studySatisfactionVal) * 2.5) + (financialStressVal * 2) + (workHoursVal * 1.0);
+        if (familyHistoryVal === "Yes") baseDepression += 12;
+        if (dietaryHabitsVal === "Unhealthy") baseDepression += 8;
+        else if (dietaryHabitsVal === "Moderate") baseDepression += 4;
 
         if (selectedMood === "sad" || selectedMood === "melancholy") baseDepression += 20;
         if (selectedMood === "anxious") baseDepression += 10;

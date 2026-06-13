@@ -38,7 +38,12 @@ def predict(current_user):
             risk=metrics["risk"],
             sleep_hours=float(data.get("sleep_hours", 7.0)),
             emotion_scores=metrics.get("emotion_scores"),
-            explainability=explainability
+            explainability=explainability,
+            study_satisfaction=int(data.get("study_satisfaction", 5)) if data.get("study_satisfaction") is not None else None,
+            dietary_habits=data.get("dietary_habits"),
+            financial_stress=int(data.get("financial_stress", 5)) if data.get("financial_stress") is not None else None,
+            family_history=data.get("family_history"),
+            work_hours=float(data.get("work_hours", 0.0)) if data.get("work_hours") is not None else None
         )
         
         # Log mood heatmap entry for today

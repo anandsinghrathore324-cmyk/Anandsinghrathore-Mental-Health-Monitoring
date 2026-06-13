@@ -47,6 +47,14 @@ class MLPreprocessor:
         sleep_deficit = self.calculate_sleep_deficit(sleep_hours)
         screen_excess = self.calculate_screen_excess(screen_time)
         
+        study_satisfaction = float(data.get("study_satisfaction", 5.0))
+        dietary_habits = data.get("dietary_habits", "Moderate")
+        dietary_val = 2.0 if dietary_habits == "Healthy" else (1.0 if dietary_habits == "Moderate" else 0.0)
+        financial_stress = float(data.get("financial_stress", 5.0))
+        family_history = data.get("family_history", "No")
+        family_val = 1.0 if family_history == "Yes" else 0.0
+        work_hours = float(data.get("work_hours", 0.0))
+        
         features_array = np.array([
             study_hours,
             sleep_hours,
@@ -54,7 +62,12 @@ class MLPreprocessor:
             academic_pressure,
             social_media,
             sleep_deficit,
-            screen_excess
+            screen_excess,
+            study_satisfaction,
+            dietary_val,
+            financial_stress,
+            family_val,
+            work_hours
         ]).reshape(1, -1)
         
         if self.scaler:

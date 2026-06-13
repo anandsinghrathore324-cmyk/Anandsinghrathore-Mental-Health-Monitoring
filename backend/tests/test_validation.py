@@ -64,6 +64,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "Male",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -89,6 +94,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 12,  # Under 13
             "gender": "Male",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -106,6 +116,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "InvalidGenderOption",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -123,6 +138,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "Male",
             "academic_pressure": 11,  # Out of bounds
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -135,21 +155,26 @@ class TestValidationLayer(unittest.TestCase):
         self.assertIn("Academic pressure must be between 1 and 10", response.get_json()["message"])
 
     def test_combined_workload_hours_exceeded(self):
-        """Verify workload validation rejects study + sleep + screen > 24 hours."""
+        """Verify workload validation rejects study + sleep + screen + work > 24 hours."""
         payload = {
             "age": 20,
             "gender": "Male",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 5.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 10.0,
-            "sleep_hours": 10.0,
-            "screen_time": 6.0,  # Sum = 26 hours > 24
+            "sleep_hours": 6.0,
+            "screen_time": 4.0,  # Sum = 25 hours > 24
             "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
         }
         response = self.client.post("/api/predict", json=payload, headers=self.headers)
         self.assertEqual(response.status_code, 400)
-        self.assertIn("Combined study hours, sleep hours, and screen time cannot exceed 24 hours", response.get_json()["message"])
+        self.assertIn("Combined study hours, sleep hours, screen time, and work hours cannot exceed 24 hours", response.get_json()["message"])
 
     def test_gibberish_text_rejected(self):
         """Verify gibberish pre-processing detection blocks gibberish texts."""
@@ -157,6 +182,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "Male",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -175,6 +205,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "Male",
             "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 5,
             "stress_level": 5,
             "study_hours": 6.0,
@@ -192,6 +227,11 @@ class TestValidationLayer(unittest.TestCase):
             "age": 20,
             "gender": "Male",
             "academic_pressure": 1,  # Low pressure/stress should lead to high wellness
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
             "anxiety_level": 1,
             "stress_level": 1,
             "study_hours": 2.0,
@@ -206,6 +246,116 @@ class TestValidationLayer(unittest.TestCase):
         self.assertTrue(data["metrics"]["crisis_triggered"])
         self.assertLess(data["metrics"]["wellness"], 30)
         self.assertEqual(data["metrics"]["risk"], "High")
+
+    def test_invalid_study_satisfaction(self):
+        """Verify study_satisfaction validation fails outside 1-10 bounds."""
+        payload = {
+            "age": 20,
+            "gender": "Male",
+            "academic_pressure": 5,
+            "study_satisfaction": 11,  # Out of bounds
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
+            "anxiety_level": 5,
+            "stress_level": 5,
+            "study_hours": 6.0,
+            "sleep_hours": 8.0,
+            "screen_time": 5.0,
+            "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
+        }
+        response = self.client.post("/api/predict", json=payload, headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Study satisfaction must be between 1 and 10", response.get_json()["message"])
+
+    def test_invalid_dietary_habits(self):
+        """Verify dietary_habits validation fails with invalid choice."""
+        payload = {
+            "age": 20,
+            "gender": "Male",
+            "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "JunkFood",  # Invalid
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 4.0,
+            "anxiety_level": 5,
+            "stress_level": 5,
+            "study_hours": 6.0,
+            "sleep_hours": 8.0,
+            "screen_time": 5.0,
+            "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
+        }
+        response = self.client.post("/api/predict", json=payload, headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Dietary habits must be one of", response.get_json()["message"])
+
+    def test_invalid_financial_stress(self):
+        """Verify financial_stress validation fails outside 1-10 bounds."""
+        payload = {
+            "age": 20,
+            "gender": "Male",
+            "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": -1,  # Out of bounds
+            "family_history": "No",
+            "work_hours": 4.0,
+            "anxiety_level": 5,
+            "stress_level": 5,
+            "study_hours": 6.0,
+            "sleep_hours": 8.0,
+            "screen_time": 5.0,
+            "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
+        }
+        response = self.client.post("/api/predict", json=payload, headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Financial stress must be between 1 and 10", response.get_json()["message"])
+
+    def test_invalid_family_history(self):
+        """Verify family_history validation fails with invalid choice."""
+        payload = {
+            "age": 20,
+            "gender": "Male",
+            "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "Maybe",  # Invalid
+            "work_hours": 4.0,
+            "anxiety_level": 5,
+            "stress_level": 5,
+            "study_hours": 6.0,
+            "sleep_hours": 8.0,
+            "screen_time": 5.0,
+            "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
+        }
+        response = self.client.post("/api/predict", json=payload, headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Family history of mental illness must be one of", response.get_json()["message"])
+
+    def test_invalid_work_hours(self):
+        """Verify work_hours validation fails outside 0-16 bounds."""
+        payload = {
+            "age": 20,
+            "gender": "Male",
+            "academic_pressure": 5,
+            "study_satisfaction": 5,
+            "dietary_habits": "Moderate",
+            "financial_stress": 5,
+            "family_history": "No",
+            "work_hours": 17.0,  # Out of bounds
+            "anxiety_level": 5,
+            "stress_level": 5,
+            "study_hours": 6.0,
+            "sleep_hours": 8.0,
+            "screen_time": 5.0,
+            "text": "I feel extremely happy and proud of my work today. I feel calm and relaxed."
+        }
+        response = self.client.post("/api/predict", json=payload, headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Work hours must be between 0.0 and 16.0", response.get_json()["message"])
 
 if __name__ == "__main__":
     unittest.main()

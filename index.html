@@ -701,15 +701,11 @@
                                 max="24" required>
                         </div>
 
-                        <!-- Academic Pressure Level -->
+                        <!-- Work Hours -->
                         <div class="form-group">
-                            <label for="academic-pressure"><i class="fa-solid fa-weight-hanging"></i> Academic Pressure
-                                (1–10)</label>
-                            <div class="range-slider-container">
-                                <input type="range" id="academic-pressure" class="range-slider" min="1" max="10"
-                                    value="5">
-                                <span class="range-value" id="academic-pressure-val">5</span>
-                            </div>
+                            <label for="work-hours"><i class="fa-solid fa-briefcase"></i> Daily Work Hours</label>
+                            <input type="number" id="work-hours" class="form-input" placeholder="e.g. 4" min="0"
+                                max="24" required>
                         </div>
 
                         <!-- Screen Time -->
@@ -718,6 +714,37 @@
                                 (Hours/Day)</label>
                             <input type="number" id="screen-time" class="form-input" placeholder="e.g. 5" min="0"
                                 max="24" required>
+                        </div>
+
+                        <!-- Academic Pressure Level -->
+                        <div class="form-group">
+                            <label for="academic-pressure"><i class="fa-solid fa-weight-hanging"></i> Academic Pressure
+                                (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="academic-pressure" class="range-slider" min="1" max="10"
+                                    value="5">
+                            </div>
+                        </div>
+
+                        <!-- Study Satisfaction Level -->
+                        <div class="form-group">
+                            <label for="study-satisfaction"><i class="fa-solid fa-face-laugh"></i> Study Satisfaction
+                                (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="study-satisfaction" class="range-slider" min="1" max="10"
+                                    value="5">
+                            </div>
+                        </div>
+
+                        <!-- Dietary Habits -->
+                        <div class="form-group">
+                            <label for="dietary-habits"><i class="fa-solid fa-utensils"></i> Dietary Habits</label>
+                            <select id="dietary-habits" class="form-input" required>
+                                <option value="" disabled selected>Select Dietary Habit</option>
+                                <option value="Healthy">Healthy</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Unhealthy">Unhealthy</option>
+                            </select>
                         </div>
 
                         <!-- Social Media Usage -->
@@ -762,7 +789,6 @@
                                 (1–10)</label>
                             <div class="range-slider-container">
                                 <input type="range" id="anxiety-level" class="range-slider" min="1" max="10" value="4">
-                                <span class="range-value" id="anxiety-level-val">4</span>
                             </div>
                         </div>
 
@@ -772,8 +798,27 @@
                                 (1–10)</label>
                             <div class="range-slider-container">
                                 <input type="range" id="stress-level" class="range-slider" min="1" max="10" value="5">
-                                <span class="range-value" id="stress-level-val">5</span>
                             </div>
+                        </div>
+
+                        <!-- Financial Stress Level -->
+                        <div class="form-group">
+                            <label for="financial-stress"><i class="fa-solid fa-coins"></i> Financial Stress
+                                (1–10)</label>
+                            <div class="range-slider-container">
+                                <input type="range" id="financial-stress" class="range-slider" min="1" max="10"
+                                    value="5">
+                            </div>
+                        </div>
+
+                        <!-- Family History of Mental Illness -->
+                        <div class="form-group">
+                            <label for="family-history"><i class="fa-solid fa-people-roof"></i> Family History of Mental Illness</label>
+                            <select id="family-history" class="form-input" required>
+                                <option value="" disabled selected>Select Option</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
                         </div>
 
                         <!-- Textarea description -->

@@ -9,7 +9,9 @@ class ReportModel:
     def create_report(user_id: str, stress: int, anxiety: int, depression: int, 
                       burnout: int, wellness: int, emotion: str, risk: str,
                       sleep_hours: float = None, emotion_scores: dict = None,
-                      explainability: dict = None) -> dict:
+                      explainability: dict = None, study_satisfaction: int = None,
+                      dietary_habits: str = None, financial_stress: int = None,
+                      family_history: str = None, work_hours: float = None) -> dict:
         """Inserts a new diagnostic mental health report for a student user."""
         report_doc = {
             "user_id": ObjectId(user_id) if user_id else None,
@@ -28,6 +30,16 @@ class ReportModel:
             report_doc["emotion_scores"] = emotion_scores
         if explainability is not None:
             report_doc["explainability"] = explainability
+        if study_satisfaction is not None:
+            report_doc["study_satisfaction"] = int(study_satisfaction)
+        if dietary_habits is not None:
+            report_doc["dietary_habits"] = dietary_habits.strip()
+        if financial_stress is not None:
+            report_doc["financial_stress"] = int(financial_stress)
+        if family_history is not None:
+            report_doc["family_history"] = family_history.strip()
+        if work_hours is not None:
+            report_doc["work_hours"] = float(work_hours)
             
         result = db_manager.db.mental_health_reports.insert_one(report_doc)
         report_doc["_id"] = str(result.inserted_id)
