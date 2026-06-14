@@ -1,7 +1,7 @@
 // ==========================================================================
 // CONFIGURATION: Set your live Render Backend URL here
 // ==========================================================================
-const PROD_BACKEND_URL = "https://anandsinghrathore-mental-health-monitoring.onrender.com";
+const PROD_BACKEND_URL = "https://anandsinghrathore-mental-health.onrender.com";
 
 const API_BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
     ? "http://127.0.0.1:5000"
