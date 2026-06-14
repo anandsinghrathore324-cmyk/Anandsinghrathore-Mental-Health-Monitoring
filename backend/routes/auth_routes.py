@@ -206,8 +206,12 @@ def request_otp():
                 """
                 msg.attach(MIMEText(body, "html"))
 
-                # Secure connection using SSL (with explicit timeout)
-                server = smtplib.SMTP_SSL(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                # Log SMTP server details before initiating connection
+                logger.info(f"[SMTP SEND] Initiating SMTP STARTTLS connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
+
+                # Secure connection using TLS (with explicit timeout)
+                server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                server.starttls()
                 server.login(Config.SMTP_EMAIL, Config.SMTP_PASSWORD)
                 server.sendmail(Config.SMTP_EMAIL, email, msg.as_string())
                 server.quit()
@@ -218,14 +222,26 @@ def request_otp():
                     "message": "One-Time Password has been dispatched to your email inbox."
                 }), 200
             except Exception as mail_err:
-                # Console logger fallback with detailed traceback on SMTP delivery failure, falling back gracefully to sandbox bypass
-                logger.error(f"[OTP SMTP ERROR] Dispatch failed for {email}: {str(mail_err)}. Gracefully falling back to local sandbox mode.", exc_info=True)
-                return jsonify({
-                    "status": "success",
-                    "message": f"SMTP delivery failed: {str(mail_err)}. Bypassing via local sandbox mode.",
-                    "otp_bypass": otp_code
-                }), 200
+                # Console logger fallback with detailed traceback on SMTP delivery failure
+                logger.error(f"[OTP SMTP ERROR] Dispatch failed for {email}: {str(mail_err)}", exc_info=True)
+                if Config.IS_PRODUCTION:
+                    return jsonify({
+                        "status": "error",
+                        "message": f"SMTP mail delivery failed: {str(mail_err)}"
+                    }), 500
+                else:
+                    return jsonify({
+                        "status": "success",
+                        "message": f"SMTP delivery failed: {str(mail_err)}. Bypassing via local sandbox mode.",
+                        "otp_bypass": otp_code
+                    }), 200
         else:
+            if Config.IS_PRODUCTION:
+                return jsonify({
+                    "status": "error",
+                    "message": "SMTP credentials are not configured in production. Cannot send verification email."
+                }), 500
+
             # Local Sandbox Mode: Console logging fallback
             logger.info(f"[OTP SYSTEM LOGS] Gmail credentials not configured (using local sandbox mode)")
             logger.info(f"[OTP SYSTEM LOGS] Generated code for {email}: {otp_code}")
@@ -315,8 +331,12 @@ def signup_request_otp():
                 """
                 msg.attach(MIMEText(body, "html"))
 
-                # Secure connection using SSL (with explicit timeout)
-                server = smtplib.SMTP_SSL(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                # Log SMTP server details before initiating connection
+                logger.info(f"[SMTP SEND] Initiating SMTP STARTTLS connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
+
+                # Secure connection using TLS (with explicit timeout)
+                server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                server.starttls()
                 server.login(Config.SMTP_EMAIL, Config.SMTP_PASSWORD)
                 server.sendmail(Config.SMTP_EMAIL, email, msg.as_string())
                 server.quit()
@@ -327,14 +347,26 @@ def signup_request_otp():
                     "message": "Verification code has been dispatched to your Gmail address."
                 }), 200
             except Exception as mail_err:
-                # Console logger fallback with detailed traceback on SMTP delivery failure, falling back gracefully to sandbox bypass
-                logger.error(f"[SIGNUP SMTP ERROR] Dispatch failed for {email}: {str(mail_err)}. Gracefully falling back to local sandbox mode.", exc_info=True)
-                return jsonify({
-                    "status": "success",
-                    "message": f"SMTP delivery failed: {str(mail_err)}. Bypassing via local sandbox mode.",
-                    "otp_bypass": otp_code
-                }), 200
+                # Console logger fallback with detailed traceback on SMTP delivery failure
+                logger.error(f"[SIGNUP SMTP ERROR] Dispatch failed for {email}: {str(mail_err)}", exc_info=True)
+                if Config.IS_PRODUCTION:
+                    return jsonify({
+                        "status": "error",
+                        "message": f"SMTP mail delivery failed: {str(mail_err)}"
+                    }), 500
+                else:
+                    return jsonify({
+                        "status": "success",
+                        "message": f"SMTP delivery failed: {str(mail_err)}. Bypassing via local sandbox mode.",
+                        "otp_bypass": otp_code
+                    }), 200
         else:
+            if Config.IS_PRODUCTION:
+                return jsonify({
+                    "status": "error",
+                    "message": "SMTP credentials are not configured in production. Cannot send verification email."
+                }), 500
+
             # Local Sandbox Mode: Console logging fallback
             logger.info(f"[SIGNUP SYSTEM LOGS] Gmail credentials not configured (using local sandbox mode)")
             logger.info(f"[SIGNUP SYSTEM LOGS] Generated code for {email}: {otp_code}")
