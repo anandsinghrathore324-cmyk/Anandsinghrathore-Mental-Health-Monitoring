@@ -207,11 +207,16 @@ def request_otp():
                 msg.attach(MIMEText(body, "html"))
 
                 # Log SMTP server details before initiating connection
-                logger.info(f"[SMTP SEND] Initiating SMTP STARTTLS connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
+                logger.info(f"[SMTP SEND] Initiating SMTP connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
 
-                # Secure connection using TLS (with explicit timeout)
-                server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
-                server.starttls()
+                # Secure connection dynamically selecting protocol based on port
+                if Config.SMTP_PORT == 465:
+                    logger.info("[SMTP SEND] Using direct SSL connection for port 465")
+                    server = smtplib.SMTP_SSL(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                else:
+                    logger.info(f"[SMTP SEND] Using STARTTLS connection for port {Config.SMTP_PORT}")
+                    server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                    server.starttls()
                 server.login(Config.SMTP_EMAIL, Config.SMTP_PASSWORD)
                 server.sendmail(Config.SMTP_EMAIL, email, msg.as_string())
                 server.quit()
@@ -332,11 +337,16 @@ def signup_request_otp():
                 msg.attach(MIMEText(body, "html"))
 
                 # Log SMTP server details before initiating connection
-                logger.info(f"[SMTP SEND] Initiating SMTP STARTTLS connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
+                logger.info(f"[SMTP SEND] Initiating SMTP connection. Server: {Config.SMTP_SERVER}, Port: {Config.SMTP_PORT}")
 
-                # Secure connection using TLS (with explicit timeout)
-                server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
-                server.starttls()
+                # Secure connection dynamically selecting protocol based on port
+                if Config.SMTP_PORT == 465:
+                    logger.info("[SMTP SEND] Using direct SSL connection for port 465")
+                    server = smtplib.SMTP_SSL(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                else:
+                    logger.info(f"[SMTP SEND] Using STARTTLS connection for port {Config.SMTP_PORT}")
+                    server = smtplib.SMTP(Config.SMTP_SERVER, Config.SMTP_PORT, timeout=10)
+                    server.starttls()
                 server.login(Config.SMTP_EMAIL, Config.SMTP_PASSWORD)
                 server.sendmail(Config.SMTP_EMAIL, email, msg.as_string())
                 server.quit()
