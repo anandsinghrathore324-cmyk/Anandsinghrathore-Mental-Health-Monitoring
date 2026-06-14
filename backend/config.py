@@ -1,8 +1,13 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from backend/.env explicitly, falling back to default cwd loading
+base_dir = os.path.abspath(os.path.dirname(__file__))
+env_path = os.path.join(base_dir, ".env")
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+else:
+    load_dotenv()
 
 class Config:
     """Production-grade configuration settings utilizing environment variables."""
@@ -13,7 +18,17 @@ class Config:
     JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", 24))
     
     # MongoDB Connection Config
-    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/aira_wellness")
+    MONGO_URI = os.getenv("MONGO_URI")
+    IS_PRODUCTION = os.getenv("RENDER") == "true" or os.getenv("FLASK_ENV") == "production"
+
+    if IS_PRODUCTION:
+        if not MONGO_URI:
+            raise ValueError("MONGO_URI environment variable is missing in production environment (Render)!")
+        if "localhost" in MONGO_URI or "127.0.0.1" in MONGO_URI:
+            raise ValueError("MONGO_URI cannot point to localhost/127.0.0.1 in production environment (Render)!")
+    else:
+        if not MONGO_URI:
+            MONGO_URI = "mongodb://localhost:27017/aira_wellness"
     
     # Logging Configurations
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
