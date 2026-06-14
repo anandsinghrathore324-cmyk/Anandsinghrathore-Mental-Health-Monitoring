@@ -71,27 +71,34 @@ def login():
         }), 400
         
     db_type = "MONGOMOCK_FALLBACK" if "mongomock" in str(type(db_manager.client)) else "LIVE_MONGODB"
-    logger.info(f"[AUTH LOGIN] Received login request for email: {email} (DB Provider: {db_type})")
+    logger.info(f"[AUTH AUDIT] Received login attempt for email: {email} (DB Provider: {db_type})")
     
     user = UserModel.find_by_email(email)
     
     if not user:
-        logger.warning(f"[AUTH LOGIN] User lookup failed: no document found for email {email}")
+        logger.warning(f"[AUTH AUDIT] Failed Login: No user document found in database for email: {email}")
         return jsonify({
             "status": "error",
-            "message": "Invalid decrypt signatures. Access Denied."
+            "message": "Invalid credentials. Access Denied (User not found)."
         }), 401
         
-    logger.info(f"[AUTH LOGIN] User found in database: ID={user['_id']}")
+    logger.info(f"[AUTH AUDIT] User record found: ID={user['_id']}")
     
+    # Audit email_verified status (if present in the document)
+    email_verified = user.get("email_verified")
+    if email_verified is None:
+        logger.info("[AUTH AUDIT] email_verified field is missing from user record (defaults to True or not used in schema)")
+    else:
+        logger.info(f"[AUTH AUDIT] email_verified status: {email_verified}")
+        
     pass_check = UserModel.verify_password(user["password"], password)
-    logger.info(f"[AUTH LOGIN] Password hash match check: {pass_check}")
+    logger.info(f"[AUTH AUDIT] Password hash verification result: {pass_check}")
     
     if not pass_check:
-        logger.warning(f"[AUTH LOGIN] Access Denied: Password mismatch for email {email}")
+        logger.warning(f"[AUTH AUDIT] Failed Login: Password mismatch for email: {email}")
         return jsonify({
             "status": "error",
-            "message": "Invalid decrypt signatures. Access Denied."
+            "message": "Invalid credentials. Access Denied (Password mismatch)."
         }), 401
         
     # Generate secure JWT access token
