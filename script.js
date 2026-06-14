@@ -1,3 +1,12 @@
+// ==========================================================================
+// CONFIGURATION: Set your live Render Backend URL here
+// ==========================================================================
+const PROD_BACKEND_URL = "https://anandsinghrathore-mental-health-monitoring.onrender.com";
+
+const API_BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://127.0.0.1:5000"
+    : PROD_BACKEND_URL;
+
 /* ==========================================================================
    INTERACTIVE LOGIC: FUTURISTIC STUDENT MENTAL HEALTH & WELLNESS PLATFORM
    CLIENT-SIDE CAPABILITIES: Canvas Particles, Geolocation, NLP, ChartJS, AI Chat
@@ -341,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         console.log("[AUTH FE] Fetching live dashboard statistics...");
-        fetch("http://127.0.0.1:5000/api/dashboard-data", {
+        fetch(`${API_BASE_URL}/api/dashboard-data`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -605,7 +614,7 @@ document.addEventListener("DOMContentLoaded", () => {
             forgotSendBtn.disabled = true;
             forgotSendBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...`;
 
-            fetch("http://127.0.0.1:5000/api/request-otp", {
+            fetch(`${API_BASE_URL}/api/request-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailVal })
@@ -676,7 +685,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            fetch("http://127.0.0.1:5000/api/verify-otp", {
+            fetch(`${API_BASE_URL}/api/verify-otp`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailVal, otp: otpVal })
@@ -687,7 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .then(data => {
                     if (data.status === "success") {
-                        return fetch("http://127.0.0.1:5000/api/reset-password", {
+                        return fetch(`${API_BASE_URL}/api/reset-password`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ email: emailVal, password: newPasswordVal })
@@ -741,7 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
             otpSendBtn.disabled = true;
             otpSendBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Dispatching...`;
 
-            fetch("http://127.0.0.1:5000/api/request-otp", {
+            fetch(`${API_BASE_URL}/api/request-otp`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -861,7 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (laserScanner) laserScanner.style.display = "block";
 
                 console.log("[AUTH FE] Dispatching login request to /api/login for email:", usernameVal);
-                fetch("http://127.0.0.1:5000/api/login", {
+                fetch(`${API_BASE_URL}/api/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: usernameVal, password: passwordVal })
@@ -942,7 +951,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (laserScanner) laserScanner.style.display = "block";
 
                 console.log("[AUTH FE] Dispatching OTP verification request to /api/verify-otp for email:", emailVal, "OTP code:", otpVal);
-                fetch("http://127.0.0.1:5000/api/verify-otp", {
+                fetch(`${API_BASE_URL}/api/verify-otp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: emailVal, otp: otpVal })
@@ -1000,7 +1009,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     if (laserScanner) laserScanner.style.display = "block";
 
-                    fetch("http://127.0.0.1:5000/api/signup-request-otp", {
+                    fetch(`${API_BASE_URL}/api/signup-request-otp`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name: nameVal, email: emailVal })
@@ -1059,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     if (laserScanner) laserScanner.style.display = "block";
 
-                    fetch("http://127.0.0.1:5000/api/signup-verify-otp", {
+                    fetch(`${API_BASE_URL}/api/signup-verify-otp`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email: emailVal, otp: otpVal })
@@ -1125,7 +1134,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     if (laserScanner) laserScanner.style.display = "block";
 
-                    fetch("http://127.0.0.1:5000/api/signup", {
+                    fetch(`${API_BASE_URL}/api/signup`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name: nameVal, email: emailVal, password: passwordVal })
@@ -1145,7 +1154,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     loginSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Auto Login...`;
                                 }
 
-                                return fetch("http://127.0.0.1:5000/api/login", {
+                                return fetch(`${API_BASE_URL}/api/login`, {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ email: emailVal, password: passwordVal })
@@ -1984,7 +1993,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        fetch("http://127.0.0.1:5000/api/nearby-doctors", {
+        fetch(`${API_BASE_URL}/api/nearby-doctors`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -2073,7 +2082,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---- CITY/COUNTRY SELECTOR MODAL ----
     // Geolocation API helper
     const GeoAPI = {
-        baseUrl: "http://127.0.0.1:5000/api",
+        baseUrl: `${API_BASE_URL}/api`,
         
         async fetchCountries() {
             try {
@@ -2795,7 +2804,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    fetch("http://127.0.0.1:5000/api/predict", {
+                    fetch(`${API_BASE_URL}/api/predict`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -3602,7 +3611,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        fetch("http://127.0.0.1:5000/api/chatbot", {
+        fetch(`${API_BASE_URL}/api/chatbot`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -5293,7 +5302,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (existingFallback) existingFallback.remove();
 
             // Fetch hotline details from API
-            fetch(`http://127.0.0.1:5000/api/hotlines/${code}`)
+            fetch(`${API_BASE_URL}/api/hotlines/${code}`)
                 .then(res => {
                     if (!res.ok) {
                         throw new Error(`API returned status ${res.status}`);
