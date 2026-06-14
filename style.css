@@ -1054,7 +1054,7 @@ textarea.form-input {
     font-family: 'Space Grotesk', sans-serif;
 }
 
-/* DistilBERT NLP Card */
+/* Text Analysis Model Card */
 .nlp-visualization-card {
     padding: 2.5rem;
     display: flex;
@@ -1496,11 +1496,11 @@ textarea.form-input {
 }
 
 .heatmap-day-cell.wellness-lvl-1 {
-    background-color: rgba(0, 255, 135, 0.25);
-    border-color: rgba(0, 255, 135, 0.4);
+    background-color: rgba(255, 0, 85, 0.25);
+    border-color: rgba(255, 0, 85, 0.4);
     color: var(--text-main);
     text-shadow: 0 0 4px #000;
-    box-shadow: inset 0 0 8px rgba(0, 255, 135, 0.2);
+    box-shadow: inset 0 0 8px rgba(255, 0, 85, 0.2);
 }
 
 .heatmap-day-cell.wellness-lvl-2 {
@@ -1512,23 +1512,31 @@ textarea.form-input {
 }
 
 .heatmap-day-cell.wellness-lvl-3 {
-    background-color: rgba(255, 0, 85, 0.25);
-    border-color: rgba(255, 0, 85, 0.4);
+    background-color: rgba(255, 200, 0, 0.22);
+    border-color: rgba(255, 200, 0, 0.35);
     color: var(--text-main);
     text-shadow: 0 0 4px #000;
-    box-shadow: inset 0 0 8px rgba(255, 0, 85, 0.2);
+    box-shadow: inset 0 0 8px rgba(255, 200, 0, 0.15);
 }
 
 .heatmap-day-cell.wellness-lvl-4 {
-    background-color: rgba(127, 0, 255, 0.25);
-    border-color: rgba(127, 0, 255, 0.4);
+    background-color: rgba(160, 255, 0, 0.2);
+    border-color: rgba(160, 255, 0, 0.35);
     color: var(--text-main);
     text-shadow: 0 0 4px #000;
-    box-shadow: inset 0 0 8px rgba(127, 0, 255, 0.2);
+    box-shadow: inset 0 0 8px rgba(160, 255, 0, 0.15);
+}
+
+.heatmap-day-cell.wellness-lvl-5 {
+    background-color: rgba(0, 255, 135, 0.25);
+    border-color: rgba(0, 255, 135, 0.4);
+    color: var(--text-main);
+    text-shadow: 0 0 4px #000;
+    box-shadow: inset 0 0 8px rgba(0, 255, 135, 0.2);
 }
 
 .heatmap-day-cell.wellness-lvl-1:hover {
-    box-shadow: var(--glow-emerald);
+    box-shadow: var(--glow-rose);
 }
 
 .heatmap-day-cell.wellness-lvl-2:hover {
@@ -1536,11 +1544,15 @@ textarea.form-input {
 }
 
 .heatmap-day-cell.wellness-lvl-3:hover {
-    box-shadow: var(--glow-rose);
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
 }
 
 .heatmap-day-cell.wellness-lvl-4:hover {
-    box-shadow: var(--glow-purple);
+    box-shadow: 0 0 10px rgba(160, 255, 0, 0.5);
+}
+
+.heatmap-day-cell.wellness-lvl-5:hover {
+    box-shadow: var(--glow-emerald);
 }
 
 .heatmap-day-cell.active-selected {
@@ -4475,4 +4487,71 @@ textarea.form-input {
     .policy-modal-header h4 {
         font-size: 1.1rem;
     }
-}
+}
+
+/* AI Personalized Recommendations Card Styling */
+.recommendation-item-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.recommendation-item-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 242, 254, 0.3);
+    background: rgba(0, 242, 254, 0.03);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.recommendation-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.recommendation-info-box h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.recommendation-info-box p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.recommendation-tag-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.6rem;
+}
+
+/* Warning Toast styles */
+.aira-toast-warning {
+    border-left: 4px solid var(--neon-orange);
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.15);
+}
+
+.aira-toast-warning i {
+    color: var(--neon-orange);
+    font-size: 1.1rem;
+}

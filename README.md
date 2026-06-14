@@ -1,5 +1,5 @@
 # AIRA — AI-Based Student Mental Health Monitoring & Support System
-Welcome to the comprehensive technical documentation for **AIRA (AI Student Mental Health & Support Platform)**. This manual provides a bottom-up architectural breakdown of every system layer, detailing the frontend design system, the Python Flask backend microservices, the MongoDB database collections, and the integrated machine learning prediction models (Hugging Face Transformers & Ridge Regression).
+Welcome to the comprehensive technical documentation for **AIRA (AI Student Mental Health & Support Platform)**. This manual provides a bottom-up architectural breakdown of every system layer, detailing the frontend design system, the Python Flask backend microservices, the MongoDB database collections, and the integrated machine learning prediction models (Text Analysis Model & Behavioral ML Model).
 
 ---
 
@@ -14,8 +14,8 @@ graph TD
     C --> D[Sticky Cyberpunk Navbar]
     C --> E[Quantum Mental Health Scanner Form]
     E -->|POST request payload| F[Python Flask API Server]
-    F -->|Inference| G1[DistilBERT NLP Model]
-    F -->|Inference| G2[Ridge Regression Model]
+    F -->|Inference| G1[Text Analysis Model]
+    F -->|Inference| G2[Behavioral ML Model]
     F -->|Persist & Log| H[MongoDB / Mongomock DB]
     F -->|JSON Response| C
     C --> I[AI Diagnostics & Score Dashboard]
@@ -69,16 +69,16 @@ AIRA implements a hybrid predictive architecture blending deep neural network mo
 When a user submits the Quantum Mental Health Scanner form:
 1. **Frontend Capture**: The client-side collects both numerical inputs (study hours, sleep hours, screen time, etc.) and free-text inputs (daily diary journal log).
 2. **API Dispatch**: A POST request is made to `/api/predict` with the JSON payload.
-3. **NLP Classification (DistilBERT)**: The free-text log is analyzed by the DistilBERT model to evaluate emotional states and sentiment.
+3. **NLP Classification (Text Analysis Model)**: The free-text log is analyzed by the Text Analysis Model to evaluate emotional states and sentiment.
 4. **Feature Derivation**: Derived features (Sleep Deficit, Screen Excess) are calculated from raw hours.
-5. **Ridge Inference**: The 7 numerical features are scaled and fed into the Ridge Regression model to predict a wellness baseline score.
+5. **Behavioral ML Inference**: The 7 numerical features are scaled and fed into the Behavioral ML Model to predict a wellness baseline score.
 6. **Rule-Based Risk Calculation**: Clinical formulas calculate Stress, Anxiety, Depression, and Burnout threat values, modified by keyword triggers and the NLP sentiment.
-7. **Hybrid Blending**: The baseline wellness rule calculation ($80\%$) is blended with the Ridge ML prediction ($20\%$) to produce a final, robust Wellness Index.
+7. **Hybrid Blending**: The baseline wellness rule calculation ($80\%$) is blended with the Behavioral ML Model prediction ($20\%$) to produce a final, robust Wellness Index.
 8. **Logging & Visualization**: The metrics are saved in MongoDB and returned to the client to update the stability dashboard and mood stability heatmap.
 
-### A. NLP Sentiment Analysis: DistilBERT Model
-The user's qualitative journal log entries (`#diary-input`) are parsed by a Hugging Face Transformers pipeline utilizing the **`bhadresh-savani/distilbert-base-uncased-emotion`** weights.
-* **Accuracy**: The pretrained **DistilBERT Emotion model** achieves a classification accuracy of **~92%** on the standard CARER emotion dataset.
+### A. NLP Sentiment Analysis: Text Analysis Model
+The user's qualitative journal log entries (`#diary-input`) are parsed by a Hugging Face Transformers pipeline utilizing the **Text Analysis Model** weights.
+* **Accuracy**: The pretrained **Text Analysis Model** achieves a classification accuracy of **~92%** on the standard CARER emotion dataset.
 * **Working Principle**:
   * Tokenizes input sentences and extracts emotional vectors.
   * Outputs raw classification percentages across standard keys: `joy`, `love`, `sadness`, `fear`, `anger`, and `surprise`.
@@ -94,9 +94,9 @@ The user's qualitative journal log entries (`#diary-input`) are parsed by a Hugg
   * **Low-Confidence Alert**: Real-time warning banners display if Hugging Face prediction confidence registers below `0.45`.
   * **Lexical Rule-Based Fallback**: If Hugging Face dependencies (`transformers`, `pytorch`) are missing or fail to load, the engine falls back to a high-fidelity lexicon matcher that evaluates keyword frequencies for stress, anxiety, sadness, and joy to determine sentiment.
 
-### B. Wellness Index: Blended Ridge Regression Model
-Structured numerical features (demographics, screen excess, sleep deficit) are evaluated alongside subjective stress ratings through a trained **Ridge Regression** model (`saved_model.pkl`).
-* **Accuracy**: The **Ridge Regression model** is trained on structured student profiles mapping workload, sleep, and screen metrics to subjective outcomes. It achieves an R-squared ($R^2$) metric of **~99.8%** on clean synthetic validation splits.
+### B. Wellness Index: Blended Behavioral ML Model
+Structured numerical features (demographics, screen excess, sleep deficit) are evaluated alongside subjective stress ratings through a trained **Behavioral ML Model** (`saved_model.pkl`).
+* **Accuracy**: The **Behavioral ML Model** is trained on structured student profiles mapping workload, sleep, and screen metrics to subjective outcomes. It achieves an R-squared ($R^2$) metric of **~99.8%** on clean synthetic validation splits.
 * **Feature Extraction**:
   $$\text{Sleep Deficit} = \max(0, 8 - \text{Sleep Hours})$$
   $$\text{Screen Excess} = \max(0, \text{Screen Time} - 6)$$
@@ -113,8 +113,8 @@ Structured numerical features (demographics, screen excess, sleep deficit) are e
 * **Blended Prediction**:
   The system computes an overall wellness score based on these variables:
   $$\text{Base Rule Wellness} = 100 - (R_{stress} \times 0.4 + R_{anxiety} \times 0.4 + R_{depression} \times 0.2)$$
-  The final output is computed by blending the rule-based wellness score ($80\%$) with the Ridge regression model prediction ($20\%$):
-  $$\text{Final Wellness Score} = \text{Clamp}(0.8 \times \text{Base Rule Wellness} + 0.2 \times \text{ML Ridge Prediction}, 0, 100)$$
+  The final output is computed by blending the rule-based wellness score ($80\%$) with the Behavioral ML Model prediction ($20\%$):
+  $$\text{Final Wellness Score} = \text{Clamp}(0.8 \times \text{Base Rule Wellness} + 0.2 \times \text{ML Behavioral Prediction}, 0, 100)$$
 
 ---
 

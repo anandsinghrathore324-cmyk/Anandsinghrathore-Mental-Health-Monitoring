@@ -59,23 +59,69 @@ class DashboardService:
         
         heatmap_data = []
         for h in heatmap_logs:
+            wellness_val = h.get("wellness", 85)
+            
+            # Legacy fallback for older logs lacking the new probability/risk fields
+            behavioral_prob = h.get("behavioral_probability")
+            text_prob = h.get("text_probability")
+            combined_prob = h.get("combined_probability")
+            risk_lvl = h.get("risk_level")
+            
+            if combined_prob is None:
+                combined_prob = round((100.0 - wellness_val) / 100.0, 4)
+            if behavioral_prob is None:
+                behavioral_prob = round(combined_prob * 0.4, 4)
+            if text_prob is None:
+                text_prob = round(combined_prob * 0.6, 4)
+                
+            if not risk_lvl:
+                if wellness_val >= 80:
+                    risk_lvl = "Low"
+                elif wellness_val >= 60:
+                    risk_lvl = "Mild"
+                elif wellness_val >= 40:
+                    risk_lvl = "Moderate"
+                elif wellness_val >= 20:
+                    risk_lvl = "High"
+                else:
+                    risk_lvl = "Critical"
+                    
             heatmap_data.append({
                 "day": h.get("date", ""),
                 "mood": h.get("mood", "joy"),
-                "score": h.get("wellness", 85),
-                "journal": h.get("journal", "Logged assessment details.")
+                "score": wellness_val,
+                "journal": h.get("journal", "Logged assessment details."),
+                "behavioral_probability": behavioral_prob,
+                "text_probability": text_prob,
+                "combined_probability": combined_prob,
+                "risk_level": risk_lvl
             })
             
-        # 3. Compile analytics summaries
+        # 3. Compile analytics summaries using consistent risk thresholds
+        latest_report = ordered_reports[-1] if ordered_reports else None
         latest_stress = stress_path[-1] if stress_path else 40
         latest_anxiety = anxiety_path[-1] if anxiety_path else 38
         latest_depression = depression_path[-1] if depression_path else 35
         latest_wellness = wellness_path[-1] if wellness_path else 68
         
-        # Sleep Quality classification using realistic categories (Issue 3)
-        latest_report = ordered_reports[-1] if ordered_reports else None
+        latest_burnout = latest_report.get("burnout_score", latest_stress) if latest_report else latest_stress
+        latest_academic = latest_report.get("academic_strain", latest_stress) if latest_report else latest_stress
         latest_sleep = latest_report.get("sleep_hours", 7.0) if latest_report else 7.0
         
+        # Consistent risk threshold mapping helper (0-20 Low, 20-40 Mild, 40-60 Moderate, 60-80 High, 80-100 Critical)
+        def map_score_to_risk(score):
+            if score <= 20:
+                return "Low"
+            elif score <= 40:
+                return "Mild"
+            elif score <= 60:
+                return "Moderate"
+            elif score <= 80:
+                return "High"
+            else:
+                return "Critical"
+        
+        # Sleep Quality classification using realistic categories
         if latest_sleep <= 3:
             sleep_quality = "Critical Sleep Deprivation"
         elif latest_sleep <= 5:
@@ -91,10 +137,10 @@ class DashboardService:
         primary_emo = latest_report.get("emotion", "Calm") if latest_report else "Calm"
             
         summary = {
-            "stability_index": int(latest_wellness * 0.9),
+            "stability_index": int(latest_wellness),
             "sleep_quality": sleep_quality,
-            "burnout_threat": "High" if latest_stress > 65 else "Medium" if latest_stress > 40 else "Low",
-            "academic_strain": "Severe" if latest_stress > 70 else "High" if latest_stress > 50 else "Low",
+            "burnout_threat": map_score_to_risk(latest_burnout),
+            "academic_strain": map_score_to_risk(latest_academic),
             "social_balance": "Balanced" if latest_wellness >= 60 else "Strained",
             "primary_emotion": primary_emo,
             "emotion_scores": latest_report.get("emotion_scores") if latest_report else None

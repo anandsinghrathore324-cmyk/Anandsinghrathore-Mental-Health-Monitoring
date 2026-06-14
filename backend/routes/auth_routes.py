@@ -58,6 +58,7 @@ def signup():
 @auth_bp.route("/login", methods=["POST"])
 def login():
     """Endpoint to authenticate a student user and generate bearer JWT signatures."""
+    from database.db import db_manager
     data = request.get_json() or {}
     
     email = data.get("email", "").strip().lower()
@@ -69,9 +70,25 @@ def login():
             "message": "Email and password security key are required parameters."
         }), 400
         
+    db_type = "MONGOMOCK_FALLBACK" if "mongomock" in str(type(db_manager.client)) else "LIVE_MONGODB"
+    logger.info(f"[AUTH LOGIN] Received login request for email: {email} (DB Provider: {db_type})")
+    
     user = UserModel.find_by_email(email)
     
-    if not user or not UserModel.verify_password(user["password"], password):
+    if not user:
+        logger.warning(f"[AUTH LOGIN] User lookup failed: no document found for email {email}")
+        return jsonify({
+            "status": "error",
+            "message": "Invalid decrypt signatures. Access Denied."
+        }), 401
+        
+    logger.info(f"[AUTH LOGIN] User found in database: ID={user['_id']}")
+    
+    pass_check = UserModel.verify_password(user["password"], password)
+    logger.info(f"[AUTH LOGIN] Password hash match check: {pass_check}")
+    
+    if not pass_check:
+        logger.warning(f"[AUTH LOGIN] Access Denied: Password mismatch for email {email}")
         return jsonify({
             "status": "error",
             "message": "Invalid decrypt signatures. Access Denied."
@@ -79,12 +96,15 @@ def login():
         
     # Generate secure JWT access token
     try:
+        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
         token_payload = {
             "sub": user["_id"],
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS),
+            "exp": expiration,
             "iat": datetime.datetime.utcnow()
         }
+        logger.info(f"[AUTH LOGIN] Generating token: sub={user['_id']}, exp={expiration.isoformat()}")
         token = jwt.encode(token_payload, Config.JWT_SECRET_KEY, algorithm="HS256")
+        logger.info(f"[AUTH LOGIN] Token encoding completed for user: {email}")
         
         return jsonify({
             "status": "success",
@@ -97,6 +117,7 @@ def login():
             }
         }), 200
     except Exception as e:
+        logger.error(f"[AUTH LOGIN] Token generation failure: {str(e)}", exc_info=True)
         return jsonify({
             "status": "error",
             "message": f"Failed to generate access signature: {str(e)}"
@@ -391,11 +412,15 @@ def verify_otp():
             "message": "Email and 6-digit OTP verification code are required parameters."
         }), 400
         
+    db_type = "MONGOMOCK_FALLBACK" if "mongomock" in str(type(db_manager.client)) else "LIVE_MONGODB"
+    logger.info(f"[AUTH OTP VERIFY] Received verification request for: {email} (DB Provider: {db_type})")
+    
     try:
         # Search active code registry
         record = db_manager.db.otp_codes.find_one({"email": email, "otp": otp_provided})
         
         if not record:
+            logger.warning(f"[AUTH OTP VERIFY] OTP check failed: no record found matching email {email} and code {otp_provided}")
             return jsonify({
                 "status": "error",
                 "message": "Invalid or expired One-Time Password. Access Denied."
@@ -403,7 +428,9 @@ def verify_otp():
             
         # Optional validation check on expiry time (in case MongoDB TTL index hasn't run yet)
         time_elapsed = datetime.datetime.utcnow() - record["created_at"]
+        logger.info(f"[AUTH OTP VERIFY] OTP record found. Created at {record['created_at'].isoformat()}, time elapsed: {time_elapsed.total_seconds()}s")
         if time_elapsed > datetime.timedelta(minutes=5):
+            logger.warning(f"[AUTH OTP VERIFY] OTP code has expired (> 5 minutes elapsed) for user: {email}")
             db_manager.db.otp_codes.delete_one({"_id": record["_id"]})
             return jsonify({
                 "status": "error",
@@ -412,22 +439,30 @@ def verify_otp():
             
         # Burn OTP immediately so it cannot be re-used under any circumstance
         db_manager.db.otp_codes.delete_one({"_id": record["_id"]})
+        logger.info(f"[AUTH OTP VERIFY] Burned OTP token successfully for user: {email}")
         
         # Check if user already exists
         user = UserModel.find_by_email(email)
         
         if not user:
+            logger.info(f"[AUTH OTP VERIFY] Auto-Signup triggered for new user: {email}")
             # Auto-Signup: Automatically register new users on first OTP verification!
             name_prefix = email.split("@")[0].capitalize()
             user = UserModel.create_user(name_prefix, email, "otp-auto-secured-pass-2026")
+            logger.info(f"[AUTH OTP VERIFY] Registered new user during auto-signup: ID={user['_id']}")
+        else:
+            logger.info(f"[AUTH OTP VERIFY] Found existing user profile for email: {email}")
             
         # Generate secure JWT access token
+        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
         token_payload = {
             "sub": user["_id"],
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS),
+            "exp": expiration,
             "iat": datetime.datetime.utcnow()
         }
+        logger.info(f"[AUTH OTP VERIFY] Generating token: sub={user['_id']}, exp={expiration.isoformat()}")
         token = jwt.encode(token_payload, Config.JWT_SECRET_KEY, algorithm="HS256")
+        logger.info(f"[AUTH OTP VERIFY] OTP validation complete. Returning secure JWT token for user: {email}")
         
         return jsonify({
             "status": "success",
@@ -441,6 +476,7 @@ def verify_otp():
         }), 200
         
     except Exception as e:
+        logger.error(f"[AUTH OTP VERIFY] Verification logic exception: {str(e)}", exc_info=True)
         return jsonify({
             "status": "error",
             "message": f"Server verification logic crashed: {str(e)}"

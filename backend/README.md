@@ -11,8 +11,8 @@ Welcome to the production-ready backend architectural core of **AIRA (Artificial
 - **Cross-Origin Securities:** Flask-CORS (`r"/api/*"` restrictions)
 - **Database Engine:** MongoDB (via standard PyMongo client drivers)
 - **Cryptographic Portals:** PyJWT Bearer Authentication, Bcrypt Password Salting
-- **Machine Learning Matrix:** SciKit-Learn Ridge Regression (Multilabel diagnostic predictions)
-- **Natural Language Processing:** Hugging Face PyTorch DistilBERT Pipeline
+- **Machine Learning Matrix:** SciKit-Learn Behavioral ML Model (Multilabel diagnostic predictions)
+- **Natural Language Processing:** Hugging Face PyTorch Text Analysis Model Pipeline
 
 ---
 
@@ -35,13 +35,13 @@ backend/
 │   └── auth_middleware.py      # Secure JWT validation interceptors
 ├── ml/                         # Advanced Machine Learning Pipelines
 │   ├── preprocess.py           # Workload/sleep vectors transformer
-│   ├── train_model.py          # Ridge Regression trainer script
+│   ├── train_model.py          # Behavioral ML Model trainer script
 │   └── saved_model.pkl         # Trained serialized machine learning weights
 ├── nlp/                        # Cognitive Language Engines
-│   └── distilbert.py           # Singleton Hugging Face Classifier with rule fallbacks
+│   └── distilbert.py           # Text Analysis Model Singleton with rule fallbacks
 ├── routes/                     # Blueprint API Endpoint Handlers
 │   ├── auth_routes.py          # Signup, login verification, student profiles
-│   ├── prediction_routes.py    # ML assessment triggers & DistilBERT sentiments
+│   ├── prediction_routes.py    # ML assessment triggers & Text Analysis Model sentiments
 │   ├── chatbot_routes.py       # Conversational chatbot loops & logs
 │   ├── doctor_routes.py        # Haversine distance calculations sorted ascending
 │   └── dashboard_routes.py     # Aggregated weekly timelines & heatmap blocks
@@ -103,12 +103,12 @@ gunicorn -w 4 -b 127.0.0.1:5000 app:app
 
 ### A. The Hybrid Diagnostic Solver
 The backend implements a two-layered diagnostic scoring routine:
-1. **Ridge Regression pickle weights (`saved_model.pkl`):** Trained on workload variables, academic strain ratios, screen-time factors, and sleep deficit parameters to predict wellness indicators.
+1. **Behavioral ML Model pickle weights (`saved_model.pkl`):** Trained on workload variables, academic strain ratios, screen-time factors, and sleep deficit parameters to predict wellness indicators.
 2. **Deterministic Clinical Formulas:** Modulates stress, anxiety, depression, and burnout based on high-pressure keyword vectors and daily sleep limits to ensure safety boundaries.
 3. **Blending weight:** 80% deterministic clinical indicators, 20% ML regression variance mapping.
 
-### B. DistilBERT NLP Sentiment Analyzer
-- Uses Hugging Face's `transformers` module to load a lightweight, highly accurate PyTorch DistilBERT model.
+### B. Text Analysis Model Sentiment Analyzer
+- Uses Hugging Face's `transformers` module to load a lightweight, highly accurate PyTorch Text Analysis Model.
 - Analyzes student journal statements to extract positive, negative, and neutral weights.
 - **Fail-safe Dictionary Fallback:** If the host processor is under memory constraints or offline, the singleton class catches exceptions and falls back to a lexical lookup loop with equal output formats to ensure 100% server uptime.
 
@@ -131,7 +131,7 @@ Every endpoint under prediction, dashboard compile, doctor sorting, or chatbot d
 - **`GET /api/profile`**: Returns active student's name, identifiers, and sign-up dates.
 
 ### 📊 Diagnostic Predictions
-- **`POST /api/predict`**: Blends regression variables and DistilBERT sentiment logs, logs reports, and updates the daily mood heatmap.
+- **`POST /api/predict`**: Blends behavioral variables and Text Analysis Model sentiment logs, logs reports, and updates the daily mood heatmap.
 - **`POST /api/analyze-text`**: On-demand text analyzer returns sentiment weights.
 
 ### 💬 Supportive Chatbot Dialogues

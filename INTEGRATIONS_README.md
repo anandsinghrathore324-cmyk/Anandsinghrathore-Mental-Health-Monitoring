@@ -46,13 +46,13 @@ AIRA simulates high-fidelity Machine Learning classification pipelines directly 
 ```mermaid
 graph LR
     A[Raw Student Journal Log] --> B[NLP Semantic Dictionary Parser]
-    B -->|Calculate sentiment weight vectors| C[Normalized DistilBERT v3 Emotion Profile]
+    B -->|Calculate sentiment weight vectors| C[Normalized Text Analysis Model Emotion Profile]
     D[Quantitative Workload Sliders] --> E[Multi-label Workload Threat Risk Index]
     C --> F[Coping Recovery Suggestions]
     E --> F
 ```
 
-### Model 1: DistilBERT-v3 NLP Sentiment Classifier
+### Model 1: Text Analysis Model Sentiment Classifier
 * **System Design:** The application reads qualitative sentences inside the journal log textarea, matches them against a pre-selected dictionary of emotional keywords, and extracts active semantic tags.
 * **Normalization Logic:** Sentiment ratios (Joy, Sadness, Anger, Fear) are calculated based on quantitative diagnostics and then normalized to ensure the total is exactly $100\%$ on the dashboard:
   $$\text{joy} = 100 - \frac{\text{stress} + \text{depression}}{2}$$

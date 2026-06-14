@@ -128,10 +128,10 @@ $$W = 100 - \frac{R_{stress} + R_{anxiety} + R_{depression}}{3}$$
 
 ---
 
-## Section 5: NLP DistilBERT Sentiment Parsing (Lines 1189 - 1251)
+## Section 5: NLP Text Analysis Model Sentiment Parsing (Lines 1189 - 1251)
 
 ```javascript
-    function executeDistilBERTNLP(text, stress, anxiety, depression) {
+    function executeTextAnalysisModel(text, stress, anxiety, depression) {
         const dictionary = [
             "exam", "stressed", "grades", "lonely", "exhausted", "tired", "sleep", "fail", "hopeless", "sad",
             "study", "anxious", "worry", "projects", "family", "friends", "happy", "accomplished", "relax"

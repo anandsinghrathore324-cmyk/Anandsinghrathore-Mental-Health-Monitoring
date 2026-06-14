@@ -127,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let icon = "fa-circle-info";
         if (type === "success") icon = "fa-circle-check";
         if (type === "error") icon = "fa-circle-exclamation";
+        if (type === "warning") icon = "fa-triangle-exclamation";
         
         toast.innerHTML = `
             <i class="fa-solid ${icon}"></i>
@@ -293,7 +294,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (log) {
                 let lvl = 1;
                 const score = log.score;
-                if (score >= 80) lvl = 4;
+                if (score >= 90) lvl = 5;
+                else if (score >= 80) lvl = 4;
                 else if (score >= 60) lvl = 3;
                 else if (score >= 40) lvl = 2;
 
@@ -303,7 +305,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     wellnessLevel: lvl,
                     score: score,
                     journal: log.journal,
-                    formattedDate: dateStr
+                    formattedDate: dateStr,
+                    behavioralProbability: log.behavioral_probability,
+                    textProbability: log.text_probability,
+                    combinedProbability: log.combined_probability,
+                    riskLevel: log.risk_level
                 });
             } else {
                 heatmapHistory.push({
@@ -312,7 +318,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     wellnessLevel: 0,
                     score: 0,
                     journal: "No logged status.",
-                    formattedDate: dateStr
+                    formattedDate: dateStr,
+                    behavioralProbability: 0,
+                    textProbability: 0,
+                    combinedProbability: 0,
+                    riskLevel: "None"
                 });
             }
         }
@@ -322,18 +332,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Live Dashboard Fetcher from MongoDB
     function loadDashboardData() {
-        const token = sessionStorage.getItem("aira_auth_token");
-        if (!token) return;
+        // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+        const token = localStorage.getItem("aira_auth_token");
+        console.log("[AUTH FE] loadDashboardData initialized. Token present:", !!token);
+        if (!token) {
+            console.warn("[AUTH FE] loadDashboardData: No active session token found in localStorage.");
+            return;
+        }
 
+        console.log("[AUTH FE] Fetching live dashboard statistics...");
         fetch("http://127.0.0.1:5000/api/dashboard-data", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
             }
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
+            .then(res => {
+                console.log("[AUTH FE] loadDashboardData HTTP status response:", res.status, "ok:", res.ok);
+                return res.json().then(data => ({ status: res.status, ok: res.ok, data }));
+            })
+            .then(({ status, ok, data }) => {
+                console.log("[AUTH FE] loadDashboardData parsed data:", data);
+                if (ok && data.status === "success") {
                     dashboardRawMetrics = data.metrics;
 
                     populateMonthSelect(dashboardRawMetrics.registration_date, dashboardRawMetrics.today);
@@ -385,7 +405,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Session checking logic
-    const sessionActive = sessionStorage.getItem("aira_session_active") === "true";
+    // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+    const sessionActive = localStorage.getItem("aira_session_active") === "true";
 
     if (sessionActive) {
         // Bypass preloader and login completely if already authenticated
@@ -415,7 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const logs = [
                 "INIT: Initializing secure micro-nodal handshakes...",
                 "SYNC: Fetching database variables for local regions...",
-                "NLP: Loading PyTorch & DistilBERT semantic structures...",
+                "NLP: Loading PyTorch & Text Analysis Model semantic structures...",
                 "SYS: Generating dynamic styling indices...",
                 "SUCCESS: System nodes online. Redirecting to auth..."
             ];
@@ -780,9 +801,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
             // Save session state & JWT auth token
-            sessionStorage.setItem("aira_session_active", "true");
-            sessionStorage.setItem("aira_auth_token", token);
-            sessionStorage.setItem("aira_user", JSON.stringify(user));
+            // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+            localStorage.setItem("aira_session_active", "true");
+            localStorage.setItem("aira_auth_token", token);            localStorage.setItem("aira_user", JSON.stringify(user));
 
             // Hide login portal completely
             if (loginPortal) {
@@ -839,17 +860,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 if (laserScanner) laserScanner.style.display = "block";
 
+                console.log("[AUTH FE] Dispatching login request to /api/login for email:", usernameVal);
                 fetch("http://127.0.0.1:5000/api/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: usernameVal, password: passwordVal })
                 })
                     .then(res => {
+                        console.log("[AUTH FE] /api/login HTTP status response:", res.status, "ok:", res.ok);
                         if (!res.ok) throw new Error("Invalid credentials. Access Denied.");
                         return res.json();
                     })
                     .then(data => {
+                        console.log("[AUTH FE] /api/login parsed data:", data);
                         if (data.status === "success") {
+                            console.log("[AUTH FE] Server login successful. User ID:", data.user.id);
                             showAiraToast("Login successful! Redirecting...", "success");
                             handleSuccessfulDecryption(data.token, data.user);
                         } else {
@@ -862,6 +887,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         const localPass = localStorage.getItem(`offline_user_${usernameVal}`);
                         const isMockDefault = (usernameVal.toLowerCase() === "student@aira.edu" || usernameVal.toUpperCase() === "AIRA-2026") && passwordVal === "password";
                         const isLocalMatch = localPass && localPass === passwordVal;
+
+                        console.log("[AUTH FE] Offline Fallback check: isMockDefault =", isMockDefault, "isLocalMatch =", !!isLocalMatch);
 
                         if (isMockDefault) {
                             showAiraToast("Offline session loaded successfully.", "success");
@@ -914,17 +941,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 if (laserScanner) laserScanner.style.display = "block";
 
+                console.log("[AUTH FE] Dispatching OTP verification request to /api/verify-otp for email:", emailVal, "OTP code:", otpVal);
                 fetch("http://127.0.0.1:5000/api/verify-otp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: emailVal, otp: otpVal })
                 })
                     .then(res => {
+                        console.log("[AUTH FE] /api/verify-otp HTTP status response:", res.status, "ok:", res.ok);
                         if (!res.ok) throw new Error("Verification signatures mismatched. Access Denied.");
                         return res.json();
                     })
                     .then(data => {
+                        console.log("[AUTH FE] /api/verify-otp parsed data:", data);
                         if (data.status === "success") {
+                            console.log("[AUTH FE] OTP verify successful. User ID:", data.user.id);
                             handleSuccessfulDecryption(data.token, data.user);
                         } else {
                             throw new Error(data.message || "Access Denied.");
@@ -1163,9 +1194,10 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
 
             // Clear session state
-            sessionStorage.removeItem("aira_session_active");
-            sessionStorage.removeItem("aira_auth_token");
-            sessionStorage.removeItem("aira_user");
+            // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+            localStorage.removeItem("aira_session_active");
+            localStorage.removeItem("aira_auth_token");
+            localStorage.removeItem("aira_user");
 
             // Reset input values
             if (usernameInput) usernameInput.value = "";
@@ -1222,7 +1254,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const logs = [
                 "INIT: Initializing secure micro-nodal handshakes...",
                 "SYNC: Fetching database variables for local regions...",
-                "NLP: Loading PyTorch & DistilBERT semantic structures...",
+                "NLP: Loading PyTorch & Text Analysis Model semantic structures...",
                 "SYS: Generating dynamic styling indices...",
                 "SUCCESS: System nodes online. Redirecting to auth..."
             ];
@@ -1637,6 +1669,28 @@ document.addEventListener("DOMContentLoaded", () => {
                     dayTitle.textContent = `Day ${dayLog.day} Status`;
                     scoreBadge.textContent = `${dayLog.score} Wellness`;
 
+                    // Populate expanded details inspector fields
+                    const insDate = document.getElementById("inspector-date");
+                    const insRisk = document.getElementById("inspector-risk-level");
+                    const insBeh = document.getElementById("inspector-behavioral-prob");
+                    const insTxt = document.getElementById("inspector-text-prob");
+                    const insComb = document.getElementById("inspector-combined-prob");
+
+                    if (insDate) insDate.textContent = dayLog.formattedDate || "N/A";
+                    if (insRisk) {
+                        insRisk.textContent = dayLog.riskLevel || "N/A";
+                        if ((dayLog.riskLevel || "").toLowerCase() === "low") {
+                            insRisk.style.color = "var(--neon-emerald)";
+                        } else if ((dayLog.riskLevel || "").toLowerCase() === "moderate" || (dayLog.riskLevel || "").toLowerCase() === "mild") {
+                            insRisk.style.color = "var(--neon-orange)";
+                        } else {
+                            insRisk.style.color = "var(--neon-rose)";
+                        }
+                    }
+                    if (insBeh) insBeh.textContent = dayLog.behavioralProbability !== undefined ? `${(dayLog.behavioralProbability * 100).toFixed(1)}%` : "0.0%";
+                    if (insTxt) insTxt.textContent = dayLog.textProbability !== undefined ? `${(dayLog.textProbability * 100).toFixed(1)}%` : "0.0%";
+                    if (insComb) insComb.textContent = dayLog.combinedProbability !== undefined ? `${(dayLog.combinedProbability * 100).toFixed(1)}%` : "0.0%";
+
                     let emoji = "😊";
                     let formattedMoodName = "Joy / Optimism";
                     if (dayLog.mood === "melancholy") { emoji = "😭"; formattedMoodName = "Melancholy / Sadness"; }
@@ -1851,7 +1905,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         grid.innerHTML = `<div class="glass-panel" style="padding:2.5rem;text-align:center;grid-column:span 2;border-radius:16px;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:2rem;color:var(--neon-cyan);margin-bottom:1rem;display:block;"></i><p>Scanning surrounding micro-nodal clinics...</p></div>`;
 
-        const token = sessionStorage.getItem("aira_auth_token");
+        // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+        const token = localStorage.getItem("aira_auth_token");
 
         // Define offline fallback renderer inside to keep code exceptionally DRY
         const renderOfflineFallback = () => {
@@ -2414,7 +2469,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultsSec = document.getElementById("results-display");
     const dashboardSec = document.getElementById("dashboard");
 
+    function renderRecommendationsList(recs) {
+        const recommendationsSection = document.getElementById("ai-recommendations-section");
+        const cardsContainer = document.getElementById("recommendations-cards-container");
+        
+        if (!recommendationsSection || !cardsContainer) return;
+        
+        cardsContainer.innerHTML = "";
+        
+        if (!recs || recs.length === 0) {
+            recommendationsSection.style.display = "none";
+            return;
+        }
+        
+        recs.forEach(rec => {
+            const card = document.createElement("div");
+            card.className = "recommendation-item-card";
+            
+            const iconColor = rec.color || "var(--neon-cyan)";
+            
+            card.innerHTML = `
+                <div class="recommendation-icon-box" style="background: rgba(255, 255, 255, 0.02); border: 1px solid ${iconColor}; color: ${iconColor}; box-shadow: 0 0 10px ${iconColor}4d;">
+                    <i class="fa-solid ${rec.icon || 'fa-info'}"></i>
+                </div>
+                <div class="recommendation-info-box">
+                    <h5>${rec.title}</h5>
+                    <p>${rec.description}</p>
+                    <span class="recommendation-tag-badge" style="background: ${iconColor}1a; border: 1px solid ${iconColor}4d; color: ${iconColor};">
+                        ${rec.category || 'Wellness'}
+                    </span>
+                </div>
+            `;
+            cardsContainer.appendChild(card);
+        });
+        
+        recommendationsSection.style.display = "block";
+    }
+
     function renderBackendMetrics(metrics, data) {
+        if (metrics && metrics.recommendations) {
+            renderRecommendationsList(metrics.recommendations);
+        }
+
         const finalStress = metrics.stress;
         const finalAnxiety = metrics.anxiety;
         const finalDepression = metrics.depression;
@@ -2437,11 +2533,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (wellnessScore) wellnessScore.textContent = finalWellness;
 
+        // Render external neural microservices API values
+        const behavioralProb = metrics.behavioral_probability;
+        const textProb = metrics.text_probability;
+        const combinedProb = metrics.combined_probability;
+        const finalRiskLevel = metrics.final_risk_level || metrics.risk_level || metrics.risk;
+
+        const behavioralEl = document.getElementById("metric-behavioral-prob");
+        const textEl = document.getElementById("metric-text-prob");
+        const combinedEl = document.getElementById("metric-combined-prob");
+        const finalRiskEl = document.getElementById("metric-final-risk");
+
+        if (behavioralEl && behavioralProb !== undefined) behavioralEl.textContent = `${(behavioralProb * 100).toFixed(1)}%`;
+        if (textEl && textProb !== undefined) textEl.textContent = `${(textProb * 100).toFixed(1)}%`;
+        if (combinedEl && combinedProb !== undefined) combinedEl.textContent = `${(combinedProb * 100).toFixed(1)}%`;
+        if (finalRiskEl && finalRiskLevel !== undefined) {
+            finalRiskEl.textContent = finalRiskLevel;
+            // 5-level canonical risk color mapping
+            const rl = finalRiskLevel.toLowerCase();
+            if (rl === "low") {
+                finalRiskEl.style.color = "var(--neon-emerald)";
+            } else if (rl === "mild") {
+                finalRiskEl.style.color = "var(--neon-cyan)";
+            } else if (rl === "moderate") {
+                finalRiskEl.style.color = "var(--neon-orange)";
+            } else if (rl === "high") {
+                finalRiskEl.style.color = "var(--neon-rose)";
+            } else {
+                // Critical
+                finalRiskEl.style.color = "var(--neon-rose)";
+                finalRiskEl.style.fontWeight = "700";
+                finalRiskEl.style.textShadow = "0 0 10px var(--neon-rose)";
+            }
+        }
+
         // Dynamic time stamp
         const now = new Date();
         if (diagnosticTime) {
             diagnosticTime.innerHTML = `<i class="fa-solid fa-clock"></i> Node Synced: ${now.toISOString().replace('T', ' ').slice(0, 19)}`;
         }
+
 
         let interpText = "";
         if (finalWellness >= 75) {
@@ -2453,8 +2584,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (wellnessDesc) wellnessDesc.textContent = interpText;
 
-        // 5. NLP DISTILBERT KEYWORD & SENTIMENT DEDUCTION
-        executeDistilBERTNLP(data.text || "", finalStress, finalAnxiety, finalDepression);
+        // 5. NLP TEXT ANALYSIS MODEL KEYWORD & SENTIMENT DEDUCTION
+        executeTextAnalysisModel(data.text || "", finalStress, finalAnxiety, finalDepression);
 
         // Display results
         if (resultsSec) resultsSec.style.display = "block";
@@ -2486,6 +2617,94 @@ document.addEventListener("DOMContentLoaded", () => {
             // Standard form validation pass
             if (!scanForm.checkValidity()) return;
 
+            const ageVal = parseInt(document.getElementById("student-age").value) || 0;
+            const studyVal = parseFloat(document.getElementById("study-hours").value) || 0;
+            const sleepVal = parseFloat(document.getElementById("sleep-hours").value) || 0;
+            const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
+            const screenVal = parseFloat(document.getElementById("screen-time").value) || 0;
+            const textVal = document.getElementById("diary-input").value.trim();
+
+            // Hard input-validation checks
+            if (ageVal < 15 || ageVal > 60) {
+                showAiraToast("Age must be between 15 and 60.", "error");
+                return;
+            }
+            if (sleepVal < 0 || sleepVal > 24) {
+                showAiraToast("Sleep hours must be between 0 and 24.", "error");
+                return;
+            }
+            if (studyVal < 0 || studyVal > 24) {
+                showAiraToast("Study hours must be between 0 and 24.", "error");
+                return;
+            }
+            if (workHoursVal < 0 || workHoursVal > 24) {
+                showAiraToast("Work hours must be between 0 and 24.", "error");
+                return;
+            }
+            if (screenVal < 0 || screenVal > 24) {
+                showAiraToast("Screen time must be between 0 and 24.", "error");
+                return;
+            }
+            if ((sleepVal + studyVal + workHoursVal) > 24) {
+                showAiraToast("Notice: Combined sleep, study, and work hours exceed 24 hours in a single day.", "warning");
+            }
+
+            // Journal validation checks
+            if (textVal.length < 30) {
+                showAiraToast("Journal text must be at least 30 characters.", "error");
+                return;
+            }
+            const words = textVal.split(/\s+/).filter(w => w.length > 0);
+            if (words.length < 5) {
+                showAiraToast("Journal text must contain at least 5 words.", "error");
+                return;
+            }
+
+            const lettersOnly = textVal.replace(/[^a-zA-Z]/g, '');
+            const digitsOnly = textVal.replace(/[^0-9]/g, '');
+            if (digitsOnly.length > 0 && lettersOnly.length === 0) {
+                showAiraToast("Journal text cannot consist of only numbers.", "error");
+                return;
+            }
+
+            const alphanumericOnly = textVal.replace(/[^a-zA-Z0-9]/g, '');
+            if (alphanumericOnly.length === 0) {
+                showAiraToast("Journal text cannot consist of only symbols.", "error");
+                return;
+            }
+
+            if (/(.)\1{3,}/.test(textVal)) {
+                showAiraToast("Please enter meaningful journal content (keyboard spam detected).", "error");
+                return;
+            }
+
+            if (/\b(\w+)\b\s+\1\s+\1/i.test(textVal)) {
+                showAiraToast("Please enter meaningful journal content (repeated nonsense tokens detected).", "error");
+                return;
+            }
+
+            if (words.length >= 5) {
+                const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+                if ((uniqueWords.size / words.length) < 0.35) {
+                    showAiraToast("Please enter meaningful journal content (low unique word ratio).", "error");
+                    return;
+                }
+            }
+
+            // Soft Warnings (Alert user but allow them to proceed)
+            if (sleepVal > 16) {
+                showAiraToast("Notice: Sleep duration is unusually high (over 16 hours).", "warning");
+            }
+            if (studyVal > 16) {
+                showAiraToast("Notice: Study duration is unusually high (over 16 hours).", "warning");
+            }
+            if (workHoursVal > 16) {
+                showAiraToast("Notice: Work duration is unusually high (over 16 hours).", "warning");
+            }
+            if (screenVal > 18) {
+                showAiraToast("Notice: Screen time is unusually high (over 18 hours).", "warning");
+            }
+
             // Trigger AI sweep animation
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Neural Sequence...`;
@@ -2496,7 +2715,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const logs = [
                 "INIT: Instantiating client tunnel to local secure micro-node...",
                 "CHECK: Encrypting user form payload standard variables...",
-                "NLP: Extracting journal sequence to DistilBERT vector space model...",
+                "NLP: Extracting journal sequence to Text Analysis Model vector space model...",
                 "MODEL: Loading PyTorch weight metrics for Multilabel classifier...",
                 "PROC: Categorizing sleep balance vs screen exposure habits...",
                 "SUCCESS: Flask status code 200 returned in 1.4s.",
@@ -2523,6 +2742,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fa-solid fa-radar"></i> Re-Analyze My Mental Health`;
 
+                    const ageVal = parseInt(document.getElementById("student-age").value) || 21;
+                    const genderRaw = document.getElementById("student-gender").value || "Male";
+                    let genderVal = "Male";
+                    if (genderRaw.toLowerCase() === "female") {
+                        genderVal = "Female";
+                    } else if (genderRaw.toLowerCase() === "nonbinary") {
+                        genderVal = "Other";
+                    } else if (genderRaw.toLowerCase() === "prefer_not_to_say") {
+                        genderVal = "Prefer not to say";
+                    }
+
                     const studyVal = parseFloat(document.getElementById("study-hours").value) || 6;
                     const sleepVal = parseFloat(document.getElementById("sleep-hours").value) || 7;
                     const screenVal = parseFloat(document.getElementById("screen-time").value) || 5;
@@ -2538,6 +2768,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
 
                     const payload = {
+                        age: ageVal,
+                        gender: genderVal,
                         study_hours: studyVal,
                         sleep_hours: sleepVal,
                         screen_time: screenVal,
@@ -2553,7 +2785,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         work_hours: workHoursVal
                     };
 
-                    const token = sessionStorage.getItem("aira_auth_token");
+
+                    // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+                    const token = localStorage.getItem("aira_auth_token");
 
                     if (!token) {
                         console.warn("No active JWT session token found. Enforcing local formula rules fallback.");
@@ -2575,6 +2809,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         })
                         .then(data => {
                             if (data.status === "success") {
+                                if (data.warnings && data.warnings.length > 0) {
+                                    data.warnings.forEach(w => {
+                                        showAiraToast(w, "warning");
+                                    });
+                                }
                                 renderBackendMetrics(data.metrics, payload);
                             } else {
                                 throw new Error("Diagnostics error: " + data.message);
@@ -2606,40 +2845,41 @@ document.addEventListener("DOMContentLoaded", () => {
         const familyHistoryVal = document.getElementById("family-history").value || "No";
         const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
 
-        // 1. COMPUTE STRESS RISK LEVEL (0 - 100%)
-        // Formula variables: sleep deficit spikes stress, high pressure spikes stress
+        // 1. COMPUTE STRESS RISK LEVEL (0 - 100%) - Normalized Derived Indicator
         let sleepDeficit = Math.max(0, 8 - sleepVal); // ideal 8 hours
-        let baseStress = (inputStress * 5) + (academicVal * 2.5) + (sleepDeficit * 4) + (financialStressVal * 2.5) + ((10 - studySatisfactionVal) * 1.5) + (workHoursVal * 1.5);
-
-        // Scan for textual keywords impact stress
+        let baseStress = (inputStress * 5.0) + (academicVal * 3.0) + (sleepDeficit * 4.0) + (financialStressVal * 3.0) + ((10 - studySatisfactionVal) * 2.0) + (workHoursVal * 1.5);
         if (textVal.includes("stressed") || textVal.includes("heavy") || textVal.includes("tired")) baseStress += 8;
         if (textVal.includes("exam") || textVal.includes("deadline") || textVal.includes("grades")) baseStress += 6;
-        let finalStress = Math.min(98, Math.max(8, Math.round(baseStress)));
+        let finalStress = Math.min(100, Math.max(0, Math.round((baseStress / 200.0) * 100)));
 
-        // 2. COMPUTE ANXIETY RISK LEVEL (0 - 100%)
-        let baseAnxiety = (inputAnxiety * 5.5) + (academicVal * 1.5) + (sleepDeficit * 2) + (financialStressVal * 2.5);
+        // 2. COMPUTE ANXIETY RISK LEVEL (0 - 100%) - Normalized Derived Indicator
+        let baseAnxiety = (inputAnxiety * 6.0) + (academicVal * 2.0) + (sleepDeficit * 3.0) + (financialStressVal * 3.0);
         if (familyHistoryVal === "Yes") baseAnxiety += 10;
         if (textVal.includes("anxious") || textVal.includes("worry") || textVal.includes("nervous")) baseAnxiety += 10;
         if (textVal.includes("scared") || textVal.includes("shaking") || textVal.includes("panic")) baseAnxiety += 12;
-        let finalAnxiety = Math.min(99, Math.max(5, Math.round(baseAnxiety)));
+        let finalAnxiety = Math.min(100, Math.max(0, Math.round((baseAnxiety / 156.0) * 100)));
 
-        // 3. COMPUTE DEPRESSION RISK LEVEL (0 - 100%)
-        // Screen time and sleep lack strongly correlate
-        let screenExcess = Math.max(0, screenVal - 6);
-        let baseDepression = (sleepDeficit * 5) + (screenExcess * 3) + ((10 - studySatisfactionVal) * 2.5) + (financialStressVal * 2) + (workHoursVal * 1.0);
-        if (familyHistoryVal === "Yes") baseDepression += 12;
-        if (dietaryHabitsVal === "Unhealthy") baseDepression += 8;
-        else if (dietaryHabitsVal === "Moderate") baseDepression += 4;
+        // 3. COMPUTE DEPRESSION RISK LEVEL & PROBABILITIES
+        let fallbackScore = (academicVal * 6.0) + (financialStressVal * 4.0) + ((10 - studySatisfactionVal) * 3.0) + (sleepDeficit * 5.0) + (workHoursVal * 1.5) + (familyHistoryVal === "Yes" ? 10 : 0);
+        let fallbackBehavioralProb = Math.min(1.0, Math.max(0.0, fallbackScore / 213.0));
 
-        if (selectedMood === "sad" || selectedMood === "melancholy") baseDepression += 20;
-        if (selectedMood === "anxious") baseDepression += 10;
-        if (textVal.includes("sad") || textVal.includes("lonely") || textVal.includes("cry")) baseDepression += 12;
-        if (textVal.includes("hopeless") || textVal.includes("empty") || textVal.includes("worthless")) baseDepression += 20;
-        let finalDepression = Math.min(98, Math.max(4, Math.round(baseDepression)));
+        let fallbackTextProb = (finalStress * 0.4 + finalAnxiety * 0.6) / 100.0;
+        if (textVal.includes("hopeless") || textVal.includes("worthless") || textVal.includes("sad") || textVal.includes("lonely") || textVal.includes("anxious") || textVal.includes("panic")) {
+            fallbackTextProb = Math.min(0.98, fallbackTextProb + 0.2);
+        }
 
-        // 4. OVERALL WELLNESS SCORE
-        let avgRisk = (finalStress + finalAnxiety + finalDepression) / 3;
-        let finalWellness = Math.round(100 - avgRisk);
+        let fallbackCombinedProb = (0.4 * fallbackBehavioralProb) + (0.6 * fallbackTextProb);
+        let finalWellness = Math.round((1.0 - fallbackCombinedProb) * 100);
+
+        // Crisis indicators override
+        const crisisWords = ["suicide", "kill myself", "self-harm", "end my life", "want to die", "harm myself", "cutting", "harming myself"];
+        const isCrisis = crisisWords.some(cw => textVal.includes(cw));
+        if (isCrisis) {
+            finalWellness = Math.min(finalWellness, 15);
+            fallbackCombinedProb = Math.max(fallbackCombinedProb, 0.85);
+        }
+
+        let finalDepression = Math.round(fallbackBehavioralProb * 100);
 
         // Render predicted metric rings
         updateCircularProgress("ring-stress", "perc-stress", finalStress);
@@ -2656,11 +2896,204 @@ document.addEventListener("DOMContentLoaded", () => {
         const wellnessDesc = document.getElementById("wellness-interpretation");
         const diagnosticTime = document.getElementById("diagnostic-timestamp");
 
-        wellnessScore.textContent = finalWellness;
+        if (wellnessScore) wellnessScore.textContent = finalWellness;
+
+        // Categorize risk level based on the wellness score (aligned risk thresholds)
+        let fallbackRiskLevel = "Low";
+        if (finalWellness >= 80) {
+            fallbackRiskLevel = "Low";
+        } else if (finalWellness >= 60) {
+            fallbackRiskLevel = "Mild";
+        } else if (finalWellness >= 40) {
+            fallbackRiskLevel = "Moderate";
+        } else if (finalWellness >= 20) {
+            fallbackRiskLevel = "High";
+        } else {
+            fallbackRiskLevel = "Critical";
+        }
+
+        // Generate client-side recommendations for offline fallback
+        const recommendations = [];
+        // Risk level for recommendations - aligned with canonical 5-level thresholds
+        const recRisk = isCrisis ? "Critical"
+            : finalWellness >= 80 ? "Low"
+            : finalWellness >= 60 ? "Mild"
+            : finalWellness >= 40 ? "Moderate"
+            : finalWellness >= 20 ? "High"
+            : "Critical";
+        
+        // 1. Risk-based recommendations (canonical 5-level thresholds)
+        if (recRisk === "Low") {
+            recommendations.push({
+                "title": "Maintain Current Wellness Routines",
+                "description": "Your wellness score is high! Keep up your healthy sleep, study, and life balance to maintain this positive trend.",
+                "icon": "fa-heart",
+                "color": "var(--neon-emerald)",
+                "category": "Risk-based"
+            });
+        } else if (recRisk === "Mild") {
+            recommendations.push({
+                "title": "Build Resilience & Support Networks",
+                "description": "You are experiencing mild mental strain. Consider sharing your workload with friends or peers and practicing daily relaxation techniques.",
+                "icon": "fa-users",
+                "color": "var(--neon-cyan)",
+                "category": "Risk-based"
+            });
+        } else if (recRisk === "Moderate") {
+            recommendations.push({
+                "title": "Proactive Stress Management",
+                "description": "Your stress and workload saturation levels are registering moderate anxiety indicators. Set boundaries and allocate dedicated time for self-care.",
+                "icon": "fa-shield-heart",
+                "color": "var(--neon-orange)",
+                "category": "Risk-based"
+            });
+        } else if (recRisk === "High") {
+            recommendations.push({
+                "title": "Structured Cognitive De-escalation",
+                "description": "High saturation levels identified. System detects critical anxiety/depression warnings. AI recommends immediate workload reduction and counselor consultation.",
+                "icon": "fa-triangle-exclamation",
+                "color": "var(--neon-rose)",
+                "category": "Risk-based"
+            });
+        } else if (recRisk === "Critical") {
+            recommendations.push({
+                "title": "Urgent Support Recommendation",
+                "description": "Your wellness indicators are at a critical level. We strongly recommend talking to a counselor or calling a crisis line immediately.",
+                "icon": "fa-circle-exclamation",
+                "color": "var(--neon-rose)",
+                "category": "Risk-based"
+            });
+        }
+
+        // 2. Factor-based recommendations
+        // Poor sleep -> sleep improvement advice
+        if (sleepVal < 7.0) {
+            recommendations.push({
+                "title": "Optimize Sleep Hygiene",
+                "description": `You are averaging ${sleepVal.toFixed(1)} hours of sleep. Aim for 7-9 hours of consistent sleep and limit screen use 30 minutes before bedtime.`,
+                "icon": "fa-bed",
+                "color": "var(--neon-cyan)",
+                "category": "Sleep Improvement"
+            });
+        }
+
+        // High academic pressure -> study management advice
+        if (academicVal >= 7) {
+            recommendations.push({
+                "title": "Structure Your Study Strategy",
+                "description": `Academic pressure is high (${academicVal}/10). Break large tasks into smaller steps, prioritize, and take 5-minute study breaks.`,
+                "icon": "fa-graduation-cap",
+                "color": "var(--neon-purple)",
+                "category": "Study Management"
+            });
+        }
+
+        // High financial stress -> financial support advice
+        if (financialStressVal >= 7) {
+            recommendations.push({
+                "title": "Financial Support & Resources",
+                "description": `Financial stress is elevated (${financialStressVal}/10). Connect with student financial services or explore budgeting applications.`,
+                "icon": "fa-wallet",
+                "color": "var(--neon-orange)",
+                "category": "Financial Support"
+            });
+        }
+
+        // High anxiety -> breathing and mindfulness advice
+        if (inputAnxiety >= 7 || finalAnxiety >= 70 || fallbackTextProb > 0.6) {
+            recommendations.push({
+                "title": "Practice Mindfulness & Breathing",
+                "description": "High anxiety or emotional strain detected. Utilize our Guided Breathing center for Box Breathing or the 4-7-8 method.",
+                "icon": "fa-wind",
+                "color": "var(--neon-cyan)",
+                "category": "Breathing & Mindfulness"
+            });
+        }
+
+        // Low study satisfaction -> academic counseling advice
+        if (studySatisfactionVal <= 4) {
+            recommendations.push({
+                "title": "Academic Counseling & Guidance",
+                "description": `Your study satisfaction is low (${studySatisfactionVal}/10). Schedule an advisory session to review your curriculum and course objectives.`,
+                "icon": "fa-chalkboard-user",
+                "color": "var(--neon-purple)",
+                "category": "Academic Counseling"
+            });
+        }
+
+        // 3. Fill up to reach 5-10 recommendations if we have fewer than 5
+        const generalPool = [
+            {
+                "title": "Incorporate Daily Physical Activity",
+                "description": "A simple 15-minute walk can release endorphins, lower stress hormones, and improve cognitive performance.",
+                "icon": "fa-person-running",
+                "color": "var(--neon-emerald)",
+                "category": "General Wellness"
+            },
+            {
+                "title": "Nourish and Hydrate Your Body",
+                "description": "Eating regular, balanced meals and staying hydrated stabilizes blood sugar and energy levels throughout the day.",
+                "icon": "fa-apple-whole",
+                "color": "var(--neon-cyan)",
+                "category": "Healthy Lifestyle"
+            },
+            {
+                "title": "Practice Digital Boundaries",
+                "description": `With ${screenVal.toFixed(1)} hours of daily screen time, setting app limits can significantly reduce digital fatigue.`,
+                "icon": "fa-mobile-screen",
+                "color": "var(--neon-purple)",
+                "category": "Digital Wellness"
+            },
+            {
+                "title": "Schedule Routine Social Connections",
+                "description": "Connecting with friends or family serves as an emotional buffer. Reach out to a peer or family member today.",
+                "icon": "fa-comments",
+                "color": "var(--neon-orange)",
+                "category": "Social Connection"
+            },
+            {
+                "title": "Decompress with Creative Hobbies",
+                "description": "Set aside time daily for non-academic interests, music, or reading to allow your mind to fully decompress.",
+                "icon": "fa-music",
+                "color": "var(--neon-pink)",
+                "category": "Stress Relief"
+            }
+        ];
+
+        for (const item of generalPool) {
+            if (recommendations.length >= 5) {
+                break;
+            }
+            if (!recommendations.some(r => r.title === item.title)) {
+                recommendations.push(item);
+            }
+        }
+
+        renderRecommendationsList(recommendations);
+
+        const behavioralEl = document.getElementById("metric-behavioral-prob");
+        const textEl = document.getElementById("metric-text-prob");
+        const combinedEl = document.getElementById("metric-combined-prob");
+        const finalRiskEl = document.getElementById("metric-final-risk");
+
+        if (behavioralEl) behavioralEl.textContent = `${(fallbackBehavioralProb * 100).toFixed(1)}%`;
+        if (textEl) textEl.textContent = `${(fallbackTextProb * 100).toFixed(1)}%`;
+        if (combinedEl) combinedEl.textContent = `${(fallbackCombinedProb * 100).toFixed(1)}%`;
+        if (finalRiskEl) {
+            finalRiskEl.textContent = fallbackRiskLevel;
+            if (fallbackRiskLevel.toLowerCase() === "low") {
+                finalRiskEl.style.color = "var(--neon-emerald)";
+            } else if (fallbackRiskLevel.toLowerCase() === "moderate") {
+                finalRiskEl.style.color = "var(--neon-orange)";
+            } else {
+                finalRiskEl.style.color = "var(--neon-rose)";
+            }
+        }
 
         // Dynamic time stamp
         const now = new Date();
         diagnosticTime.innerHTML = `<i class="fa-solid fa-clock"></i> Node Synced: ${now.toISOString().replace('T', ' ').slice(0, 19)}`;
+
 
         let interpText = "";
         if (finalWellness >= 75) {
@@ -2672,8 +3105,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         wellnessDesc.textContent = interpText;
 
-        // 5. NLP DISTILBERT KEYWORD & SENTIMENT DEDUCTION
-        executeDistilBERTNLP(textVal, finalStress, finalAnxiety, finalDepression);
+        // 5. NLP TEXT ANALYSIS MODEL KEYWORD & SENTIMENT DEDUCTION
+        executeTextAnalysisModel(textVal, finalStress, finalAnxiety, finalDepression);
 
         // Display results
         resultsSec.style.display = "block";
@@ -2704,8 +3137,14 @@ document.addEventListener("DOMContentLoaded", () => {
         heatmapHistory[29] = {
             day: 30,
             mood: todayMood,
+            wellnessLevel: finalWellness >= 90 ? 5 : finalWellness >= 80 ? 4 : finalWellness >= 60 ? 3 : finalWellness >= 40 ? 2 : 1,
             score: finalWellness,
-            journal: document.getElementById("diary-input").value || "Submitted today's diagnostic assessment."
+            journal: document.getElementById("diary-input").value || "Submitted today's diagnostic assessment.",
+            formattedDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
+            behavioralProbability: fallbackBehavioralProb,
+            textProbability: fallbackTextProb,
+            combinedProbability: fallbackCombinedProb,
+            riskLevel: fallbackRiskLevel
         };
         renderHeatmapGrid();
 
@@ -2880,7 +3319,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function executeDistilBERTNLP(text, stress, anxiety, depression) {
+    function executeTextAnalysisModel(text, stress, anxiety, depression) {
         const interpretationText = document.getElementById("nlp-interpretation-text");
         const keywordContainer = document.getElementById("nlp-extracted-keywords");
 
@@ -2945,7 +3384,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateAnalyticsData(stress, anxiety, wellness) {
-        const token = sessionStorage.getItem("aira_auth_token");
+        // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+        const token = localStorage.getItem("aira_auth_token");
 
         // Update Radar values
         const joy = parseFloat(document.getElementById("nlp-joy-perc").textContent) || 30;
@@ -3035,7 +3475,8 @@ document.addEventListener("DOMContentLoaded", () => {
             else if (wellness < 60) todayMood = "melancholy";
 
             let lvl = 1;
-            if (wellness >= 80) lvl = 4;
+            if (wellness >= 90) lvl = 5;
+            else if (wellness >= 80) lvl = 4;
             else if (wellness >= 60) lvl = 3;
             else if (wellness >= 40) lvl = 2;
 
@@ -3148,7 +3589,8 @@ document.addEventListener("DOMContentLoaded", () => {
         typingDots.style.display = "flex";
         msgContainer.scrollTop = msgContainer.scrollHeight;
 
-        const token = sessionStorage.getItem("aira_auth_token");
+        // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
+        const token = localStorage.getItem("aira_auth_token");
 
         if (!token) {
             setTimeout(() => {
@@ -5128,7 +5570,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 {
                     title: "7. Cookies and Local Vaults",
-                    content: "We use browser local and session storage (sessionStorage) to retain secure login state and preserve interface preferences. Traditional persistent tracking cookies are not deployed."
+                    content: "We use browser local storage (localStorage) to retain secure login state and preserve interface preferences. Traditional persistent tracking cookies are not deployed."
                 },
                 {
                     title: "8. Update Announcements",

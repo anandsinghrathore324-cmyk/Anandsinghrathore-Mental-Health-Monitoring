@@ -11,7 +11,9 @@ class ReportModel:
                       sleep_hours: float = None, emotion_scores: dict = None,
                       explainability: dict = None, study_satisfaction: int = None,
                       dietary_habits: str = None, financial_stress: int = None,
-                      family_history: str = None, work_hours: float = None) -> dict:
+                      family_history: str = None, work_hours: float = None,
+                      behavioral_probability: float = None, text_probability: float = None,
+                      combined_probability: float = None) -> dict:
         """Inserts a new diagnostic mental health report for a student user."""
         report_doc = {
             "user_id": ObjectId(user_id) if user_id else None,
@@ -24,6 +26,13 @@ class ReportModel:
             "risk_level": risk.strip(),
             "created_at": datetime.datetime.utcnow()
         }
+        if behavioral_probability is not None:
+            report_doc["behavioral_probability"] = float(behavioral_probability)
+        if text_probability is not None:
+            report_doc["text_probability"] = float(text_probability)
+        if combined_probability is not None:
+            report_doc["combined_probability"] = float(combined_probability)
+            
         if sleep_hours is not None:
             report_doc["sleep_hours"] = float(sleep_hours)
         if emotion_scores is not None:

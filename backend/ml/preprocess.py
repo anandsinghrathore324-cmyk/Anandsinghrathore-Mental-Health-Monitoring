@@ -2,31 +2,18 @@ import os
 import pickle
 import pandas as pd
 import numpy as np
+import logging
 from sklearn.preprocessing import StandardScaler
+
+logger = logging.getLogger(__name__)
 
 class MLPreprocessor:
     """Pre-processing engine for demographic variables and academic pressures."""
     
     def __init__(self):
         self.scaler = None
-        # Load pre-fitted scaler from file
-        try:
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            scaler_path = os.path.join(current_dir, "saved_scaler.pkl")
-            if os.path.exists(scaler_path):
-                with open(scaler_path, "rb") as f:
-                    self.scaler = pickle.load(f)
-            else:
-                # Fallback to local project path if running from parent dir
-                fallback_path = os.path.join("ml", "saved_scaler.pkl")
-                if os.path.exists(fallback_path):
-                    with open(fallback_path, "rb") as f:
-                        self.scaler = pickle.load(f)
-        except Exception as e:
-            pass
-            
-        if self.scaler is None:
-            self.scaler = StandardScaler()
+        # Disable pre-fitted scaler loading as per prediction refactor
+        logger.info("Fitted scaler loading disabled.")
 
     def calculate_sleep_deficit(self, sleep_hours: float) -> float:
         """Returns the sleep deficit calculation against ideal 8 hours."""

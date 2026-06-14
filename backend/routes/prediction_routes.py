@@ -43,7 +43,10 @@ def predict(current_user):
             dietary_habits=data.get("dietary_habits"),
             financial_stress=int(data.get("financial_stress", 5)) if data.get("financial_stress") is not None else None,
             family_history=data.get("family_history"),
-            work_hours=float(data.get("work_hours", 0.0)) if data.get("work_hours") is not None else None
+            work_hours=float(data.get("work_hours", 0.0)) if data.get("work_hours") is not None else None,
+            behavioral_probability=metrics["behavioral_probability"],
+            text_probability=metrics["text_probability"],
+            combined_probability=metrics["combined_probability"]
         )
         
         # Log mood heatmap entry for today
@@ -53,13 +56,20 @@ def predict(current_user):
             user_id=current_user["_id"],
             mood=mood,
             wellness=metrics["wellness"],
-            journal=journal_text
+            journal=journal_text,
+            behavioral_probability=metrics["behavioral_probability"],
+            text_probability=metrics["text_probability"],
+            combined_probability=metrics["combined_probability"],
+            risk_level=metrics["risk_level"]
         )
         
+        from flask import g
+        warnings = getattr(g, "warnings", [])
         return jsonify({
             "status": "success",
             "message": "Neural diagnostics successfully analyzed and logged.",
             "metrics": metrics,
+            "warnings": warnings,
             "report_id": report["_id"]
         }), 200
         

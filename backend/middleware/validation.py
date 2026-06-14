@@ -12,8 +12,8 @@ def validate_prediction_input(f):
             return jsonify({"status": "error", "message": "Age is required."}), 400
         try:
             age = int(age_raw)
-            if age < 13 or age > 100:
-                return jsonify({"status": "error", "message": "Age must be between 13 and 100."}), 400
+            if age < 15 or age > 60:
+                return jsonify({"status": "error", "message": "Age must be between 15 and 60."}), 400
         except (ValueError, TypeError):
             return jsonify({"status": "error", "message": "Age must be a valid integer."}), 400
 
@@ -79,31 +79,40 @@ def validate_prediction_input(f):
             return jsonify({"status": "error", "message": f"Family history of mental illness must be one of {valid_history}."}), 400
 
         # Study Hours
-        study, err = check_bound("Study hours", data.get("study_hours"), 0.0, 16.0, is_int=False)
+        study, err = check_bound("Study hours", data.get("study_hours"), 0.0, 24.0, is_int=False)
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
         # Sleep Hours
-        sleep, err = check_bound("Sleep hours", data.get("sleep_hours"), 0.0, 14.0, is_int=False)
+        sleep, err = check_bound("Sleep hours", data.get("sleep_hours"), 0.0, 24.0, is_int=False)
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
         # Screen Time
-        screen, err = check_bound("Screen time", data.get("screen_time"), 0.0, 16.0, is_int=False)
+        screen, err = check_bound("Screen time", data.get("screen_time"), 0.0, 24.0, is_int=False)
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
         # Work Hours
-        work, err = check_bound("Work hours", data.get("work_hours"), 0.0, 16.0, is_int=False)
+        work, err = check_bound("Work hours", data.get("work_hours"), 0.0, 24.0, is_int=False)
         if err:
             return jsonify({"status": "error", "message": err}), 400
 
-        # Combined workload limit
-        if (study + sleep + screen + work) > 24.0:
-            return jsonify({
-                "status": "error",
-                "message": "Combined study hours, sleep hours, screen time, and work hours cannot exceed 24 hours."
-            }), 400
+        # Implement soft warnings instead of hard rejections for combined hours
+        from flask import g
+        g.warnings = []
+        if (sleep + study + work) > 24.0:
+            g.warnings.append("Combined sleep, study, and work hours exceed 24 hours in a single day.")
+
+        # Soft warnings for individual high values
+        if sleep > 16.0:
+            g.warnings.append("Sleep duration is unusually high (over 16 hours).")
+        if study > 16.0:
+            g.warnings.append("Study duration is unusually high (over 16 hours).")
+        if work > 16.0:
+            g.warnings.append("Work duration is unusually high (over 16 hours).")
+        if screen > 18.0:
+            g.warnings.append("Screen time is unusually high (over 18 hours).")
 
         # Text input validation checks (gibberish, text length, word bounds)
         diary_text = data.get("text", "").strip()
@@ -111,11 +120,43 @@ def validate_prediction_input(f):
             return jsonify({"status": "error", "message": "Journal text is required."}), 400
 
         words = [w for w in diary_text.split() if w]
-        if len(diary_text) < 20 or len(words) < 5:
-            return jsonify({"status": "error", "message": "Journal text must be at least 20 characters and contain at least 5 words."}), 400
+        
+        # Minimum 30 characters
+        if len(diary_text) < 30:
+            return jsonify({"status": "error", "message": "Journal text must be at least 30 characters."}), 400
+            
+        # Minimum 5 words
+        if len(words) < 5:
+            return jsonify({"status": "error", "message": "Journal text must contain at least 5 words."}), 400
 
         if len(diary_text) > 1000:
             return jsonify({"status": "error", "message": "Journal text must not exceed 1000 characters."}), 400
+
+        # Reject only numbers
+        import re
+        letters_only = re.sub(r'[^a-zA-Z]', '', diary_text)
+        digits_only = re.sub(r'[^0-9]', '', diary_text)
+        if len(digits_only) > 0 and len(letters_only) == 0:
+            return jsonify({"status": "error", "message": "Journal text cannot consist of only numbers."}), 400
+
+        # Reject only symbols
+        alphanumeric_only = re.sub(r'[^a-zA-Z0-9]', '', diary_text)
+        if len(alphanumeric_only) == 0:
+            return jsonify({"status": "error", "message": "Journal text cannot consist of only symbols."}), 400
+
+        # Reject keyboard spam (character repetition of 4+ same characters consecutively)
+        if re.search(r'(.)\1{3,}', diary_text):
+            return jsonify({"status": "error", "message": "Please enter meaningful journal content (keyboard spam detected)."}), 400
+
+        # Reject repeated nonsense tokens (consecutive identical words repeated 3+ times)
+        if re.search(r'\b(\w+)\b\s+\1\s+\1', diary_text, re.IGNORECASE):
+            return jsonify({"status": "error", "message": "Please enter meaningful journal content (repeated nonsense tokens detected)."}), 400
+
+        # Reject repeated nonsense tokens (low unique word ratio < 0.35)
+        if len(words) >= 5:
+            unique_words = set(w.lower() for w in words)
+            if (len(unique_words) / len(words)) < 0.35:
+                return jsonify({"status": "error", "message": "Please enter meaningful journal content (low unique word ratio)."}), 400
 
         from nlp.gibberish_detector import GibberishDetector
         if GibberishDetector.is_gibberish(diary_text):

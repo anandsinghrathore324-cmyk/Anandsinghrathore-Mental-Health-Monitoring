@@ -360,7 +360,7 @@
             </h1>
             <p class="hero-description">
                 Unlock deeper self-awareness. Our platform parses academic pressure, sleep parameters, and journal
-                transcripts using DistilBERT NLP to provide dynamic stress models, actionable mental health analytics,
+                transcripts using the Text Analysis Model to provide dynamic stress models, actionable mental health analytics,
                 and empathetic Gen-Z guidance.
             </p>
             <div class="hero-btns">
@@ -476,7 +476,7 @@
                 <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
             </div>
 
-            <!-- Card 4: DistilBERT Emotion Detection -->
+            <!-- Card 4: Text Analysis Model -->
             <div class="feature-card glass-panel">
                 <div class="feature-icon-container">
                     <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -484,7 +484,7 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                 </div>
-                <h3>DistilBERT Emotion NLP</h3>
+                <h3>Text Analysis Model</h3>
                 <p>Parses linguistic triggers, extracting emotional sentiments (Joy, Sadness, Anger, Fear, Love,
                     Surprise) from journals.</p>
                 <a href="#analysis" class="feature-link">NLP details <i class="fa-solid fa-chevron-right"></i></a>
@@ -604,7 +604,7 @@
         <div class="section-header">
             <span class="section-tag">Diagnostic Scan</span>
             <h2 class="section-title">Quantum Mental Health Scanner</h2>
-            <p class="section-desc">Fill out the variables below to let our AI model perform a simulated DistilBERT
+            <p class="section-desc">Fill out the variables below to let our AI model perform a simulated Text Analysis Model
                 neural classification on your emotional profile.</p>
         </div>
 
@@ -664,7 +664,7 @@
                         <div class="form-group">
                             <label for="student-age"><i class="fa-solid fa-calendar-days"></i> Age</label>
                             <input type="number" id="student-age" class="form-input" placeholder="e.g. 21" min="15"
-                                max="40" required>
+                                max="60" required>
                         </div>
 
                         <!-- Gender -->
@@ -866,6 +866,7 @@
                         <h4>Stress Risk</h4>
                         <i class="fa-solid fa-bolt-lightning" style="color: var(--neon-cyan);"></i>
                     </div>
+                    <span class="derived-sublabel" style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">Derived Indicator</span>
                     <div class="circle-progress-container">
                         <svg class="circle-progress-svg" width="100" height="100">
                             <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
@@ -883,6 +884,7 @@
                         <h4>Anxiety Risk</h4>
                         <i class="fa-solid fa-heart-pulse" style="color: var(--neon-purple);"></i>
                     </div>
+                    <span class="derived-sublabel" style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">Derived Indicator</span>
                     <div class="circle-progress-container">
                         <svg class="circle-progress-svg" width="100" height="100">
                             <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
@@ -900,6 +902,7 @@
                         <h4>Depression Risk</h4>
                         <i class="fa-solid fa-cloud-showers-heavy" style="color: var(--neon-rose);"></i>
                     </div>
+                    <span class="derived-sublabel" style="font-size: 0.65rem; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">ML Prediction</span>
                     <div class="circle-progress-container">
                         <svg class="circle-progress-svg" width="100" height="100">
                             <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
@@ -923,13 +926,52 @@
                         <div class="wellness-score-label">Wellness Score</div>
                     </div>
                 </div>
+
+                <!-- Neural Model API Pipelines Panel -->
+                <div class="result-card glass-panel" style="grid-column: span 3; width: 100%; display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem;">
+                    <div class="result-card-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <h4 style="font-size: 1.1rem; color: var(--neon-cyan); margin: 0; font-family: 'Space Grotesk', sans-serif;"><i class="fa-solid fa-server" style="margin-right: 8px;"></i> Neural Model API Pipelines</h4>
+                        <span class="action-plan-badge" id="mcp-status-badge" style="background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); padding: 0.25rem 0.6rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(0, 242, 254, 0.3);">API Synced</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; text-align: center; width: 100%;">
+                        <!-- Behavioral Probability -->
+                        <div class="mcp-metric-box" style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral Probability</span>
+                            <span id="metric-behavioral-prob" style="font-size: 1.8rem; font-weight: 800; color: var(--neon-cyan); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Port 5001 Model</span>
+                        </div>
+                        
+                        <!-- Text Probability -->
+                        <div class="mcp-metric-box" style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Text Risk Probability</span>
+                            <span id="metric-text-prob" style="font-size: 1.8rem; font-weight: 800; color: var(--neon-purple); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Port 5002 Model</span>
+                        </div>
+                        
+                        <!-- Combined Probability -->
+                        <div class="mcp-metric-box" style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Combined Probability</span>
+                            <span id="metric-combined-prob" style="font-size: 1.8rem; font-weight: 800; color: var(--neon-pink); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Weighted Aggregation</span>
+                        </div>
+                        
+                        <!-- Final Risk Level -->
+                        <div class="mcp-metric-box" style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Final Risk Level</span>
+                            <span id="metric-final-risk" style="font-size: 1.5rem; font-weight: 800; color: var(--neon-rose); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase;">Low</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Decision Outcome</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Right Side: DistilBERT NLP Analysis visualizer -->
+
+            <!-- Right Side: Text Analysis Model visualizer -->
             <div class="nlp-visualization-card glass-panel">
                 <div class="nlp-header">
                     <h3><i class="fa-solid fa-quote-left"></i> NLP Semantic Breakdown</h3>
-                    <span class="nlp-badge">DistilBERT-v3</span>
+                    <span class="nlp-badge">Text Analysis Model</span>
                 </div>
 
                 <p class="nlp-interpretation" id="nlp-interpretation-text">"Analyzing emotional parameters. Sentiment
@@ -1033,6 +1075,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- AI Personalized Recommendations Section -->
+        <div class="recommendations-card glass-panel" id="ai-recommendations-section" style="margin-top: 2.5rem; padding: 2.5rem; display: none;">
+            <div class="action-plan-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-cyan);">AI Engine</span>
+                    <h3>AI Personalized Recommendations</h3>
+                </div>
+            </div>
+            
+            <p class="action-plan-desc" style="margin-bottom: 2rem;">Based on your unique mental health risk profile and lifestyle factors, our Combined Risk Engine has generated these personalized recommendations:</p>
+
+            <div class="recommendations-grid" id="recommendations-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Dynamically populated card items -->
+            </div>
+        </div>
     </section>
 
     <!-- 6. STRESS & EMOTIONAL ANALYTICS DASHBOARD -->
@@ -1119,12 +1177,32 @@
                                 <h5 id="inspector-day-title">Day 12 Details</h5>
                                 <span class="inspector-score-badge" id="inspector-wellness-score">85 Wellness</span>
                             </div>
-                            <p class="inspector-mood-label">Primary Sentiment: <span id="inspector-mood-name">Joy
-                                    😊</span></p>
+                            <div class="inspector-metrics-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.8rem; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; text-align: left;">
+                                <div class="inspector-metric-row">
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Date:</span>
+                                    <span id="inspector-date" style="font-size: 0.75rem; color: var(--text-main); font-weight: 600; display: block;">2026-06-12</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Risk Level:</span>
+                                    <span id="inspector-risk-level" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: block;">Low</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Behavioral Prob:</span>
+                                    <span id="inspector-behavioral-prob" style="font-size: 0.75rem; color: var(--neon-cyan); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Text Prob:</span>
+                                    <span id="inspector-text-prob" style="font-size: 0.75rem; color: var(--neon-purple); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                                <div class="inspector-metric-row" style="grid-column: span 2;">
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Combined Prob:</span>
+                                    <span id="inspector-combined-prob" style="font-size: 0.75rem; color: var(--neon-pink); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                            </div>
+                            <p class="inspector-mood-label" style="font-size: 0.8rem; margin-bottom: 0.5rem; text-align: left;">Primary Sentiment: <span id="inspector-mood-name">Joy 😊</span></p>
                             <div class="inspector-journal-quote">
                                 <i class="fa-solid fa-quote-left"></i>
-                                <span id="inspector-journal-text">"Did really well on the exam today, feeling so
-                                    accomplished!"</span>
+                                <span id="inspector-journal-text">"Did really well on the exam today, feeling so accomplished!"</span>
                             </div>
                         </div>
                     </div>
@@ -1168,12 +1246,14 @@
                 <div class="analytics-small-card glass-panel">
                     <i class="fa-solid fa-fire" style="color: var(--neon-orange);"></i>
                     <h5>Burnout Threat</h5>
+                    <span class="derived-sublabel" style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-top: 2px; margin-bottom: 4px;">Derived Indicator</span>
                     <span id="stat-burnout">Low</span>
                 </div>
                 <!-- 4 -->
                 <div class="analytics-small-card glass-panel">
                     <i class="fa-solid fa-weight-hanging" style="color: var(--neon-rose);"></i>
                     <h5>Academic Strain</h5>
+                    <span class="derived-sublabel" style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-top: 2px; margin-bottom: 4px;">Derived Indicator</span>
                     <span id="stat-academic">Medium</span>
                 </div>
                 <!-- 5 -->
@@ -1293,7 +1373,7 @@
                         <i class="fa-solid fa-circle-check"></i>
                         <div>
                             <h5>Fine-Tuned NLP Classifiers</h5>
-                            <p>Powered by fine-tuned DistilBERT models mapping syntactic features to emotional labels.
+                            <p>Powered by fine-tuned Text Analysis Models mapping syntactic features to emotional labels.
                             </p>
                         </div>
                     </div>
