@@ -30,39 +30,23 @@ def create_app():
     
     # ── Email delivery driver diagnostics ────────────────────────────────────
     import os as _os
-    resend_key  = _os.getenv("RESEND_API_KEY",      "").strip()
-    resend_from = _os.getenv("RESEND_FROM_ADDRESS", "").strip()
-    smtp_email  = Config.SMTP_EMAIL  or ""
-    smtp_pass   = Config.SMTP_PASSWORD or ""
+    brevo_key  = _os.getenv("BREVO_API_KEY",    "").strip()
+    brevo_from = _os.getenv("BREVO_FROM_EMAIL", "").strip()
 
-    # Log exactly which variables are present so Render logs show the truth
-    logger.info(
-        "[STARTUP EMAIL] ENV CHECK — RESEND_API_KEY=%s, RESEND_FROM_ADDRESS=%s, "
-        "SMTP_EMAIL=%s, SMTP_PASSWORD=%s",
-        "SET(len=%d)" % len(resend_key)  if resend_key  else "NOT SET",
-        "SET(len=%d)" % len(resend_from) if resend_from else "NOT SET",
-        "SET" if smtp_email else "NOT SET",
-        "SET(len=%d)" % len(smtp_pass) if smtp_pass else "NOT SET",
-    )
-
-    if resend_key and resend_from:
-        masked_from = resend_from[:6] + "..." if len(resend_from) > 6 else resend_from
+    if brevo_key and brevo_from:
+        masked = (brevo_from[:4] + "...@" + brevo_from.split("@")[-1]) if "@" in brevo_from else brevo_from[:6] + "..."
         logger.info(
-            "[STARTUP EMAIL] ✅ Resend HTTP API driver ACTIVE. "
-            "FROM=%s (works on Render free tier — HTTPS port 443).", masked_from
-        )
-    elif smtp_email and smtp_pass and "your-gmail" not in smtp_email:
-        masked_smtp = (smtp_email[:3] + "..." + smtp_email[smtp_email.find("@"):]) if "@" in smtp_email else smtp_email[:3] + "..."
-        logger.warning(
-            "[STARTUP EMAIL] ⚠️  smtplib STARTTLS driver active (sender=%s). "
-            "NOTE: Gmail SMTP (ports 465/587) is BLOCKED on Render free tier — "
-            "emails will fail. Set RESEND_API_KEY + RESEND_FROM_ADDRESS to fix this.", masked_smtp
+            "[STARTUP EMAIL] ✅ Brevo REST API driver ACTIVE. "
+            "FROM=%s | OTP emails will work on all plans (HTTPS port 443).", masked
         )
     else:
+        missing = []
+        if not brevo_key:  missing.append("BREVO_API_KEY")
+        if not brevo_from: missing.append("BREVO_FROM_EMAIL")
         logger.warning(
-            "[STARTUP EMAIL] ⚠️  No email driver configured. "
-            "OTP emails will fail in production. "
-            "Set RESEND_API_KEY + RESEND_FROM_ADDRESS in Render environment variables."
+            "[STARTUP EMAIL] ⚠️  Brevo not configured — missing: %s. "
+            "OTP emails will fail. Set these in Render environment variables.",
+            ", ".join(missing)
         )
     
     # Enable Cross-Origin Resource Sharing
