@@ -47,6 +47,8 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    /* Prevent layout shift (CLS) when scrollbar appears/disappears between pages */
+    scrollbar-gutter: stable;
 }
 
 body {
@@ -185,32 +187,41 @@ h6 {
     box-shadow: 0 6px 25px rgba(225, 0, 255, 0.5), 0 0 15px rgba(225, 0, 255, 0.35);
 }
 
-/* 5. STICKY NAVBAR */
+/* 5. STICKY NAVBAR — Fixed height, never shifts */
 .navbar {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
+    height: 68px;                       /* locked — never changes */
     z-index: 1000;
     background: var(--bg-nav);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-glass);
-    transition: var(--transition-smooth);
+    /* Only animate visual properties, NOT dimensions */
+    transition: background 0.4s cubic-bezier(0.16,1,0.3,1),
+                box-shadow 0.4s cubic-bezier(0.16,1,0.3,1),
+                border-color 0.4s cubic-bezier(0.16,1,0.3,1);
 }
 
+/* Scrolled state: visual changes ONLY — height and padding are NOT touched */
 .navbar.scrolled {
-    padding: 0.5rem 0;
-    background: rgba(4, 6, 14, 0.9);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    background: rgba(4, 6, 14, 0.95);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+    border-bottom-color: rgba(0, 242, 254, 0.12);
 }
 
 .navbar-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 1.2rem 2rem;
+    /* Horizontal padding only — vertical centering via height + flex */
+    padding: 0 2rem;
+    height: 100%;                       /* fills navbar's locked 68px */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .nav-logo {
