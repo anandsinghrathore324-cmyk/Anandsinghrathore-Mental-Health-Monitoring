@@ -168,7 +168,4 @@ npx http-server -p 3000
 ```
 *Open `http://localhost:3000` in your web browser.*
 
-### Default Authentication Credentials
-* **Username/Email**: `student@aira.edu` *or* `AIRA-2026`
-* **Password Key**: `password`
-*(Alternatively, click the **Demo Autocomplete** link to instantly autofill test credentials)*
+
