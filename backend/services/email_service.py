@@ -1,14 +1,16 @@
 """
-email_service.py — Centralised, production-ready email delivery service for AIRA.
+email_service.py — Centralised email delivery service for AIRA.
 
-Primary driver  : Resend HTTP API  (works on Render free tier — uses HTTPS port 443)
-Local fallback  : smtplib STARTTLS (used only when RESEND_API_KEY is absent)
+Driver: Gmail SMTP via smtplib STARTTLS (smtp.gmail.com, port 587).
 
-Why Resend instead of Gmail SMTP?
-  Render.com blocks outbound TCP on ports 25, 465, and 587 for ALL free-tier
-  services to prevent spam abuse.  The error "[Errno 101] Network is unreachable"
-  is Render's kernel dropping the SYN packet before it ever leaves the host.
-  Resend communicates entirely over HTTPS (port 443), which Render never blocks.
+Required environment variables:
+    SMTP_EMAIL    — the Gmail address used to send OTPs  (e.g. youraccount@gmail.com)
+    SMTP_PASSWORD — a Gmail App Password (16-char, no spaces)
+                    Generate one at: Google Account → Security → 2-Step Verification → App Passwords
+
+Why an App Password?
+    Google blocks regular passwords for "less-secure apps".
+    App Passwords are scoped, revocable tokens that work with smtplib.
 
 Usage:
     from services.email_service import EmailService
@@ -19,10 +21,8 @@ Usage:
 """
 
 import logging
-import os
 import smtplib
 import socket
-import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Tuple
@@ -30,6 +30,7 @@ from typing import Tuple
 from config import Config
 
 logger = logging.getLogger(__name__)
+
 
 # ---------------------------------------------------------------------------
 # HTML Email Templates
@@ -39,6 +40,7 @@ _BASE_STYLE = (
     'font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;'
     'background-color:#060813;color:#ffffff;padding:2rem;'
 )
+
 
 def _build_otp_html(otp_code: str, purpose: str, recipient_name: str = "") -> str:
     """Build a branded AIRA OTP email body."""
@@ -109,75 +111,7 @@ def _subject_for_purpose(purpose: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Resend HTTP API driver  (primary — works on Render free tier)
-# ---------------------------------------------------------------------------
-
-def _send_via_resend(
-    to_email: str,
-    subject: str,
-    html_body: str,
-) -> Tuple[bool, str]:
-    """Send email through the Resend REST API over HTTPS (port 443).
-
-    Returns:
-        (True, "")          on success
-        (False, reason_str) on failure
-    """
-    api_key = os.getenv("RESEND_API_KEY", "").strip()
-    if not api_key:
-        return False, "RESEND_API_KEY environment variable is not set."
-
-    from_address = os.getenv("RESEND_FROM_ADDRESS", "").strip()
-    if not from_address:
-        return False, "RESEND_FROM_ADDRESS environment variable is not set."
-
-    import requests  # already in requirements.txt
-
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "from": from_address,
-        "to":   [to_email],
-        "subject": subject,
-        "html": html_body,
-    }
-
-    logger.info("[EMAIL] Sending via Resend API to: %s | subject: %s", to_email, subject)
-
-    try:
-        resp = requests.post(
-            "https://api.resend.com/emails",
-            json=payload,
-            headers=headers,
-            timeout=15,
-        )
-    except requests.exceptions.Timeout:
-        return False, "Resend API request timed out after 15 seconds."
-    except requests.exceptions.ConnectionError as exc:
-        return False, f"Could not reach Resend API: {exc}"
-
-    if resp.status_code in (200, 201):
-        data = resp.json()
-        email_id = data.get("id", "unknown")
-        logger.info("[EMAIL] Resend accepted message. id=%s → %s", email_id, to_email)
-        return True, ""
-
-    try:
-        err_detail = resp.json().get("message") or resp.text
-    except Exception:
-        err_detail = resp.text or f"HTTP {resp.status_code}"
-
-    logger.error(
-        "[EMAIL] Resend API rejected request. status=%s error=%s → %s",
-        resp.status_code, err_detail, to_email,
-    )
-    return False, f"Resend API error ({resp.status_code}): {err_detail}"
-
-
-# ---------------------------------------------------------------------------
-# smtplib STARTTLS driver  (local development fallback only)
+# Gmail SMTP STARTTLS driver
 # ---------------------------------------------------------------------------
 
 def _send_via_smtp(
@@ -185,26 +119,35 @@ def _send_via_smtp(
     subject: str,
     html_body: str,
 ) -> Tuple[bool, str]:
-    """Send email through Gmail SMTP using STARTTLS.
+    """Send email through Gmail SMTP using STARTTLS on port 587.
 
-    This driver is intentionally used ONLY in local development
-    (IS_PRODUCTION=False).  On Render free tier it will fail with
-    [Errno 101] because ports 465/587 are kernel-blocked.
+    Requires:
+        SMTP_EMAIL    — sender Gmail address
+        SMTP_PASSWORD — Gmail App Password (not the regular Gmail password)
     """
-    smtp_server   = Config.SMTP_SERVER
-    smtp_port     = Config.SMTP_PORT
+    smtp_server   = Config.SMTP_SERVER    # smtp.gmail.com
+    smtp_port     = Config.SMTP_PORT      # 587
     smtp_user     = Config.SMTP_EMAIL
     smtp_password = Config.SMTP_PASSWORD
 
     if not smtp_user or not smtp_password:
-        return False, "SMTP_EMAIL or SMTP_PASSWORD is not configured."
+        logger.error(
+            "[EMAIL SMTP] SMTP_EMAIL or SMTP_PASSWORD is not configured. "
+            "Set these environment variables before running the server."
+        )
+        return False, (
+            "Email is not configured. "
+            "Set SMTP_EMAIL and SMTP_PASSWORD environment variables."
+        )
 
+    # Build MIME message
     msg = MIMEMultipart("alternative")
-    msg["From"]    = smtp_user
+    msg["From"]    = f"AIRA Wellness <{smtp_user}>"
     msg["To"]      = to_email
     msg["Subject"] = subject
     msg.attach(MIMEText(html_body, "html"))
 
+    # TCP reachability pre-flight
     logger.info("[EMAIL SMTP] Pre-flight: resolving %s ...", smtp_server)
     try:
         resolved_ip = socket.gethostbyname(smtp_server)
@@ -216,44 +159,48 @@ def _send_via_smtp(
     try:
         test_sock = socket.create_connection((smtp_server, smtp_port), timeout=5)
         test_sock.close()
-        logger.info("[EMAIL SMTP] TCP reachability check passed: %s:%s", smtp_server, smtp_port)
+        logger.info("[EMAIL SMTP] TCP reachability OK: %s:%s", smtp_server, smtp_port)
     except OSError as tcp_err:
         logger.error(
-            "[EMAIL SMTP] TCP reachability FAILED for %s:%s — %s. "
-            "If running on Render free tier, SMTP ports are blocked. "
-            "Set RESEND_API_KEY and RESEND_FROM_ADDRESS to use the Resend driver instead.",
+            "[EMAIL SMTP] TCP reachability FAILED for %s:%s — %s",
             smtp_server, smtp_port, tcp_err,
         )
         return False, (
-            f"[Errno {getattr(tcp_err, 'errno', '?')}] Cannot reach {smtp_server}:{smtp_port}. "
-            "Render free tier blocks SMTP ports. Use Resend driver instead."
+            f"Cannot reach {smtp_server}:{smtp_port} — {tcp_err}. "
+            "If running on Render free tier, outbound SMTP (port 587) may be blocked. "
+            "Upgrade to a paid Render plan or use a different mail provider."
         )
 
+    # STARTTLS handshake + send
     logger.info("[EMAIL SMTP] Connecting via STARTTLS to %s:%s ...", smtp_server, smtp_port)
     try:
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=15) as server:
+        with smtplib.SMTP(smtp_server, smtp_port, timeout=20) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
             logger.info("[EMAIL SMTP] STARTTLS handshake complete. Authenticating ...")
             server.login(smtp_user, smtp_password)
-            logger.info("[EMAIL SMTP] Authentication successful. Sending message ...")
+            logger.info("[EMAIL SMTP] Authenticated. Sending to %s ...", to_email)
             server.sendmail(smtp_user, to_email, msg.as_string())
-            logger.info("[EMAIL SMTP] Message delivered successfully to: %s", to_email)
+            logger.info("[EMAIL SMTP] Message delivered to: %s", to_email)
         return True, ""
 
     except smtplib.SMTPAuthenticationError as auth_err:
         logger.error("[EMAIL SMTP] Authentication failed: %s", auth_err)
         return False, (
-            "SMTP authentication failed. Ensure you are using a Gmail App Password, "
-            "not your regular Gmail password. Enable 2-FA on Google account first."
+            "SMTP authentication failed. Make sure you are using a Gmail App Password "
+            "(not your regular Gmail password). Enable 2-Step Verification first, then "
+            "generate an App Password at Google Account → Security → App Passwords."
         )
+    except smtplib.SMTPRecipientsRefused as rcpt_err:
+        logger.error("[EMAIL SMTP] Recipient refused: %s", rcpt_err)
+        return False, f"Recipient address rejected by Gmail: {rcpt_err}"
     except smtplib.SMTPException as smtp_err:
         logger.error("[EMAIL SMTP] SMTP protocol error: %s", smtp_err, exc_info=True)
         return False, f"SMTP protocol error: {smtp_err}"
     except OSError as os_err:
         logger.error("[EMAIL SMTP] OS-level network error: %s", os_err, exc_info=True)
-        return False, f"Network error: {os_err}"
+        return False, f"Network error sending email: {os_err}"
 
 
 # ---------------------------------------------------------------------------
@@ -261,11 +208,10 @@ def _send_via_smtp(
 # ---------------------------------------------------------------------------
 
 class EmailService:
-    """Unified email delivery facade.
+    """Gmail SMTP email delivery service for AIRA OTP flows.
 
-    Driver selection priority:
-      1. Resend HTTP API — if RESEND_API_KEY env var is set  (always use in prod)
-      2. smtplib STARTTLS — local dev fallback only
+    Always uses smtplib STARTTLS (smtp.gmail.com:587).
+    Set SMTP_EMAIL and SMTP_PASSWORD in your environment.
     """
 
     @staticmethod
@@ -275,7 +221,9 @@ class EmailService:
         purpose: str = "reset",
         recipient_name: str = "",
     ) -> Tuple[bool, str]:
-        """Send an OTP email to the given address.
+        """Send an OTP email to any address via Gmail SMTP.
+
+        Works for any recipient email — no domain verification required.
 
         Returns:
             (True,  "")           on success
@@ -284,36 +232,15 @@ class EmailService:
         subject   = _subject_for_purpose(purpose)
         html_body = _build_otp_html(otp_code, purpose, recipient_name)
 
-        resend_key = os.getenv("RESEND_API_KEY", "").strip()
-
-        if resend_key:
-            logger.info("[EMAIL] Driver selected: Resend (RESEND_API_KEY is set)")
-            return _send_via_resend(to_email, subject, html_body)
-
-        if Config.IS_PRODUCTION:
-            logger.error(
-                "[EMAIL] Production environment detected but RESEND_API_KEY is not set. "
-                "Gmail SMTP will fail on Render free tier (ports 465/587 are blocked). "
-                "Add RESEND_API_KEY and RESEND_FROM_ADDRESS to your Render environment variables."
-            )
-            return False, (
-                "Email delivery is not configured for production. "
-                "Set RESEND_API_KEY and RESEND_FROM_ADDRESS in Render environment variables."
-            )
-
-        logger.info("[EMAIL] Driver selected: smtplib STARTTLS (local dev fallback)")
+        logger.info(
+            "[EMAIL] Sending OTP via Gmail SMTP | purpose=%s | to=%s",
+            purpose, to_email,
+        )
         return _send_via_smtp(to_email, subject, html_body)
 
     @staticmethod
     def is_configured() -> bool:
-        """Return True if at least one email delivery driver is ready."""
-        resend_key  = os.getenv("RESEND_API_KEY", "").strip()
-        resend_from = os.getenv("RESEND_FROM_ADDRESS", "").strip()
-        if resend_key and resend_from:
-            return True
+        """Return True if SMTP credentials are set and non-empty."""
         smtp_email    = Config.SMTP_EMAIL or ""
         smtp_password = Config.SMTP_PASSWORD or ""
-        if smtp_email and smtp_password:
-            if "your-gmail" not in smtp_email and "your-gmail" not in smtp_password:
-                return True
-        return False
+        return bool(smtp_email and smtp_password)

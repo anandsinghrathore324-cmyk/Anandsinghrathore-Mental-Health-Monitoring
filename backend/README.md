@@ -86,13 +86,9 @@ MONGO_URI=mongodb://localhost:27017/aira_wellness
 PORT=5000
 HOST=127.0.0.1
 
-# Email delivery (Resend — required for production)
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
-RESEND_FROM_ADDRESS=AIRA Wellness <noreply@yourdomain.com>
-
-# Gmail SMTP (local dev fallback only — NOT used on Render)
-SMTP_EMAIL=your-gmail@gmail.com
-SMTP_PASSWORD=your-app-password
+# Gmail SMTP (required for OTP delivery)
+SMTP_EMAIL=youraccount@gmail.com
+SMTP_PASSWORD=xxxx xxxx xxxx xxxx   # Gmail App Password (16 chars)
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
 ```
@@ -111,22 +107,25 @@ gunicorn -w 4 -b 0.0.0.0:10000 app:app
 
 ## 📧 Email Delivery Architecture
 
-AIRA uses a **two-driver email system** managed by `services/email_service.py`:
+AIRA sends OTPs via **Gmail SMTP** using Python's built-in `smtplib` (STARTTLS, port 587).
 
-| Environment | Driver | Port | Notes |
-|---|---|---|---|
-| **Production (Render)** | Resend HTTP API | 443 (HTTPS) | Set `RESEND_API_KEY` + `RESEND_FROM_ADDRESS` in Render env vars |
-| **Local Development** | Gmail SMTP STARTTLS | 587 | Set `SMTP_EMAIL` + `SMTP_PASSWORD` in `.env` |
+| Setting | Value |
+|---|---|
+| SMTP server | `smtp.gmail.com` |
+| Port | `587` (STARTTLS) |
+| Auth | Gmail App Password |
+| Recipient restriction | **None** — works for any email address |
 
-### Why not Gmail SMTP on Render?
-Render free tier kernel-blocks all outbound TCP on ports 25, 465, and 587. Any direct SMTP connection fails with `[Errno 101] Network is unreachable`. Resend communicates over HTTPS port 443, which is never blocked.
+### How to Generate a Gmail App Password
+1. Go to your [Google Account Security](https://myaccount.google.com/security)
+2. Enable **2-Step Verification** (required)
+3. Click **App Passwords** → Select app: *Mail* → Select device: *Other* → Name it `AIRA`
+4. Copy the 16-character password (no spaces)
+5. Set `SMTP_PASSWORD=<16-char-app-password>` in your environment
 
-### Resend Setup (Production)
-1. Create a free account at [resend.com](https://resend.com) (3,000 emails/month free)
-2. Verify your sending domain under **Domains**
-3. Create an API key under **API Keys**
-4. Add to Render environment: `RESEND_API_KEY` and `RESEND_FROM_ADDRESS`
-5. Redeploy the Render service
+> **Note:** On Render **free tier**, outbound TCP port 587 may be blocked by the kernel.
+> If you see `[Errno 101] Network is unreachable`, upgrade to a Render paid plan
+> which allows outbound SMTP connections.
 
 ---
 
