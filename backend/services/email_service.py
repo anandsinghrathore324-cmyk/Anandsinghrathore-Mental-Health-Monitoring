@@ -1,16 +1,28 @@
 """
 email_service.py — Centralised email delivery service for AIRA.
 
-Driver: Gmail SMTP via smtplib STARTTLS (smtp.gmail.com, port 587).
+Driver: Brevo (formerly Sendinblue) transactional email REST API.
+        Communicates over HTTPS (port 443) — works on ALL hosting platforms
+        including Render free tier where SMTP ports 25/465/587 are blocked.
+
+Why Brevo instead of Gmail SMTP?
+    Render.com free tier blocks outbound TCP on ports 25, 465, and 587.
+    The error [Errno 101] Network is unreachable is the Render kernel dropping
+    the TCP SYN packet before it leaves the host. Brevo's API uses HTTPS
+    (port 443) which is never blocked.
+
+Why Brevo instead of Resend?
+    Brevo only requires verifying a single SENDER EMAIL ADDRESS.
+    No domain ownership, no DNS records, no TXT/DKIM/DMARC setup needed.
+    Resend requires full domain verification before you can send to arbitrary users.
+
+Free tier limits:
+    300 emails/day · 9,000 emails/month · No credit card required.
 
 Required environment variables:
-    SMTP_EMAIL    — the Gmail address used to send OTPs  (e.g. youraccount@gmail.com)
-    SMTP_PASSWORD — a Gmail App Password (16-char, no spaces)
-                    Generate one at: Google Account → Security → 2-Step Verification → App Passwords
-
-Why an App Password?
-    Google blocks regular passwords for "less-secure apps".
-    App Passwords are scoped, revocable tokens that work with smtplib.
+    BREVO_API_KEY      — API key from Brevo dashboard (Transactional → API Keys)
+    BREVO_FROM_EMAIL   — the verified sender email on your Brevo account
+    BREVO_FROM_NAME    — display name (optional, defaults to "AIRA Wellness")
 
 Usage:
     from services.email_service import EmailService
@@ -21,11 +33,10 @@ Usage:
 """
 
 import logging
-import smtplib
-import socket
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import os
 from typing import Tuple
+
+import requests
 
 from config import Config
 
@@ -111,96 +122,87 @@ def _subject_for_purpose(purpose: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Gmail SMTP STARTTLS driver
+# Brevo REST API driver  (HTTPS port 443 — works on Render free tier)
 # ---------------------------------------------------------------------------
 
-def _send_via_smtp(
+_BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+
+
+def _send_via_brevo(
     to_email: str,
     subject: str,
     html_body: str,
 ) -> Tuple[bool, str]:
-    """Send email through Gmail SMTP using STARTTLS on port 587.
+    """Send email through the Brevo transactional email REST API.
 
-    Requires:
-        SMTP_EMAIL    — sender Gmail address
-        SMTP_PASSWORD — Gmail App Password (not the regular Gmail password)
+    Uses HTTPS (port 443) — never blocked on Render free tier.
+    Works for any recipient email with no domain verification required.
+
+    Returns:
+        (True, "")           on success
+        (False, reason_str)  on failure
     """
-    smtp_server   = Config.SMTP_SERVER    # smtp.gmail.com
-    smtp_port     = Config.SMTP_PORT      # 587
-    smtp_user     = Config.SMTP_EMAIL
-    smtp_password = Config.SMTP_PASSWORD
+    api_key    = os.getenv("BREVO_API_KEY", "").strip()
+    from_email = os.getenv("BREVO_FROM_EMAIL", "").strip()
+    from_name  = os.getenv("BREVO_FROM_NAME", "AIRA Wellness").strip()
 
-    if not smtp_user or not smtp_password:
-        logger.error(
-            "[EMAIL SMTP] SMTP_EMAIL or SMTP_PASSWORD is not configured. "
-            "Set these environment variables before running the server."
-        )
-        return False, (
-            "Email is not configured. "
-            "Set SMTP_EMAIL and SMTP_PASSWORD environment variables."
-        )
+    if not api_key:
+        logger.error("[EMAIL BREVO] BREVO_API_KEY environment variable is not set.")
+        return False, "BREVO_API_KEY environment variable is not set."
 
-    # Build MIME message
-    msg = MIMEMultipart("alternative")
-    msg["From"]    = f"AIRA Wellness <{smtp_user}>"
-    msg["To"]      = to_email
-    msg["Subject"] = subject
-    msg.attach(MIMEText(html_body, "html"))
+    if not from_email:
+        logger.error("[EMAIL BREVO] BREVO_FROM_EMAIL environment variable is not set.")
+        return False, "BREVO_FROM_EMAIL environment variable is not set."
 
-    # TCP reachability pre-flight
-    logger.info("[EMAIL SMTP] Pre-flight: resolving %s ...", smtp_server)
-    try:
-        resolved_ip = socket.gethostbyname(smtp_server)
-        logger.info("[EMAIL SMTP] DNS resolved %s → %s", smtp_server, resolved_ip)
-    except socket.gaierror as dns_err:
-        logger.error("[EMAIL SMTP] DNS resolution failed: %s", dns_err)
-        return False, f"DNS resolution failed for {smtp_server}: {dns_err}"
+    payload = {
+        "sender": {"name": from_name, "email": from_email},
+        "to":     [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_body,
+    }
+
+    headers = {
+        "accept":       "application/json",
+        "api-key":      api_key,
+        "content-type": "application/json",
+    }
+
+    logger.info("[EMAIL BREVO] Sending via Brevo API | to=%s | subject=%s", to_email, subject)
 
     try:
-        test_sock = socket.create_connection((smtp_server, smtp_port), timeout=5)
-        test_sock.close()
-        logger.info("[EMAIL SMTP] TCP reachability OK: %s:%s", smtp_server, smtp_port)
-    except OSError as tcp_err:
-        logger.error(
-            "[EMAIL SMTP] TCP reachability FAILED for %s:%s — %s",
-            smtp_server, smtp_port, tcp_err,
+        resp = requests.post(
+            _BREVO_API_URL,
+            json=payload,
+            headers=headers,
+            timeout=15,
         )
-        return False, (
-            f"Cannot reach {smtp_server}:{smtp_port} — {tcp_err}. "
-            "If running on Render free tier, outbound SMTP (port 587) may be blocked. "
-            "Upgrade to a paid Render plan or use a different mail provider."
-        )
+    except requests.exceptions.Timeout:
+        logger.error("[EMAIL BREVO] Request timed out after 15 seconds.")
+        return False, "Brevo API request timed out."
+    except requests.exceptions.ConnectionError as exc:
+        logger.error("[EMAIL BREVO] Connection error: %s", exc)
+        return False, f"Could not reach Brevo API: {exc}"
 
-    # STARTTLS handshake + send
-    logger.info("[EMAIL SMTP] Connecting via STARTTLS to %s:%s ...", smtp_server, smtp_port)
-    try:
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=20) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            logger.info("[EMAIL SMTP] STARTTLS handshake complete. Authenticating ...")
-            server.login(smtp_user, smtp_password)
-            logger.info("[EMAIL SMTP] Authenticated. Sending to %s ...", to_email)
-            server.sendmail(smtp_user, to_email, msg.as_string())
-            logger.info("[EMAIL SMTP] Message delivered to: %s", to_email)
+    # 201 Created is the normal success response from Brevo
+    if resp.status_code in (200, 201):
+        try:
+            msg_id = resp.json().get("messageId", "unknown")
+        except Exception:
+            msg_id = "unknown"
+        logger.info("[EMAIL BREVO] Accepted by Brevo. messageId=%s → %s", msg_id, to_email)
         return True, ""
 
-    except smtplib.SMTPAuthenticationError as auth_err:
-        logger.error("[EMAIL SMTP] Authentication failed: %s", auth_err)
-        return False, (
-            "SMTP authentication failed. Make sure you are using a Gmail App Password "
-            "(not your regular Gmail password). Enable 2-Step Verification first, then "
-            "generate an App Password at Google Account → Security → App Passwords."
-        )
-    except smtplib.SMTPRecipientsRefused as rcpt_err:
-        logger.error("[EMAIL SMTP] Recipient refused: %s", rcpt_err)
-        return False, f"Recipient address rejected by Gmail: {rcpt_err}"
-    except smtplib.SMTPException as smtp_err:
-        logger.error("[EMAIL SMTP] SMTP protocol error: %s", smtp_err, exc_info=True)
-        return False, f"SMTP protocol error: {smtp_err}"
-    except OSError as os_err:
-        logger.error("[EMAIL SMTP] OS-level network error: %s", os_err, exc_info=True)
-        return False, f"Network error sending email: {os_err}"
+    # Error path
+    try:
+        err_detail = resp.json().get("message") or resp.text
+    except Exception:
+        err_detail = resp.text or f"HTTP {resp.status_code}"
+
+    logger.error(
+        "[EMAIL BREVO] API rejected request. status=%s error=%s → %s",
+        resp.status_code, err_detail, to_email,
+    )
+    return False, f"Brevo API error ({resp.status_code}): {err_detail}"
 
 
 # ---------------------------------------------------------------------------
@@ -208,10 +210,11 @@ def _send_via_smtp(
 # ---------------------------------------------------------------------------
 
 class EmailService:
-    """Gmail SMTP email delivery service for AIRA OTP flows.
+    """Brevo-based email delivery facade for AIRA OTP flows.
 
-    Always uses smtplib STARTTLS (smtp.gmail.com:587).
-    Set SMTP_EMAIL and SMTP_PASSWORD in your environment.
+    Sends via Brevo REST API (HTTPS port 443).
+    Works on Render free tier — no SMTP port restrictions apply.
+    Works for any recipient email — no domain verification required.
     """
 
     @staticmethod
@@ -221,9 +224,13 @@ class EmailService:
         purpose: str = "reset",
         recipient_name: str = "",
     ) -> Tuple[bool, str]:
-        """Send an OTP email to any address via Gmail SMTP.
+        """Send an OTP verification email via Brevo.
 
-        Works for any recipient email — no domain verification required.
+        Args:
+            to_email:       recipient's email address
+            otp_code:       6-digit OTP string
+            purpose:        "signup" | "login" | "reset"
+            recipient_name: optional display name for personalisation
 
         Returns:
             (True,  "")           on success
@@ -233,14 +240,15 @@ class EmailService:
         html_body = _build_otp_html(otp_code, purpose, recipient_name)
 
         logger.info(
-            "[EMAIL] Sending OTP via Gmail SMTP | purpose=%s | to=%s",
+            "[EMAIL] Dispatching OTP via Brevo | purpose=%s | to=%s",
             purpose, to_email,
         )
-        return _send_via_smtp(to_email, subject, html_body)
+        return _send_via_brevo(to_email, subject, html_body)
 
     @staticmethod
     def is_configured() -> bool:
-        """Return True if SMTP credentials are set and non-empty."""
-        smtp_email    = Config.SMTP_EMAIL or ""
-        smtp_password = Config.SMTP_PASSWORD or ""
-        return bool(smtp_email and smtp_password)
+        """Return True if Brevo credentials are set and non-empty."""
+        return bool(
+            os.getenv("BREVO_API_KEY", "").strip() and
+            os.getenv("BREVO_FROM_EMAIL", "").strip()
+        )
