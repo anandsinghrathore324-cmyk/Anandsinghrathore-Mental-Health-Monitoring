@@ -11,6 +11,7 @@ Welcome to the production-ready backend architectural core of **AIRA (Artificial
 - **Cross-Origin Securities:** Flask-CORS (`r"/api/*"` restrictions)
 - **Database Engine:** MongoDB (via standard PyMongo client drivers)
 - **Cryptographic Portals:** PyJWT Bearer Authentication, Bcrypt Password Salting
+- **Email Delivery:** Resend HTTP API (HTTPS port 443 — works on Render free tier)
 - **Machine Learning Matrix:** SciKit-Learn Behavioral ML Model (Multilabel diagnostic predictions)
 - **Natural Language Processing:** Hugging Face PyTorch Text Analysis Model Pipeline
 
@@ -23,7 +24,7 @@ backend/
 ├── app.py                      # Flask Application Root & DB Seeding Manager
 ├── config.py                   # Secure Configuration Variables (Env Decoders)
 ├── requirements.txt            # Python Module Dependencies List
-├── .env                        # Local Environment Variable Decrypter
+├── .env                        # Local Environment Variable Decrypter (never committed)
 ├── database/                   # MongoDB Collection Model Frameworks
 │   ├── db.py                   # DB Manager, Index Deployer & Unique Constraints
 │   ├── user_model.py           # Bcrypt verification & standard search indexes
@@ -40,12 +41,13 @@ backend/
 ├── nlp/                        # Cognitive Language Engines
 │   └── distilbert.py           # Text Analysis Model Singleton with rule fallbacks
 ├── routes/                     # Blueprint API Endpoint Handlers
-│   ├── auth_routes.py          # Signup, login verification, student profiles
+│   ├── auth_routes.py          # OTP authentication, login, signup, profile
 │   ├── prediction_routes.py    # ML assessment triggers & Text Analysis Model sentiments
 │   ├── chatbot_routes.py       # Conversational chatbot loops & logs
 │   ├── doctor_routes.py        # Haversine distance calculations sorted ascending
 │   └── dashboard_routes.py     # Aggregated weekly timelines & heatmap blocks
 └── services/                   # Business Logic Processing Units
+    ├── email_service.py        # Unified email driver (Resend API primary, SMTP local fallback)
     ├── prediction_service.py   # Hybrid model/algorithmic diagnostic blenders
     ├── chatbot_service.py      # Context-rich support dialect generators
     ├── doctor_service.py       # Proximity location sorters
@@ -78,24 +80,80 @@ pip install -r requirements.txt
 Review and configure `backend/.env` matching your MongoDB connection strings:
 
 ```ini
-SECRET_KEY=aira-super-secret-quantum-key-2026
-JWT_SECRET_KEY=aira-super-secret-jwt-signature-key-2026
+SECRET_KEY=your-secret-key
+JWT_SECRET_KEY=your-jwt-secret-key
 MONGO_URI=mongodb://localhost:27017/aira_wellness
 PORT=5000
 HOST=127.0.0.1
+
+# Email delivery (Resend — required for production)
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+RESEND_FROM_ADDRESS=AIRA Wellness <noreply@yourdomain.com>
+
+# Gmail SMTP (local dev fallback only — NOT used on Render)
+SMTP_EMAIL=your-gmail@gmail.com
+SMTP_PASSWORD=your-app-password
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
 ```
 
-### 4. Seed Verified Psychologists & Start Node
-Run the application launcher. The server will dynamically verify database status, establish indexing rules on all collections, auto-generate default verified doctor registries across international regions, and launch the REST API nodes:
-
+### 4. Start the Development Server
 ```bash
 python app.py
 ```
 
 *Note: In production environments, invoke the server using a WSGI server like Gunicorn:*
 ```bash
-gunicorn -w 4 -b 127.0.0.1:5000 app:app
+gunicorn -w 4 -b 0.0.0.0:10000 app:app
 ```
+
+---
+
+## 📧 Email Delivery Architecture
+
+AIRA uses a **two-driver email system** managed by `services/email_service.py`:
+
+| Environment | Driver | Port | Notes |
+|---|---|---|---|
+| **Production (Render)** | Resend HTTP API | 443 (HTTPS) | Set `RESEND_API_KEY` + `RESEND_FROM_ADDRESS` in Render env vars |
+| **Local Development** | Gmail SMTP STARTTLS | 587 | Set `SMTP_EMAIL` + `SMTP_PASSWORD` in `.env` |
+
+### Why not Gmail SMTP on Render?
+Render free tier kernel-blocks all outbound TCP on ports 25, 465, and 587. Any direct SMTP connection fails with `[Errno 101] Network is unreachable`. Resend communicates over HTTPS port 443, which is never blocked.
+
+### Resend Setup (Production)
+1. Create a free account at [resend.com](https://resend.com) (3,000 emails/month free)
+2. Verify your sending domain under **Domains**
+3. Create an API key under **API Keys**
+4. Add to Render environment: `RESEND_API_KEY` and `RESEND_FROM_ADDRESS`
+5. Redeploy the Render service
+
+---
+
+## 🔒 Authentication & Security
+
+### Login Paths
+There is **exactly one** way to authenticate into AIRA:
+
+| Path | Method | Description |
+|---|---|---|
+| Email + Password | `POST /api/login` | Standard login with Bcrypt-verified credentials |
+| OTP Login | `POST /api/request-otp` → `POST /api/verify-otp` | Email-verified one-time password login |
+| OTP Signup | `POST /api/signup-request-otp` → `POST /api/signup-verify-otp` → `POST /api/signup` | Email-verified registration |
+
+> **No bypass paths exist.** OTP codes are never returned in API responses under any circumstance. Email delivery failure always returns HTTP 500 — the OTP is never exposed.
+
+### JWT Bearer Token
+Every endpoint under prediction, dashboard, doctor, or chatbot routes requires a validated JWT:
+- **Header format:** `Authorization: Bearer <JWT_signature>`
+- **Expiration:** 24 hours (configurable via `JWT_EXPIRATION_HOURS`)
+- **Middleware:** `auth_middleware.py` validates tokens and injects `current_user` into handlers
+
+### Password Security
+- All passwords are Bcrypt-salted with a unique salt per user
+- OTP codes are generated using `secrets.randbelow()` (cryptographically secure RNG)
+- OTP codes are single-use — burned from the database immediately upon successful verification
+- OTP codes expire after 5 minutes (enforced both by MongoDB TTL index and application-level check)
 
 ---
 
@@ -114,21 +172,18 @@ The backend implements a two-layered diagnostic scoring routine:
 
 ---
 
-## 🔒 Security & Middleware Protocols
-Every endpoint under prediction, dashboard compile, doctor sorting, or chatbot dialogue routes requires a validated session JWT Bearer token:
-- **Header format:** `Authorization: Bearer <JWT_signature>`
-- **Expirations:** 24 Hours default.
-- **Middleware:** `auth_middleware.py` intercepts incoming payloads, validates token authenticity, searches user tables, and injects `current_user` object references directly into blueprint handlers.
-
----
-
 ## 📡 REST API Blueprints Reference
 
 ### 🔐 Authentication Blueprints
-- **`POST /api/signup`**: Registers name, email, and returns Bcrypt salted records.
-- **`POST /api/login`**: Verifies cryptographically, creates JWT signatures, returns token.
+- **`POST /api/signup`**: Registers name, email, and password — stores Bcrypt-salted credentials.
+- **`POST /api/login`**: Verifies credentials, returns signed JWT token.
 - **`POST /api/logout`**: Validates active session and signs student node off.
 - **`GET /api/profile`**: Returns active student's name, identifiers, and sign-up dates.
+- **`POST /api/request-otp`**: Generates 6-digit OTP and dispatches it to the user's email via Resend.
+- **`POST /api/verify-otp`**: Verifies OTP, returns JWT token on success.
+- **`POST /api/signup-request-otp`**: Checks email availability, dispatches signup OTP.
+- **`POST /api/signup-verify-otp`**: Verifies signup OTP — confirms email ownership.
+- **`POST /api/reset-password`**: Updates password after OTP verification.
 
 ### 📊 Diagnostic Predictions
 - **`POST /api/predict`**: Blends behavioral variables and Text Analysis Model sentiment logs, logs reports, and updates the daily mood heatmap.

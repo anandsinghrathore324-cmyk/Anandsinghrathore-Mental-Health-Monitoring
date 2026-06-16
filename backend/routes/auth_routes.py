@@ -163,19 +163,11 @@ def request_otp():
         return jsonify({"status": "error", "message": "Failed to generate verification code."}), 500
 
     if not EmailService.is_configured():
-        if Config.IS_PRODUCTION:
-            logger.error("[OTP] No email driver configured in production.")
-            return jsonify({
-                "status": "error",
-                "message": "Email delivery is not configured. Contact the administrator.",
-            }), 500
-        # Local sandbox: return OTP in response body
-        logger.info("[OTP SANDBOX] No email driver — returning otp_bypass for: %s", email)
+        logger.error("[OTP] No email driver configured — aborting for: %s", email)
         return jsonify({
-            "status": "success",
-            "message": "OTP generated locally (sandbox mode).",
-            "otp_bypass": otp_code,
-        }), 200
+            "status": "error",
+            "message": "Email delivery is not configured. Contact the administrator.",
+        }), 500
 
     ok, err = EmailService.send_otp(to_email=email, otp_code=otp_code, purpose="reset")
 
@@ -186,15 +178,7 @@ def request_otp():
         }), 200
 
     logger.error("[OTP] Email delivery failed for %s: %s", email, err)
-    if Config.IS_PRODUCTION:
-        return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
-
-    # Dev: surface the error but still return otp_bypass so dev can continue
-    return jsonify({
-        "status": "success",
-        "message": f"Email delivery failed ({err}). Using sandbox bypass.",
-        "otp_bypass": otp_code,
-    }), 200
+    return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
 
 @auth_bp.route("/signup-request-otp", methods=["POST"])
 def signup_request_otp():
@@ -228,18 +212,11 @@ def signup_request_otp():
         return jsonify({"status": "error", "message": "Failed to generate verification code."}), 500
 
     if not EmailService.is_configured():
-        if Config.IS_PRODUCTION:
-            logger.error("[SIGNUP OTP] No email driver configured in production.")
-            return jsonify({
-                "status": "error",
-                "message": "Email delivery is not configured. Contact the administrator.",
-            }), 500
-        logger.info("[SIGNUP OTP SANDBOX] No email driver — returning otp_bypass for: %s", email)
+        logger.error("[SIGNUP OTP] No email driver configured — aborting for: %s", email)
         return jsonify({
-            "status": "success",
-            "message": "OTP generated locally (sandbox mode).",
-            "otp_bypass": otp_code,
-        }), 200
+            "status": "error",
+            "message": "Email delivery is not configured. Contact the administrator.",
+        }), 500
 
     ok, err = EmailService.send_otp(
         to_email=email,
@@ -255,14 +232,7 @@ def signup_request_otp():
         }), 200
 
     logger.error("[SIGNUP OTP] Email delivery failed for %s: %s", email, err)
-    if Config.IS_PRODUCTION:
-        return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
-
-    return jsonify({
-        "status": "success",
-        "message": f"Email delivery failed ({err}). Using sandbox bypass.",
-        "otp_bypass": otp_code,
-    }), 200
+    return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
 
 @auth_bp.route("/signup-verify-otp", methods=["POST"])
 def signup_verify_otp():

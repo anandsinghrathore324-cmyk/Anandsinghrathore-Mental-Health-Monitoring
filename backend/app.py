@@ -432,12 +432,6 @@ def seed_database():
         HotlineModel.seed_hotlines()
         logger.info("Mental health crisis hotlines database successfully seeded.")
         GeoModel.seed_check()
-        
-        # Seed default student user
-        from database.user_model import UserModel
-        if not UserModel.find_by_email("student@aira.edu"):
-            UserModel.create_user("Student User", "student@aira.edu", "password")
-            logger.info("Demo student account successfully registered inside MongoDB.")
     except Exception as e:
         logger.error(f"Failed to seed database contents: {str(e)}")
 
