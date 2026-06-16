@@ -28,17 +28,42 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
-    # Check and log SMTP configuration status (without exposing secrets)
-    smtp_email = Config.SMTP_EMAIL
-    smtp_pass = Config.SMTP_PASSWORD
-    if smtp_email and smtp_pass:
-        if "your-gmail" in smtp_email or "your-gmail" in smtp_pass:
-            logger.warning("[STARTUP SMTP] SMTP credentials detected but contain PLACEHOLDER values in .env. Real email delivery is bypassed in favor of local sandbox mode.")
-        else:
-            masked_email = (smtp_email[:3] + "..." + smtp_email[smtp_email.find("@"):]) if "@" in smtp_email else (smtp_email[:3] + "...")
-            logger.info(f"[STARTUP SMTP] SMTP credentials loaded successfully: Sender={masked_email}, Password=Configured (length={len(smtp_pass)}). Real email delivery is ACTIVE.")
+    # ── Email delivery driver diagnostics ────────────────────────────────────
+    import os as _os
+    resend_key  = _os.getenv("RESEND_API_KEY",      "").strip()
+    resend_from = _os.getenv("RESEND_FROM_ADDRESS", "").strip()
+    smtp_email  = Config.SMTP_EMAIL  or ""
+    smtp_pass   = Config.SMTP_PASSWORD or ""
+
+    # Log exactly which variables are present so Render logs show the truth
+    logger.info(
+        "[STARTUP EMAIL] ENV CHECK — RESEND_API_KEY=%s, RESEND_FROM_ADDRESS=%s, "
+        "SMTP_EMAIL=%s, SMTP_PASSWORD=%s",
+        "SET(len=%d)" % len(resend_key)  if resend_key  else "NOT SET",
+        "SET(len=%d)" % len(resend_from) if resend_from else "NOT SET",
+        "SET" if smtp_email else "NOT SET",
+        "SET(len=%d)" % len(smtp_pass) if smtp_pass else "NOT SET",
+    )
+
+    if resend_key and resend_from:
+        masked_from = resend_from[:6] + "..." if len(resend_from) > 6 else resend_from
+        logger.info(
+            "[STARTUP EMAIL] ✅ Resend HTTP API driver ACTIVE. "
+            "FROM=%s (works on Render free tier — HTTPS port 443).", masked_from
+        )
+    elif smtp_email and smtp_pass and "your-gmail" not in smtp_email:
+        masked_smtp = (smtp_email[:3] + "..." + smtp_email[smtp_email.find("@"):]) if "@" in smtp_email else smtp_email[:3] + "..."
+        logger.warning(
+            "[STARTUP EMAIL] ⚠️  smtplib STARTTLS driver active (sender=%s). "
+            "NOTE: Gmail SMTP (ports 465/587) is BLOCKED on Render free tier — "
+            "emails will fail. Set RESEND_API_KEY + RESEND_FROM_ADDRESS to fix this.", masked_smtp
+        )
     else:
-        logger.warning("[STARTUP SMTP] SMTP credentials are not configured or empty. Real email delivery is bypassed in favor of local sandbox mode.")
+        logger.warning(
+            "[STARTUP EMAIL] ⚠️  No email driver configured. "
+            "OTP emails will fail in production. "
+            "Set RESEND_API_KEY + RESEND_FROM_ADDRESS in Render environment variables."
+        )
     
     # Enable Cross-Origin Resource Sharing
     CORS(app, resources={r"/api/*": {"origins": "*"}})
