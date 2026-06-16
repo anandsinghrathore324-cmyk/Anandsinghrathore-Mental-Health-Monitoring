@@ -5,11 +5,25 @@ def validate_prediction_input(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         data = request.get_json() or {}
-        
-        # Age validation
+
+        # Resolve current_user from args[0] (injected by @token_required which runs first)
+        current_user = args[0] if args else None
+
+        # ── Age validation ────────────────────────────────────────────────────
+        # Age may come from the request payload OR be computed from the user's
+        # stored birth_year (one-time onboarding profile).
+        import datetime as _dt
         age_raw = data.get("age")
+        if age_raw is None and current_user and current_user.get("birth_year"):
+            # Inject age computed from stored birth_year
+            age_raw = _dt.datetime.utcnow().year - int(current_user["birth_year"])
+            data["age"] = age_raw
+
         if age_raw is None:
-            return jsonify({"status": "error", "message": "Age is required."}), 400
+            return jsonify({
+                "status": "error",
+                "message": "Age not found. Please complete your profile before running an analysis."
+            }), 400
         try:
             age = int(age_raw)
             if age < 15 or age > 60:
@@ -17,10 +31,18 @@ def validate_prediction_input(f):
         except (ValueError, TypeError):
             return jsonify({"status": "error", "message": "Age must be a valid integer."}), 400
 
-        # Gender validation
+        # ── Gender validation ─────────────────────────────────────────────────
+        # Gender may come from the request payload OR from the user's stored profile.
         gender = data.get("gender")
+        if gender is None and current_user and current_user.get("gender"):
+            gender = current_user["gender"]
+            data["gender"] = gender
+
         if gender is None:
-            return jsonify({"status": "error", "message": "Gender is required."}), 400
+            return jsonify({
+                "status": "error",
+                "message": "Gender not found. Please complete your profile before running an analysis."
+            }), 400
         valid_genders = ["Male", "Female", "Other", "Prefer not to say"]
         if gender not in valid_genders:
             return jsonify({"status": "error", "message": f"Gender must be one of {valid_genders}."}), 400

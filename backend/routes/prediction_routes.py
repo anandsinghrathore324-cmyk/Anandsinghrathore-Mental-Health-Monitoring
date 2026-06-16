@@ -12,8 +12,17 @@ prediction_bp = Blueprint("prediction", __name__)
 @validate_prediction_input
 def predict(current_user):
     """Endpoint that runs the hybrid ML/rule-based diagnostic assessment and records the result."""
+    import datetime
     data = request.get_json() or {}
-    
+
+    # ── Inject profile fields if not already present in payload ───────────────
+    # The validation middleware already attempted this, but we do it again here
+    # as a safety net so the prediction service always receives age and gender.
+    if "age" not in data and current_user.get("birth_year"):
+        data["age"] = datetime.datetime.utcnow().year - int(current_user["birth_year"])
+    if "gender" not in data and current_user.get("gender"):
+        data["gender"] = current_user["gender"]
+
     try:
         # Run prediction diagnostic service
         metrics = prediction_service.run_assessment(data)

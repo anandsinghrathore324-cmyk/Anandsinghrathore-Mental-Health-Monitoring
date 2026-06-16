@@ -312,6 +312,91 @@
         </div>
     </div>
 
+    <!-- ── ONBOARDING PROFILE MODAL (shown once after first login) ─────────── -->
+    <div id="onboarding-modal" style="display:none; position:fixed; inset:0; z-index:9999;
+         background:rgba(0,0,0,0.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+         align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:linear-gradient(135deg,rgba(15,15,30,0.98),rgba(10,10,25,0.98));
+                    border:1px solid rgba(0,242,254,0.25); border-radius:24px; padding:2.5rem 2rem;
+                    max-width:440px; width:100%; box-shadow:0 0 60px rgba(0,242,254,0.15);
+                    position:relative;">
+            <!-- Header -->
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg,rgba(0,242,254,0.2),rgba(189,0,255,0.2));
+                             border:1px solid rgba(0,242,254,0.3); border-radius:50%;
+                             display:flex; align-items:center; justify-content:center;
+                             margin:0 auto 1rem; font-size:1.5rem;">
+                    <i class="fa-solid fa-user-gear" style="color:var(--neon-cyan);"></i>
+                </div>
+                <h2 style="font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700;
+                            background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+                            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+                            margin:0 0 0.4rem;">Complete Your Profile</h2>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); margin:0;">
+                    This is collected once and used for all future analyses.
+                </p>
+            </div>
+
+            <!-- Error message -->
+            <div id="onboarding-error" style="display:none; background:rgba(255,50,50,0.12);
+                 border:1px solid rgba(255,50,50,0.3); border-radius:10px; padding:0.7rem 1rem;
+                 margin-bottom:1.2rem; color:#ff6b6b; font-size:0.82rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>
+                <span id="onboarding-error-text"></span>
+            </div>
+
+            <!-- Name -->
+            <div style="margin-bottom:1.2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-user" style="margin-right:6px; color:var(--neon-cyan);"></i>Full Name
+                </label>
+                <input type="text" id="onboarding-name" class="form-input"
+                       placeholder="e.g. Anand Singh"
+                       style="width:100%; border-radius:10px;">
+            </div>
+
+            <!-- Gender -->
+            <div style="margin-bottom:1.2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-venus-mars" style="margin-right:6px; color:var(--neon-purple);"></i>Gender
+                </label>
+                <select id="onboarding-gender" class="form-input" style="width:100%; border-radius:10px;">
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other / Non-Binary</option>
+                    <option value="Prefer not to say">Prefer Not To Say</option>
+                </select>
+            </div>
+
+            <!-- Birth Year -->
+            <div style="margin-bottom:2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-calendar-days" style="margin-right:6px; color:var(--neon-pink);"></i>Birth Year
+                </label>
+                <input type="number" id="onboarding-birth-year" class="form-input"
+                       placeholder="e.g. 2000" min="1966" max="2011"
+                       style="width:100%; border-radius:10px;">
+                <span style="font-size:0.73rem; color:rgba(255,255,255,0.35); margin-top:4px; display:block;">
+                    Used to calculate your age — never stored as-is.
+                </span>
+            </div>
+
+            <!-- Save Button -->
+            <button id="onboarding-save-btn" type="button"
+                    style="width:100%; padding:0.85rem; border:none; border-radius:12px;
+                           background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+                           color:#fff; font-size:0.95rem; font-weight:700; cursor:pointer;
+                           font-family:'Space Grotesk',sans-serif; letter-spacing:0.5px;
+                           transition:opacity 0.2s, transform 0.15s;">
+                <i class="fa-solid fa-check" style="margin-right:8px;"></i>Save & Continue to Dashboard
+            </button>
+        </div>
+    </div>
+
     <!-- Dynamic Particle Network Canvas Background -->
     <canvas id="bg-canvas"></canvas>
 
@@ -653,39 +738,6 @@
 
                 <form id="mental-health-form" onsubmit="event.preventDefault();">
                     <div class="form-grid">
-                        <!-- Name -->
-                        <div class="form-group">
-                            <label for="student-name"><i class="fa-solid fa-user"></i> Full Name</label>
-                            <input type="text" id="student-name" class="form-input" placeholder="e.g. Liam Johnson"
-                                required>
-                        </div>
-
-                        <!-- Age -->
-                        <div class="form-group">
-                            <label for="student-age"><i class="fa-solid fa-calendar-days"></i> Age</label>
-                            <input type="number" id="student-age" class="form-input" placeholder="e.g. 21" min="15"
-                                max="60" required>
-                        </div>
-
-                        <!-- Gender -->
-                        <div class="form-group">
-                            <label for="student-gender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
-                            <select id="student-gender" class="form-input" required>
-                                <option value="" disabled selected>Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="nonbinary">Non-Binary</option>
-                                <option value="prefer_not_to_say">Prefer Not To Say</option>
-                            </select>
-                        </div>
-
-                        <!-- University -->
-                        <div class="form-group">
-                            <label for="student-college"><i class="fa-solid fa-graduation-cap"></i> College /
-                                University</label>
-                            <input type="text" id="student-college" class="form-input"
-                                placeholder="e.g. Stanford University" required>
-                        </div>
 
                         <!-- Study Hours -->
                         <div class="form-group">

@@ -810,9 +810,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
             // Save session state & JWT auth token
-            // PERSISTENCE FIX: Migrated from sessionStorage to localStorage for cross-reload persistence
             localStorage.setItem("aira_session_active", "true");
-            localStorage.setItem("aira_auth_token", token);            localStorage.setItem("aira_user", JSON.stringify(user));
+            localStorage.setItem("aira_auth_token", token);
+            localStorage.setItem("aira_user", JSON.stringify(user));
 
             // Hide login portal completely
             if (loginPortal) {
@@ -828,12 +828,132 @@ document.addEventListener("DOMContentLoaded", () => {
             // Unlock body scrolling
             document.body.style.overflow = "";
 
-            // Scroll cleanly back to home view top
-            window.scrollTo({ top: 0, behavior: "smooth" });
-
-            // Load live dashboard data!
-            loadDashboardData();
+            // Check if profile is complete — show onboarding modal if not
+            checkProfileStatus(token);
         }, 400);
+    }
+
+    // ── Profile Status Check & Onboarding Modal ───────────────────────────────
+    function checkProfileStatus(token) {
+        fetch(`${API_BASE_URL}/api/profile-status`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                if (data.profile_complete) {
+                    // Profile already done — cache it and go to dashboard
+                    localStorage.setItem("aira_profile", JSON.stringify(data.profile));
+                    finishPostLogin();
+                } else {
+                    // Show onboarding modal
+                    showOnboardingModal(data.profile, token);
+                }
+            } else {
+                // On error, just proceed (don't block the user)
+                finishPostLogin();
+            }
+        })
+        .catch(() => finishPostLogin());
+    }
+
+    function finishPostLogin() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        loadDashboardData();
+    }
+
+    function showOnboardingModal(profile, token) {
+        const modal = document.getElementById("onboarding-modal");
+        if (!modal) { finishPostLogin(); return; }
+
+        // Pre-fill name from existing profile or stored user
+        const nameInput = document.getElementById("onboarding-name");
+        const storedUser = JSON.parse(localStorage.getItem("aira_user") || "{}");
+        if (nameInput) {
+            nameInput.value = (profile && profile.name) || storedUser.name || "";
+        }
+
+        // Pre-fill gender if already set
+        const genderSelect = document.getElementById("onboarding-gender");
+        if (genderSelect && profile && profile.gender) {
+            genderSelect.value = profile.gender;
+        }
+
+        // Pre-fill birth_year if already set
+        const byInput = document.getElementById("onboarding-birth-year");
+        if (byInput && profile && profile.birth_year) {
+            byInput.value = profile.birth_year;
+        }
+
+        // Show modal as flexbox
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+
+        // Save button handler
+        const saveBtn = document.getElementById("onboarding-save-btn");
+        const errorBox = document.getElementById("onboarding-error");
+        const errorText = document.getElementById("onboarding-error-text");
+
+        function showOnboardingError(msg) {
+            if (errorBox) errorBox.style.display = "block";
+            if (errorText) errorText.textContent = msg;
+        }
+
+        if (saveBtn) {
+            saveBtn.onclick = function () {
+                const name       = nameInput ? nameInput.value.trim() : "";
+                const gender     = genderSelect ? genderSelect.value : "";
+                const birthYear  = byInput ? byInput.value.trim() : "";
+
+                if (!gender) { showOnboardingError("Please select your gender."); return; }
+                if (!birthYear) { showOnboardingError("Please enter your birth year."); return; }
+
+                const by = parseInt(birthYear);
+                const age = new Date().getFullYear() - by;
+                if (age < 15 || age > 60) {
+                    showOnboardingError("Birth year must result in an age between 15 and 60.");
+                    return;
+                }
+
+                // Hide error
+                if (errorBox) errorBox.style.display = "none";
+
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving...`;
+
+                fetch(`${API_BASE_URL}/api/save-profile`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, gender, birth_year: by })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        // Cache profile locally
+                        localStorage.setItem("aira_profile", JSON.stringify(data.profile));
+
+                        // Close modal
+                        modal.style.display = "none";
+                        document.body.style.overflow = "";
+
+                        finishPostLogin();
+                    } else {
+                        showOnboardingError(data.message || "Failed to save profile.");
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save & Continue to Dashboard`;
+                    }
+                })
+                .catch(err => {
+                    showOnboardingError("Network error. Please try again.");
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save & Continue to Dashboard`;
+                });
+            };
+        }
     }
 
     // Unified Authentication submission dispatcher
@@ -2626,7 +2746,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // Standard form validation pass
             if (!scanForm.checkValidity()) return;
 
-            const ageVal = parseInt(document.getElementById("student-age").value) || 0;
             const studyVal = parseFloat(document.getElementById("study-hours").value) || 0;
             const sleepVal = parseFloat(document.getElementById("sleep-hours").value) || 0;
             const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
@@ -2634,10 +2753,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const textVal = document.getElementById("diary-input").value.trim();
 
             // Hard input-validation checks
-            if (ageVal < 15 || ageVal > 60) {
-                showAiraToast("Age must be between 15 and 60.", "error");
-                return;
-            }
             if (sleepVal < 0 || sleepVal > 24) {
                 showAiraToast("Sleep hours must be between 0 and 24.", "error");
                 return;
@@ -2751,17 +2866,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fa-solid fa-radar"></i> Re-Analyze My Mental Health`;
 
-                    const ageVal = parseInt(document.getElementById("student-age").value) || 21;
-                    const genderRaw = document.getElementById("student-gender").value || "Male";
-                    let genderVal = "Male";
-                    if (genderRaw.toLowerCase() === "female") {
-                        genderVal = "Female";
-                    } else if (genderRaw.toLowerCase() === "nonbinary") {
-                        genderVal = "Other";
-                    } else if (genderRaw.toLowerCase() === "prefer_not_to_say") {
-                        genderVal = "Prefer not to say";
-                    }
-
                     const studyVal = parseFloat(document.getElementById("study-hours").value) || 6;
                     const sleepVal = parseFloat(document.getElementById("sleep-hours").value) || 7;
                     const screenVal = parseFloat(document.getElementById("screen-time").value) || 5;
@@ -2777,8 +2881,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const workHoursVal = parseFloat(document.getElementById("work-hours").value) || 0;
 
                     const payload = {
-                        age: ageVal,
-                        gender: genderVal,
                         study_hours: studyVal,
                         sleep_hours: sleepVal,
                         screen_time: screenVal,

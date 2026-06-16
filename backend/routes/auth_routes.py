@@ -397,3 +397,99 @@ def reset_password():
             "status": "error",
             "message": f"Database update failed: {str(e)}"
         }), 500
+
+
+# ─── Profile Onboarding Endpoints ────────────────────────────────────────────
+
+@auth_bp.route("/profile-status", methods=["GET"])
+@token_required
+def profile_status(current_user):
+    """Returns whether the user has completed their profile and the stored profile data."""
+    current_year = datetime.datetime.utcnow().year
+    birth_year = current_user.get("birth_year")
+    age = (current_year - int(birth_year)) if birth_year else None
+
+    profile_complete = UserModel.has_complete_profile(current_user)
+
+    return jsonify({
+        "status": "success",
+        "profile_complete": profile_complete,
+        "profile": {
+            "name": current_user.get("name"),
+            "gender": current_user.get("gender"),
+            "birth_year": birth_year,
+            "age": age
+        }
+    }), 200
+
+
+@auth_bp.route("/save-profile", methods=["POST"])
+@token_required
+def save_profile(current_user):
+    """Saves or updates the user's one-time onboarding profile (gender, birth_year, name).
+
+    Validates birth_year so that the resulting age is between 15 and 60.
+    College is not collected.
+    """
+    data = request.get_json() or {}
+
+    gender     = data.get("gender", "").strip()
+    birth_year = data.get("birth_year")
+    name       = data.get("name", "").strip()
+
+    # Validate required fields
+    if not gender or not birth_year:
+        return jsonify({
+            "status": "error",
+            "message": "Gender and birth year are required."
+        }), 400
+
+    valid_genders = ["Male", "Female", "Other", "Prefer not to say"]
+    if gender not in valid_genders:
+        return jsonify({
+            "status": "error",
+            "message": f"Gender must be one of: {', '.join(valid_genders)}."
+        }), 400
+
+    current_year = datetime.datetime.utcnow().year
+    try:
+        birth_year = int(birth_year)
+        age = current_year - birth_year
+        if age < 15 or age > 60:
+            return jsonify({
+                "status": "error",
+                "message": "Birth year must result in an age between 15 and 60."
+            }), 400
+    except (ValueError, TypeError):
+        return jsonify({
+            "status": "error",
+            "message": "Birth year must be a valid integer (e.g. 1999)."
+        }), 400
+
+    profile_data = {
+        "gender": gender,
+        "birth_year": birth_year
+    }
+    if name:
+        profile_data["name"] = name
+
+    success = UserModel.update_profile(current_user["_id"], profile_data)
+    if not success:
+        logger.error(f"[PROFILE] Failed to update profile for user {current_user['_id']}")
+        return jsonify({
+            "status": "error",
+            "message": "Profile update failed. Please try again."
+        }), 500
+
+    logger.info(f"[PROFILE] Profile saved for user {current_user['_id']} — gender={gender}, birth_year={birth_year}, age={age}")
+
+    return jsonify({
+        "status": "success",
+        "message": "Profile saved successfully.",
+        "profile": {
+            "name": name or current_user.get("name"),
+            "gender": gender,
+            "birth_year": birth_year,
+            "age": age
+        }
+    }), 200

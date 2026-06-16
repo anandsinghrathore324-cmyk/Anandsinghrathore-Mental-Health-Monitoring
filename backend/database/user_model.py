@@ -9,7 +9,6 @@ class UserModel:
     @staticmethod
     def create_user(name: str, email: str, password: str) -> dict:
         """Hashes the password and inserts a new user record into the database."""
-        # Secure salt-hashed password keys
         hashed_bytes = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12))
         hashed_password = hashed_bytes.decode('utf-8')
         
@@ -22,7 +21,6 @@ class UserModel:
         
         result = db_manager.db.users.insert_one(user_doc)
         user_doc["_id"] = str(result.inserted_id)
-        # Clear password for returns
         user_doc.pop("password", None)
         return user_doc
 
@@ -41,7 +39,7 @@ class UserModel:
             user = db_manager.db.users.find_one({"_id": ObjectId(user_id)})
             if user:
                 user["_id"] = str(user["_id"])
-                user.pop("password", None) # Remove password for security
+                user.pop("password", None)
             return user
         except Exception:
             return None
@@ -62,3 +60,31 @@ class UserModel:
             {"$set": {"password": hashed_password}}
         )
         return result.modified_count > 0
+
+    @staticmethod
+    def update_profile(user_id: str, profile_data: dict) -> bool:
+        """Saves or updates profile fields on the user document using upsert logic.
+        
+        Only touches allowed fields: gender, birth_year, name.
+        Uses $set so existing fields that are not passed are not overwritten.
+        """
+        allowed_fields = {"gender", "birth_year", "name"}
+        update_fields = {k: v for k, v in profile_data.items() if k in allowed_fields and v is not None}
+        
+        if not update_fields:
+            return False
+        
+        result = db_manager.db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": update_fields}
+        )
+        return result.matched_count > 0
+
+    @staticmethod
+    def has_complete_profile(user: dict) -> bool:
+        """Returns True if the user document has all required profile fields set.
+        
+        Required: gender, birth_year
+        (name is always set at signup, so not re-checked here)
+        """
+        return bool(user.get("gender") and user.get("birth_year"))
