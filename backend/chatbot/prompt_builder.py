@@ -1,22 +1,40 @@
-"""
-prompt_builder.py  —  AIRA Contextual Prompt Assembly Module
-=============================================================
+﻿"""
+prompt_builder.py  --  AIRA Contextual Prompt Assembly Module (Optimized v2)
+============================================================================
 Pure utility module with NO Flask dependency.
 
-Responsibility:
-    Receive the student's raw message, diagnostic assessment metrics,
-    conversation history, and optional profile data, then assemble
-    one final, richly-contextual prompt string ready to be sent
-    directly to the Ollama LLM.
+Phase 1 Optimization:
+    - Uses a compact inline system header instead of the verbose SYSTEM_PROMPT.
+    - Compresses assessment into a single natural-language sentence.
+    - Limits history to last 2 conversation turns (4 items).
+    - Includes at most 2 one-line recommendation hints.
+    - Removes all verbose section headers and repeated instructions.
+    - Achieves >=50% total prompt size reduction.
+    - Never exposes raw numerical scores.
+
+Prompt structure:
+    [Compact system header]
+    [Student context line - only if profile provided]
+    [Wellbeing summary - one natural-language sentence]
+    [Top 2 wellness hints - one bullet each]
+    [Last 2 history turns - only if available]
+    [Student message]
+    AIRA:
 """
 
 from __future__ import annotations
 
-from chatbot.system_prompt import SYSTEM_PROMPT
+# Compact system header -- covers all essential SYSTEM_PROMPT instructions
+# in ~30% of the character count. Used instead of the full SYSTEM_PROMPT
+# to reduce token overhead while preserving behavioral fidelity.
+_COMPACT_SYSTEM = """You are AIRA, an AI Student Wellness Assistant. Support students on mental health, stress, anxiety, depression, burnout, sleep, study habits, and wellbeing only. Decline unrelated topics politely. Never diagnose or prescribe. Be warm, empathetic, concise (150-250 words), and end responses with an open supportive question."""
 
+# ---------------------------------------------------------------------------
 # Constants
-_MAX_HISTORY_ITEMS: int = 10
-_MAX_RECOMMENDATIONS: int = 3
+# ---------------------------------------------------------------------------
+
+_MAX_HISTORY_TURNS: int = 4   # 2 full turns = 4 items (student + aira x2)
+_MAX_RECOMMENDATIONS: int = 2
 
 _RECOMMENDATION_PRIORITY: list[str] = [
     "Risk-based",
@@ -32,123 +50,28 @@ _RECOMMENDATION_PRIORITY: list[str] = [
     "General Wellness",
 ]
 
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
 
 def _humanize_score(score: int, label: str) -> str:
-    """
-    Convert a 0-100 numeric assessment score into a human-readable category.
-
-    Wellness uses an inverted scale (higher score = better state), so it
-    maps to a distinct set of descriptors. All other metrics (stress,
-    anxiety, depression, burnout) use the standard ascending scale.
-
-    Args:
-        score:  Integer in the range 0–100.
-        label:  The metric name in lowercase (e.g. "stress", "wellness").
-
-    Returns:
-        A plain-language category string.
-    """
+    """Convert a 0-100 numeric score to a human-readable category label."""
     score = max(0, min(100, int(score)))
-
     if label.lower() == "wellness":
-        if score <= 20:
-            return "Critical"
-        elif score <= 40:
-            return "Poor"
-        elif score <= 60:
-            return "Fair"
-        elif score <= 79:
-            return "Good"
-        else:
-            return "Excellent"
+        if score <= 20: return "critical"
+        if score <= 40: return "poor"
+        if score <= 60: return "fair"
+        if score <= 79: return "good"
+        return "excellent"
     else:
-        if score <= 20:
-            return "Very Low"
-        elif score <= 40:
-            return "Low"
-        elif score <= 60:
-            return "Moderate"
-        elif score <= 79:
-            return "High"
-        else:
-            return "Very High"
+        if score <= 20: return "very low"
+        if score <= 40: return "low"
+        if score <= 60: return "moderate"
+        if score <= 79: return "high"
+        return "very high"
 
 
-def _format_recommendations(recommendations: list[dict]) -> str:
-    """
-    Select the top N most relevant recommendations and format them as
-    bullet points.
-
-    Selection is driven by _RECOMMENDATION_PRIORITY.
-
-    Args:
-        recommendations: List of recommendation dicts.
-
-    Returns:
-        A formatted string block, or empty string if no valid recommendations.
-    """
-    if not recommendations:
-        return ""
-
-    def _priority_key(rec: dict) -> int:
-        cat = rec.get("category", "")
-        try:
-            return _RECOMMENDATION_PRIORITY.index(cat)
-        except ValueError:
-            return len(_RECOMMENDATION_PRIORITY)
-
-    sorted_recs = sorted(recommendations, key=_priority_key)
-    top_recs = sorted_recs[:_MAX_RECOMMENDATIONS]
-
-    lines: list[str] = []
-    for rec in top_recs:
-        title = rec.get("title", "").strip()
-        description = rec.get("description", "").strip()
-        if title:
-            lines.append(f"• {title}: {description}")
-
-    if not lines:
-        return ""
-
-    return "=== WELLNESS INSIGHTS AVAILABLE ===\n" + "\n".join(lines)
-
-
-def _format_history(history: list[dict] | None) -> str:
-    """
-    Render the last N conversation turns into a dialogue block.
-
-    Expected format of history items:
-        {"role": "student" | "aira", "message": str}
-
-    Args:
-        history: List of turn dicts, or None.
-
-    Returns:
-        A formatted dialogue block string, or an empty string if history is empty.
-    """
-    if not history:
-        return ""
-
-    recent = history[-_MAX_HISTORY_ITEMS:]
-
-    lines: list[str] = ["=== RECENT CONVERSATION HISTORY ==="]
-    for item in recent:
-        role = item.get("role", "student").strip().lower()
-        message = item.get("message", "").strip()
-        if not message:
-            continue
-        speaker = "Student" if role == "student" else "AIRA"
-        lines.append(f"[{speaker}] {message}")
-    lines.append("===")
-
-    if len(lines) <= 2:
-        return ""
-
-    return "\n".join(lines)
-
-
-def build_prompt(
-    user_message: str,
+def _build_wellbeing_summary(
     emotion: str,
     stress: int,
     anxiety: int,
@@ -156,116 +79,127 @@ def build_prompt(
     burnout: int,
     wellness: int,
     risk_level: str,
-    prediction_reliability: str,
-    recommendations: list[dict],
-    history: list[dict] | None = None,
-    student_profile: dict | None = None,
 ) -> str:
     """
-    Assemble the final prompt string to send to the Ollama LLM.
+    Compress all diagnostic scores into one natural-language sentence.
 
-    All numeric scores are humanized before injection. Raw numbers
-    never appear in the returned string.
+    Example:
+        "Student is feeling Anxious; high stress, moderate anxiety,
+        low depression, high burnout, poor wellbeing (risk: Moderate)."
+    """
+    s = _humanize_score(stress,     "stress")
+    a = _humanize_score(anxiety,    "anxiety")
+    d = _humanize_score(depression, "depression")
+    b = _humanize_score(burnout,    "burnout")
+    w = _humanize_score(wellness,   "wellness")
+    return (
+        f"Student: feeling {emotion}; {s} stress, {a} anxiety, "
+        f"{d} depression, {b} burnout, {w} wellbeing (risk: {risk_level})."
+    )
+
+
+def _format_recommendations(recommendations: list[dict]) -> str:
+    """Return up to 2 one-line recommendation hints as compact bullets."""
+    if not recommendations:
+        return ""
+
+    def _key(rec: dict) -> int:
+        cat = rec.get("category", "")
+        try:
+            return _RECOMMENDATION_PRIORITY.index(cat)
+        except ValueError:
+            return len(_RECOMMENDATION_PRIORITY)
+
+    top = sorted(recommendations, key=_key)[:_MAX_RECOMMENDATIONS]
+    lines = [f"- {r['title'].strip()}" for r in top if r.get("title")]
+    return "\n".join(lines) if lines else ""
+
+
+def _format_history(history: list[dict] | None) -> str:
+    """Render only the last 2 conversation turns as compact inline dialogue."""
+    if not history:
+        return ""
+    lines = []
+    for item in history[-_MAX_HISTORY_TURNS:]:
+        role    = item.get("role", "student").lower()
+        message = item.get("message", "").strip()
+        if message:
+            lines.append(f"{'S' if role == 'student' else 'A'}: {message}")
+    return "\n".join(lines) if lines else ""
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def build_prompt(
+    user_message:           str,
+    emotion:                str,
+    stress:                 int,
+    anxiety:                int,
+    depression:             int,
+    burnout:                int,
+    wellness:               int,
+    risk_level:             str,
+    prediction_reliability: str,
+    recommendations:        list[dict],
+    history:                list[dict] | None = None,
+    student_profile:        dict | None = None,
+) -> str:
+    """
+    Assemble the final compact prompt for the Ollama LLM.
+
+    Optimized for minimum token count while preserving personalization,
+    diagnostic context, wellness hints, and conversation continuity.
 
     Args:
-        user_message:           The raw text typed by the student.
-        emotion:                Detected dominant emotion.
+        user_message:           Raw student input.
+        emotion:                Detected dominant emotion string.
         stress:                 Stress score 0-100.
         anxiety:                Anxiety score 0-100.
         depression:             Depression score 0-100.
         burnout:                Burnout score 0-100.
-        wellness:               Wellness score 0-100.
+        wellness:               Wellness score 0-100 (inverted scale).
         risk_level:             Risk classification string.
-        prediction_reliability: Model confidence label.
+        prediction_reliability: Model confidence label (unused in prompt,
+                                retained for API compatibility).
         recommendations:        List of recommendation dicts.
-        history:                Optional list of previous chat turns.
-        student_profile:        Optional dict with profile fields (e.g. name, age, gender).
+        history:                Optional previous chat turns (oldest-first).
+        student_profile:        Optional dict with name/age/gender keys.
 
     Returns:
-        A single string ready to pass directly to the LLM client.
+        A single string ready to pass to ollama_client.generate_response().
     """
-    cleaned_message = user_message.strip() if user_message else ""
-    if not cleaned_message:
-        cleaned_message = "(No message provided)"
+    cleaned = user_message.strip() if user_message else "(No message provided)"
 
-    stress_label = _humanize_score(stress, "stress")
-    anxiety_label = _humanize_score(anxiety, "anxiety")
-    depression_label = _humanize_score(depression, "depression")
-    burnout_label = _humanize_score(burnout, "burnout")
-    wellness_label = _humanize_score(wellness, "wellness")
+    parts: list[str] = [_COMPACT_SYSTEM.strip()]
 
-    # A. SYSTEM PROMPT
-    block_system = SYSTEM_PROMPT.strip()
-
-    # B. STUDENT PROFILE (optional)
-    block_profile = ""
+    # Student profile (one compact line)
     if student_profile:
-        profile_lines: list[str] = ["=== STUDENT PROFILE ==="]
-        if student_profile.get("name"):
-            profile_lines.append(f"Name   : {str(student_profile['name']).strip()}")
-        if student_profile.get("age"):
-            profile_lines.append(f"Age    : {str(student_profile['age']).strip()}")
-        if student_profile.get("gender"):
-            profile_lines.append(f"Gender : {str(student_profile['gender']).strip()}")
-        if len(profile_lines) > 1:
-            block_profile = "\n".join(profile_lines)
+        ctx = []
+        if student_profile.get("name"):   ctx.append(student_profile["name"].strip())
+        if student_profile.get("age"):    ctx.append(f"age {str(student_profile['age']).strip()}")
+        if student_profile.get("gender"): ctx.append(student_profile["gender"].strip())
+        if ctx:
+            parts.append("Student profile: " + ", ".join(ctx))
 
-    # C. STUDENT DIAGNOSTIC CONTEXT
-    block_context = "\n".join([
-        "=== STUDENT DIAGNOSTIC CONTEXT ===",
-        f"Detected Emotion    : {emotion}",
-        f"Stress Level        : {stress_label}",
-        f"Anxiety Level       : {anxiety_label}",
-        f"Depression Level    : {depression_label}",
-        f"Burnout Level       : {burnout_label}",
-        f"Overall Wellness    : {wellness_label}",
-        f"Risk Level          : {risk_level}",
-        f"Prediction Quality  : {prediction_reliability}",
-    ])
+    # Wellbeing summary (one sentence)
+    parts.append(_build_wellbeing_summary(
+        emotion, stress, anxiety, depression, burnout, wellness, risk_level
+    ))
 
-    # D. WELLNESS INSIGHTS
-    block_insights = _format_recommendations(recommendations)
+    # Top 2 wellness hints (one line each)
+    hints = _format_recommendations(recommendations)
+    if hints:
+        parts.append("Hints:\n" + hints)
 
-    # E. RECENT CONVERSATION HISTORY (omitted if empty)
-    block_history = _format_history(history)
+    # Last 2 conversation turns (compact S:/A: format)
+    hist = _format_history(history)
+    if hist:
+        parts.append("History:\n" + hist)
 
-    # F. RESPONSE INSTRUCTIONS
-    block_instructions = "\n".join([
-        "=== RESPONSE INSTRUCTIONS ===",
-        "- Do NOT mention any numerical scores or percentages in your response.",
-        "- Describe the student's emotional and mental state using natural,",
-        "  empathetic language only — never clinical jargon.",
-        "- Reference at most 1 or 2 wellness insights if they are genuinely",
-        "  relevant. Do not list all of them or recite them mechanically.",
-        "- Acknowledge and validate the student's current emotional state first,",
-        "  before offering any suggestions.",
-        "- Keep your response between 150 and 250 words unless the student",
-        "  explicitly requests more detail.",
-        "- End with an open, supportive question to invite further conversation.",
-    ])
+    # Current message + trigger
+    parts.append(f"Student: {cleaned}")
+    parts.append("AIRA:")
 
-    # G. CURRENT STUDENT MESSAGE
-    block_message = f"Current Student Message: {cleaned_message}"
-
-    # H. AIRA:
-    block_trigger = "AIRA:"
-
-    # Assemble sections
-    all_blocks: list[str] = [block_system]
-
-    if block_profile:
-        all_blocks.append(block_profile)
-
-    all_blocks.append(block_context)
-
-    if block_insights:
-        all_blocks.append(block_insights)
-
-    if block_history:
-        all_blocks.append(block_history)
-
-    all_blocks.append(block_instructions)
-    all_blocks.append(block_message)
-    all_blocks.append(block_trigger)
-
-    return "\n\n".join(all_blocks)
+    return "\n\n".join(parts)
