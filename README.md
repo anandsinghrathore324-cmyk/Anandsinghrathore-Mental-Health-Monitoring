@@ -1,5 +1,6 @@
 # AIRA — AI-Based Student Mental Health Monitoring & Support System
-Welcome to the comprehensive technical documentation for **AIRA (AI Student Mental Health & Support Platform)**. This manual provides a bottom-up architectural breakdown of every system layer, detailing the frontend design system, the Python Flask backend microservices, the MongoDB database collections, and the integrated machine learning prediction models (Text Analysis Model & Behavioral ML Model).
+
+Welcome to the comprehensive technical documentation for **AIRA (AI Student Mental Health & Support Platform)**. This manual provides a bottom-up architectural breakdown of every system layer, detailing the frontend design system, the Python Flask backend microservices, the MongoDB database collections, and the integrated machine learning prediction models (Text Analysis Model & Behavioral ML Model). It also includes a complete file-by-file directory mapping every single file in the project workspace to its specific role.
 
 ---
 
@@ -135,7 +136,130 @@ The UI utilizes CSS Custom Properties to maintain design consistency and premium
 
 ---
 
-## 6. How to Run the Project Locally
+## 6. Project Directory Map & File-by-File Roles
+Below is the comprehensive listing of every folder and source code file in this repository with their exact technical roles:
+
+### 📂 Root Directory (Frontend & Base System)
+* **[index.html](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/index.html)**: The main, primary web portal for AIRA. It mounts the preloader system, authenticating structures (registration, credential logins, email verification), clinical diagnostic surveys, interactive wellness dashboards, AI chatbot windows, and clinic recommendations.
+* **[doctor-support.html](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/doctor-support.html)**: Dedicated doctor referral interface. Renders verified professional therapists, allows users to filter by condition, and dynamically computes distances based on browser geolocation APIs.
+* **[features.html](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/features.html)**: Interactive features index detailing breathing visualizers, exercise guidelines, emergency assistance options, and general support links.
+* **[script.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/script.js)**: Central Javascript file managing frontend interactions. Handles custom canvas particle backdrops, input formatting/validation, state storage management (using `sessionStorage` and in-memory variables), ChartJS line/radar graphing setups, and fallback API calculations.
+* **[style.css](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/style.css)**: The primary styling engine written in Vanilla CSS. Implements the neon-cyberpunk dark theme, glassmorphic layout wrappers, floating input outlines, breathing micro-animations, and responsive layouts.
+* **[gunicorn.conf.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/gunicorn.conf.py)**: Web server configuration used to run the production build of the Python Flask application.
+* **[package.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/package.json)**: Node.js packages manifest primarily tracking tooling resources for frontend server utilities.
+* **[.gitignore](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/.gitignore)**: Enforces Git version exclusions for cache files (`.pyc`, `__pycache__`), local databases, build files, packages, and environment settings.
+* **[.python-version](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/.python-version)**: Specifies the local system python runtime configuration constraints.
+
+#### 📄 Audits & Guides
+* **[AUTH_AUDIT_REPORT.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/AUTH_AUDIT_REPORT.md)**: Security validation audit reviewing credential hash techniques, token expiration rules, and API session security.
+* **[INPUT_VALIDATION_REPORT.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/INPUT_VALIDATION_REPORT.md)**: Form validation audit summarizing frontend inputs and backend sanitizers designed to reject XSS injection strings and spam.
+* **[HTML_EXPLAINED.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/HTML_EXPLAINED.md)**: Explains the semantic layout of `index.html`, outlines accessibility labels, structural tags, and canvas nodes.
+* **[CSS_EXPLAINED.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/CSS_EXPLAINED.md)**: Provides a styling breakdown of custom properties, animation keyframes, neon filters, and structural glass panel classes.
+* **[JS_EXPLAINED.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/JS_EXPLAINED.md)**: Breakdowns event handlers, coordinate computations, and state updates declared in `script.js`.
+* **[INTEGRATIONS_README.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/INTEGRATIONS_README.md)**: Summarizes all third-party integrations (RandomUser, UI-Avatars, FontAwesome, Google Fonts, and ChartJS) along with their APIs.
+
+---
+
+### 📂 `backend/` Directory (Flask API Server)
+* **[backend/app.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/app.py)**: The entry point of the Python Flask backend app. Initializes configurations, enables CORS, connects and seeds the MongoDB database collections, and registers blueprinted endpoints.
+* **[backend/config.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/config.py)**: Maps server environment configurations, bindings, port defaults, and cryptographic secrets.
+* **[backend/requirements.txt](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/requirements.txt)**: Python package dependency manifest (Flask, PyMongo, PyJWT, Bcrypt, transformers, etc.).
+* **[backend/scratch_check_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/scratch_check_model.py)**: Independent developer script to test the ML models and NLP tokenizers directly on local setups.
+* **[backend/.env](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/.env)**: Holds system-specific keys, MongoDB URIs, and Brevo API details.
+
+#### 🗄️ `backend/database/` (Data Schemas & Seeding)
+* **[db.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/db.py)**: PyMongo helper file that establishes MongoDB connections. Implements index configurations (TTL indexes, unique indexes) and manages MongoMock fallback environments.
+* **[user_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/user_model.py)**: Handles queries for registered user profiles and checks Bcrypt password hashes.
+* **[report_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/report_model.py)**: Methods for saving, editing, and aggregating student mental health diagnostic surveys.
+* **[mood_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/mood_model.py)**: Database schema representing daily Mood logs to drive the calendar tracking visualizers.
+* **[chatbot_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/chatbot_model.py)**: Database methods persisting student conversations with the chatbot.
+* **[doctor_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/doctor_model.py)**: Handles database queries for finding professional psychologists and clinics.
+* **[geo_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/geo_model.py)**: Database mapping logic for local cities and coordinates.
+* **[hotline_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/hotline_model.py)**: Manages listings for active medical lines.
+* **[import_geo_data.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/import_geo_data.py)**: Helper command-line loader utility that imports geographical markers and city information.
+* **[import_hotlines.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/import_hotlines.py)**: CLI script imports crisis lines from `mental_health_hotlines.json` into MongoDB.
+* **[mental_health_hotlines.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/database/mental_health_hotlines.json)**: Raw JSON source list containing emergency hotlines categorized by country and region.
+
+#### 🛡️ `backend/middleware/` (Interceptors)
+* **[auth_middleware.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/middleware/auth_middleware.py)**: Request decorator verifying client-sent Authorization JWT headers. Intercepts private operations and sets request context context values.
+* **[validation.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/middleware/validation.py)**: Server-side validation schema ensuring input compliance (rejecting SQL, invalid emails, empty structures, and numeric overflows).
+
+#### 🧬 `backend/ml/` & `backend/nlp/` (Predictive Engine Internals)
+* **[preprocess.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/ml/preprocess.py)**: Translates user-submitted surveys to scaled parameters, calculates derived stats like sleep deficit and screen excess, and feeds the outputs to predicting libraries.
+* **[train_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/ml/train_model.py)**: Backup training orchestrator script for the behavioral model.
+* **[distilbert.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/nlp/distilbert.py)**: Interacts with the DistilBert transformer network to run sentiment predictions. Implements a dictionary-based fallback parser if packages are missing.
+* **[gibberish_detector.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/nlp/gibberish_detector.py)**: Custom analyzer detecting meaningless text entries (e.g. "asdfghjk") to block invalid logging inputs.
+
+#### 🛣️ `backend/routes/` (Flask Blueprints)
+* **[auth_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/auth_routes.py)**: Blueprint exposing endpoints for `/register`, `/login`, `/logout`, `/request-otp`, and `/verify-otp`.
+* **[prediction_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/prediction_routes.py)**: Maps the `/predict` POST request to execute the hybrid AI diagnostic model (combining behavioral regression and text classifiers).
+* **[chatbot_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/chatbot_routes.py)**: Blueprint route serving `/chatbot` messages and history retrieval.
+* **[dashboard_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/dashboard_routes.py)**: Serves dashboard analytics queries mapping daily mood codes and trend arrays.
+* **[doctor_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/doctor_routes.py)**: Exposes endpoints to retrieve psychologist profiles, reviews, and clinical references.
+* **[geo_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/geo_routes.py)**: Exposes endpoints for matching and computing nearest clinic details.
+* **[hotline_routes.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/routes/hotline_routes.py)**: Serves country-specific emergency help line databases.
+
+#### ⚙️ `backend/services/` (Business Logic)
+* **[prediction_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/prediction_service.py)**: Blends numerical calculations (80%) and NLP inputs (20%) to yield the final Wellness Index.
+* **[nlp_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/nlp_service.py)**: Evaluates qualitative text inputs using DistilBert sentiment classifiers or dictionary keywords.
+* **[chatbot_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/chatbot_service.py)**: Standard conversational script matching user text statements to pre-selected context answers.
+* **[dashboard_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/dashboard_service.py)**: Queries data collections to compile student metrics.
+* **[doctor_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/doctor_service.py)**: Matches users to counselors based on coordinates using the Haversine formula.
+* **[email_service.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/services/email_service.py)**: Service class integrating Brevo APIs to dispatch security notifications and authentication OTP numbers.
+
+#### 🧪 `backend/tests/`
+* **[test_validation.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/backend/tests/test_validation.py)**: Programmatic Pytest test suite asserting the security and validation requirements of the middleware.
+
+---
+
+### 📂 `ml/` Directory (Machine Learning & Training Workspace)
+* **[ml/saved_model.pkl](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/saved_model.pkl)**: The serialized Behavioral ML predictor.
+* **[ml/saved_scaler.pkl](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/saved_scaler.pkl)**: Serialized Standard Scaler model mapping column dimensions.
+
+#### 📊 Model 1: Behavioral Mental Health Predictor
+* **[ml/Model 1 Behavioral Mental Health Predictor/train_models.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/train_models.py)**: Evaluation and comparing script testing various algorithms (Decision Trees, Random Forests, Linear Regression) to select and dump the best model.
+* **[ml/Model 1 Behavioral Mental Health Predictor/preprocess.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/preprocess.py)**: Standard columns cleaner and scaler tool.
+* **[ml/Model 1 Behavioral Mental Health Predictor/predict.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/predict.py)**: Standalone script validating inference inputs.
+* **[ml/Model 1 Behavioral Mental Health Predictor/download_dataset.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/download_dataset.py)**: Programmatic dataset downloader.
+* **[ml/Model 1 Behavioral Mental Health Predictor/app.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/app.py)**: Standalone API endpoint wrapper allowing predictions for Model 1 independently.
+* **[smmh.csv](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/smmh.csv)**, **[Student Depression Dataset.csv](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/Student%20Depression%20Dataset.csv)**, & **[Student Mental health.csv](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%201%20Behavioral%20Mental%20Health%20Predictor/Student%20Mental%20health.csv)**: Datasets holding training student profiles.
+
+#### 📝 Model 2: Text Mental Health Model
+* **[ml/Model 2  Text Mental Health Model/train.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/train.py)**: Fits a TF-IDF classifier combined with Support Vector / Logistic Regression estimators to classify text sentiments.
+* **[ml/Model 2  Text Mental Health Model/preprocess.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/preprocess.py)**: Sanitizes input statements by mapping common contractions and formatting words.
+* **[ml/Model 2  Text Mental Health Model/text_predict.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/text_predict.py)**: Runs terminal-level sentiment classifications on user-entered test lines.
+* **[ml/Model 2  Text Mental Health Model/text_api.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/text_api.py)**: Exposes an independent REST service endpoint returning predictions for text sentiment requests.
+* **[ml/Model 2  Text Mental Health Model/set_production_model.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/set_production_model.py)**: Copies serialized vectorizers and model packages to the production server runtime folder.
+* **[ml/Model 2  Text Mental Health Model/download_dataset.py](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/download_dataset.py)**: Downloads sentiment text archives (e.g. CARER data format) for learning.
+* **[text_model.pkl](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/text_model.pkl)** & **[text_vectorizer.pkl](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/ml/Model%202%20%20Text%20Mental%20Health%20Model/text_vectorizer.pkl)**: Serialized TF-IDF text models used in evaluations.
+
+---
+
+### 📂 `github-control/` Directory (Repo Automation & Commits Management)
+
+#### 🖥️ `github-control/backend/` (Express API)
+* **[server.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/server.js)**: The main entry of the repository controller. Sets up Express, configures routing endpoints, and listens for requests.
+* **[routes/github.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/routes/github.js)**: Manages API communication with GitHub APIs, enabling automatic commits, push requests, and file checks.
+* **[middleware/validation.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/middleware/validation.js)**: Enforces validation schemas on API payloads to keep requests secure.
+* **[utils/logger.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/utils/logger.js)**: Sets up Winston and Morgan logging streams.
+* **[logs/audit-actions.log](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/logs/audit-actions.log)**: Persistent text file storing logged repository interactions.
+* **[package.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/package.json)** & **[package-lock.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/package-lock.json)**: Configures and freezes Node packages list (Express, Axios, Winston, etc.).
+* **[.env](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/.env)** & **[env.template](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/backend/env.template)**: Environment configurations and templates for GitHub integration parameters.
+
+#### 💻 `github-control/frontend/` (Vite-React Dashboard)
+* **[index.html](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/index.html)**: Main index mount for the React project.
+* **[vite.config.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/vite.config.js)** & **[eslint.config.js](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/eslint.config.js)**: Configures Vite server parameters and ESLint rules.
+* **[package.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/package.json)** & **[package-lock.json](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/package-lock.json)**: Package dependencies configuration (React, Lucide icons, etc.).
+* **[README.md](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/README.md)**: Setup and operation instructions specifically for the GitHub client utility dashboard.
+* **[public/favicon.svg](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/public/favicon.svg)** & **[public/icons.svg](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/public/icons.svg)**: SVG icon resources.
+* **[src/main.jsx](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/src/main.jsx)**: Mounts the main React component.
+* **[src/App.jsx](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/src/App.jsx)**: Renders the controller UI dashboard enabling users to trigger GitHub commits, fetch push audits, and monitor repository activities.
+* **[src/App.css](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/src/App.css)** & **[src/index.css](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/src/index.css)**: Visual styles and sheets for the React app.
+* **[src/assets/](file:///c:/Users/ajays/OneDrive/Desktop/Social%20Media%20Mental%20Health%20Risk%20Analyzer%E2%80%9D/github-control/frontend/src/assets/)**: Subdirectory containing base iconographies and illustration files.
+
+---
+
+## 7. How to Run the Project Locally
 
 ### 1. Prerequisite Packages
 Install Python dependencies via `pip`:
@@ -166,6 +290,19 @@ Run a local static server inside the root directory:
 # Using Node package manager (if available)
 npx http-server -p 3000
 ```
-*Open `http://localhost:3000` in your web browser.*
+*Open `http://localhost:3000` in your web browser to view the main AIRA application.*
 
+### 5. Running the GitHub Controller Utility (Optional)
+To activate the repository control module:
+```bash
+# Run backend
+cd github-control/backend
+npm install
+npm start
 
+# Run frontend
+cd ../frontend
+npm install
+npm run dev
+```
+*Open the local address specified by Vite (usually `http://localhost:5173`) in your browser.*
