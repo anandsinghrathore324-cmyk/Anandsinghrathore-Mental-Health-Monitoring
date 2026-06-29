@@ -20,7 +20,7 @@ def chatbot(current_user):
         
     try:
         # Generate responsive counseling vibes
-        response = ChatbotService.generate_response(message)
+        response = ChatbotService.generate_response(message, user_id=current_user["_id"])
         
         # Save to database chatbot records
         ChatbotModel.save_chat(
