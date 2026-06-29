@@ -1,4 +1,4 @@
-﻿"""
+"""
 prompt_builder.py  --  AIRA Contextual Prompt Assembly Module (Optimized v2)
 ============================================================================
 Pure utility module with NO Flask dependency.
@@ -145,30 +145,13 @@ def build_prompt(
     recommendations:        list[dict],
     history:                list[dict] | None = None,
     student_profile:        dict | None = None,
+    memories:               list[str] | None = None,
 ) -> str:
     """
     Assemble the final compact prompt for the Ollama LLM.
 
     Optimized for minimum token count while preserving personalization,
-    diagnostic context, wellness hints, and conversation continuity.
-
-    Args:
-        user_message:           Raw student input.
-        emotion:                Detected dominant emotion string.
-        stress:                 Stress score 0-100.
-        anxiety:                Anxiety score 0-100.
-        depression:             Depression score 0-100.
-        burnout:                Burnout score 0-100.
-        wellness:               Wellness score 0-100 (inverted scale).
-        risk_level:             Risk classification string.
-        prediction_reliability: Model confidence label (unused in prompt,
-                                retained for API compatibility).
-        recommendations:        List of recommendation dicts.
-        history:                Optional previous chat turns (oldest-first).
-        student_profile:        Optional dict with name/age/gender keys.
-
-    Returns:
-        A single string ready to pass to ollama_client.generate_response().
+    diagnostic context, wellness hints, conversation continuity, and long-term memory.
     """
     cleaned = user_message.strip() if user_message else "(No message provided)"
 
@@ -182,6 +165,11 @@ def build_prompt(
         if student_profile.get("gender"): ctx.append(student_profile["gender"].strip())
         if ctx:
             parts.append("Student profile: " + ", ".join(ctx))
+
+    # Relevant Previous Context (memory injection)
+    if memories:
+        mem_lines = [f"* {m}" for m in memories[:5]]
+        parts.append("Relevant Previous Context:\n" + "\n".join(mem_lines))
 
     # Wellbeing summary (one sentence)
     parts.append(_build_wellbeing_summary(

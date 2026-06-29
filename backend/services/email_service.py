@@ -206,15 +206,72 @@ def _send_via_brevo(
 
 
 # ---------------------------------------------------------------------------
+# SMTP Email Delivery (Gmail / Local App Password fallback)
+# ---------------------------------------------------------------------------
+
+def _send_via_smtp(
+    to_email: str,
+    subject: str,
+    html_body: str,
+) -> Tuple[bool, str]:
+    """Send email through traditional SMTP server (Gmail, etc.) configured in .env."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com").strip()
+    smtp_port   = os.getenv("SMTP_PORT", "587").strip()
+    smtp_email  = os.getenv("SMTP_EMAIL", "").strip()
+    smtp_passwd = os.getenv("SMTP_PASSWORD", "").strip()
+
+    if not smtp_email or not smtp_passwd:
+        logger.error("[EMAIL SMTP] SMTP credentials not set.")
+        return False, "SMTP credentials not configured."
+
+    try:
+        port = int(smtp_port)
+    except ValueError:
+        port = 587
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = f"AIRA Wellness <{smtp_email}>"
+        msg["To"]      = to_email
+
+        part = MIMEText(html_body, "html")
+        msg.attach(part)
+
+        logger.info("[EMAIL SMTP] Connecting to %s:%d...", smtp_server, port)
+
+        if port == 465:
+            server = smtplib.SMTP_SSL(smtp_server, port, timeout=15)
+        else:
+            server = smtplib.SMTP(smtp_server, port, timeout=15)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+
+        server.login(smtp_email, smtp_passwd)
+        server.sendmail(smtp_email, to_email, msg.as_string())
+        server.quit()
+        logger.info("[EMAIL SMTP] Email successfully dispatched to %s via SMTP", to_email)
+        return True, ""
+    except Exception as e:
+        logger.error("[EMAIL SMTP] Failed to send email via SMTP: %s", e, exc_info=True)
+        return False, str(e)
+
+
+# ---------------------------------------------------------------------------
 # Public interface
 # ---------------------------------------------------------------------------
 
 class EmailService:
-    """Brevo-based email delivery facade for AIRA OTP flows.
+    """Brevo-based and SMTP-fallback email delivery facade for AIRA OTP flows.
 
-    Sends via Brevo REST API (HTTPS port 443).
-    Works on Render free tier — no SMTP port restrictions apply.
-    Works for any recipient email — no domain verification required.
+    Uses Brevo REST API (HTTPS port 443) on production environments.
+    Falls back to SMTP (Gmail App Passwords, etc.) on local development environments.
+    Falls back to console logger if no configuration variables are set.
     """
 
     @staticmethod
@@ -224,7 +281,7 @@ class EmailService:
         purpose: str = "reset",
         recipient_name: str = "",
     ) -> Tuple[bool, str]:
-        """Send an OTP verification email via Brevo.
+        """Send an OTP verification email.
 
         Args:
             to_email:       recipient's email address
@@ -239,16 +296,36 @@ class EmailService:
         subject   = _subject_for_purpose(purpose)
         html_body = _build_otp_html(otp_code, purpose, recipient_name)
 
-        logger.info(
-            "[EMAIL] Dispatching OTP via Brevo | purpose=%s | to=%s",
-            purpose, to_email,
+        # 1. Try Brevo REST API first (if configured)
+        api_key    = os.getenv("BREVO_API_KEY", "").strip()
+        from_email = os.getenv("BREVO_FROM_EMAIL", "").strip()
+        if api_key and from_email:
+            logger.info("[EMAIL] Dispatching OTP via Brevo | purpose=%s | to=%s", purpose, to_email)
+            return _send_via_brevo(to_email, subject, html_body)
+
+        # 2. Try SMTP second (if configured in .env)
+        smtp_email = os.getenv("SMTP_EMAIL", "").strip()
+        smtp_pwd   = os.getenv("SMTP_PASSWORD", "").strip()
+        if smtp_email and smtp_pwd:
+            logger.info("[EMAIL] Dispatching OTP via SMTP | purpose=%s | to=%s", purpose, to_email)
+            return _send_via_smtp(to_email, subject, html_body)
+
+        # 3. Development Fallback (Console Printout)
+        import sys
+        sys.stdout.write(f"\n==================================================\n")
+        sys.stdout.write(f"[DEVELOPMENT OTP FALLBACK]\n")
+        sys.stdout.write(f"Recipient: {to_email}\n")
+        sys.stdout.write(f"Purpose:   {purpose}\n")
+        sys.stdout.write(f"OTP Code:  {otp_code}\n")
+        sys.stdout.write(f"==================================================\n\n")
+        sys.stdout.flush()
+        logger.warning(
+            "[DEVELOPMENT OTP FALLBACK] Brevo and SMTP not configured. "
+            "OTP code for %s is %s", to_email, otp_code
         )
-        return _send_via_brevo(to_email, subject, html_body)
+        return True, ""
 
     @staticmethod
     def is_configured() -> bool:
-        """Return True if Brevo credentials are set and non-empty."""
-        return bool(
-            os.getenv("BREVO_API_KEY", "").strip() and
-            os.getenv("BREVO_FROM_EMAIL", "").strip()
-        )
+        """Return True since local SMTP, Brevo API, or console prints will always process requests."""
+        return True
