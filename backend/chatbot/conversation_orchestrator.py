@@ -6,22 +6,7 @@ from typing import Dict, Any, Optional, List
 # LLM Provider Abstraction Layer
 # ---------------------------------------------------------------------------
 
-class LLMProvider(ABC):
-    """Abstract interface defining the contract for LLM inference providers."""
-    @abstractmethod
-    def generate(self, prompt: str) -> str:
-        pass
-
-
-class OllamaProvider(LLMProvider):
-    """Default implementation delegating to the local Ollama client."""
-    def generate(self, prompt: str) -> str:
-        from chatbot.ollama_client import generate_response
-        return generate_response(prompt)
-
-
-# Global instance of LLMProvider, swappable at runtime if needed
-llm_provider: LLMProvider = OllamaProvider()
+from chatbot.llm_provider import llm_provider
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +216,7 @@ class ConversationOrchestrator:
             crisis_prompt = CrisisHandler.build_crisis_prompt(cleaned, user_id)
             
             gen_start = time.time()
-            llm_reply = llm_provider.generate(crisis_prompt)
+            llm_reply = llm_provider.generate_response(crisis_prompt)
             gen_latency = (time.time() - gen_start) * 1000
             
             final_reply = ResponseValidator.validate(llm_reply, history=None)
@@ -244,7 +229,7 @@ class ConversationOrchestrator:
                 coaching_mode="crisis",
                 crisis_flag=True,
                 assessment_loaded="Yes",
-                model_used="Ollama-llama3.2:3b",
+                model_used=llm_provider.model_name,
                 generation_latency_ms=gen_latency
             )
             return final_reply
@@ -359,7 +344,7 @@ class ConversationOrchestrator:
 
         # Step 6: LLM Provider Execution
         gen_start = time.time()
-        llm_reply = llm_provider.generate(prompt)
+        llm_reply = llm_provider.generate_response(prompt)
         gen_latency = (time.time() - gen_start) * 1000
 
         # Step 7: Response Validation
@@ -380,7 +365,7 @@ class ConversationOrchestrator:
             coaching_mode=coaching_mode,
             crisis_flag=False,
             assessment_loaded=assessment_loaded_db,
-            model_used="Ollama-llama3.2:3b",
+            model_used=llm_provider.model_name,
             generation_latency_ms=gen_latency
         )
 
