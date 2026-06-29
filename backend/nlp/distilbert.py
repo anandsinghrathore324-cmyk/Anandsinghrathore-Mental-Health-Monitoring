@@ -34,9 +34,14 @@ class DistilBertClassifier:
         if _transformers_available:
             try:
                 logger.info(f"Loading weights for DistilBERT NLP Singleton pipeline model: {self.model_name}...")
-                # Run standard CPU thread model configuration
                 device = 0 if torch.cuda.is_available() else -1
-                self.pipeline = pipeline("text-classification", model=self.model_name, return_all_scores=True, device=device)
+                # top_k=None replaces deprecated return_all_scores=True in transformers >=4.30
+                self.pipeline = pipeline(
+                    "text-classification",
+                    model=self.model_name,
+                    top_k=None,
+                    device=device
+                )
                 logger.info("DistilBERT model loaded successfully inside Singleton architecture.")
             except Exception as e:
                 logger.error(f"Failed to load Hugging Face pipeline weights: {str(e)}. Enforcing fallback lexicon...")
@@ -76,8 +81,10 @@ class DistilBertClassifier:
         # 3. Hugging Face Inference Flow
         if self.pipeline:
             try:
-                raw_predictions = self.pipeline(clean_text)[0]
-                # Map Bhadresh Savani emotion outputs (sadness, joy, love, anger, fear, surprise)
+                output = self.pipeline(clean_text)
+                # Normalise: top_k=None on a single string returns [[{...},...]]
+                # Unwrap outer list if needed so we always have [{label, score}, ...]
+                raw_predictions = output[0] if isinstance(output[0], list) else output
                 raw_scores = {pred["label"]: float(pred["score"]) for pred in raw_predictions}
                 
                 scores = {
