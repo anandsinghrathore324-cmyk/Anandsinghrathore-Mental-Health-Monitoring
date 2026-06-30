@@ -3727,6 +3727,12 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({ message: query })
         })
             .then(res => {
+                if (res.status === 401) {
+                    localStorage.removeItem("aira_auth_token");
+                    alert("Your session has expired. Please log in again to use the dynamic AI chatbot!");
+                    window.location.reload();
+                    throw new Error("Token expired.");
+                }
                 if (!res.ok) throw new Error("Chatbot API failed.");
                 return res.json();
             })
