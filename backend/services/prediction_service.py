@@ -24,13 +24,18 @@ _HERE        = Path(__file__).parent.resolve()              # backend/services/
 _BACKEND_DIR = _HERE.parent                                  # backend/
 _PROJECT_ROOT = _BACKEND_DIR.parent                          # project root
 
+# Determine active ML folder (check backend/ml first, fall back to project root/ml)
+_ML_DIR = _BACKEND_DIR / "ml"
+if not (_ML_DIR / "Model 2  Text Mental Health Model" / "text_model.pkl").exists():
+    _ML_DIR = _PROJECT_ROOT / "ml"
+
 # Model 1 — Behavioral Logistic Regression (real Kaggle-trained model)
-_BEHAV_MODEL_PATH = _PROJECT_ROOT / "ml" / "Model 1 Behavioral Mental Health Predictor" / "models" / "risk_model.pkl"
-_BEHAV_PREP_PATH  = _PROJECT_ROOT / "ml" / "Model 1 Behavioral Mental Health Predictor" / "preprocessed" / "preprocessor.joblib"
+_BEHAV_MODEL_PATH = _ML_DIR / "Model 1 Behavioral Mental Health Predictor" / "models" / "risk_model.pkl"
+_BEHAV_PREP_PATH  = _ML_DIR / "Model 1 Behavioral Mental Health Predictor" / "preprocessed" / "preprocessor.joblib"
 
 # Model 2 — TF-IDF + Logistic Regression text classifier
-_TEXT_MODEL_PATH      = _PROJECT_ROOT / "ml" / "Model 2  Text Mental Health Model" / "text_model.pkl"
-_TEXT_VECTORIZER_PATH = _PROJECT_ROOT / "ml" / "Model 2  Text Mental Health Model" / "text_vectorizer.pkl"
+_TEXT_MODEL_PATH      = _ML_DIR / "Model 2  Text Mental Health Model" / "text_model.pkl"
+_TEXT_VECTORIZER_PATH = _ML_DIR / "Model 2  Text Mental Health Model" / "text_vectorizer.pkl"
 
 FEATURE_COLUMNS = [
     "Age", "Gender", "Academic Pressure", "Study Satisfaction",
