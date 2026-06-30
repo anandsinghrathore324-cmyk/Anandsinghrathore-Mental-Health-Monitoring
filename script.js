@@ -3,9 +3,14 @@
 // ==========================================================================
 const PROD_BACKEND_URL = "https://anandsinghrathore-mental-health.onrender.com";
 
-const API_BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://127.0.0.1:5000"
-    : PROD_BACKEND_URL;
+const isLocal = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1" ||
+                window.location.hostname.startsWith("192.168.") ||
+                window.location.hostname.startsWith("172.") ||
+                window.location.hostname.startsWith("10.") ||
+                window.location.protocol === "file:";
+
+const API_BASE_URL = isLocal ? "http://127.0.0.1:5000" : PROD_BACKEND_URL;
 
 /* ==========================================================================
    INTERACTIVE LOGIC: FUTURISTIC STUDENT MENTAL HEALTH & WELLNESS PLATFORM
