@@ -90,9 +90,5 @@ class GroqProvider(LLMProvider):
         return f"Groq-{model}"
 
 
-# Instantiation based on environment selection
-provider_type = os.getenv("LLM_PROVIDER", "ollama").lower()
-if provider_type == "groq":
-    llm_provider: LLMProvider = GroqProvider()
-else:
-    llm_provider: LLMProvider = OllamaProvider()
+# Production LLM provider is locked to Groq (Ollama is deprecated and disabled in runtime execution flow)
+llm_provider: LLMProvider = GroqProvider()
