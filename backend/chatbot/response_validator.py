@@ -70,11 +70,16 @@ class ResponseValidator:
         if matched_opening:
             cls.last_corrections.append("repetitive_opening_removed")
             openings = [
-                "Thanks for sharing that.",
-                "I'm glad you reached out.",
-                "I appreciate you telling me.",
-                "Let's work through this together.",
-                "You're not alone in feeling this way."
+                "I hear you, and it's completely okay to feel that way.",
+                "Thanks for opening up about this.",
+                "I'm really glad you shared that with me.",
+                "That sounds like a lot to handle, but you're not alone.",
+                "I appreciate you sharing this—it takes strength to open up.",
+                "That does sound challenging, but we can take it one step at a time.",
+                "I'm here for you, and we'll work through this together.",
+                "It's completely understandable to feel overwhelmed by that.",
+                "Thanks for reaching out. Let's figure this out together.",
+                "That sounds really tough, but I'm glad you're talking about it."
             ]
             cleaned = random.choice(openings) + " " + cleaned
 
@@ -138,22 +143,29 @@ class ResponseValidator:
             cls.last_corrections.append("question_added")
             cleaned = cleaned.rstrip(".") + "?"
             questions = [
+                "What's one tiny thing that might help you feel a bit better right now?",
                 "How does that sound to you?",
-                "What do you think is a realistic first step for you today?",
-                "What would make this feel a bit more manageable right now?"
+                "What feels like a realistic first step for you today?",
+                "What would make this feel just a little bit more manageable?",
+                "Would you like to talk more about what's causing that?",
+                "Is there anything specific we could focus on to help ease that stress?",
+                "What is one small thing you can do to take care of yourself today?",
+                "How are you planning to spend your evening or break today?",
+                "What's been helping you get through these tough days?",
+                "Do you have a friend or family member you could reach out to today?"
             ]
             cleaned += " " + random.choice(questions)
 
-        # 8. Trim responses exceeding 180 words while preserving the trailing question
+        # 8. Trim responses exceeding 120 words while preserving the trailing question
         words = cleaned.split()
-        if len(words) > 180:
+        if len(words) > 120:
             cls.last_corrections.append("response_trimmed_to_length")
             parts = cleaned.split('?')
             last_question = ""
             if len(parts) > 1:
                 last_question = parts[-2].split('.')[-1].strip() + "?"
             
-            truncated_body = " ".join(words[:130])
+            truncated_body = " ".join(words[:80])
             last_dot = max(truncated_body.rfind('.'), truncated_body.rfind('!'))
             if last_dot != -1:
                 truncated_body = truncated_body[:last_dot+1]

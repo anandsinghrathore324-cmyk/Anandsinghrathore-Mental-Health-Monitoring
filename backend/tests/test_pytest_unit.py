@@ -86,7 +86,12 @@ class TestRealResponseValidator:
 
     def test_remove_repeated_openings(self):
         result = self._rrv().validate("I'm sorry to hear that, but things will improve.")
-        assert "Thanks for sharing" in result or "glad you reached" in result or "appreciate you telling" in result or "work through" in result or "alone in feeling" in result
+        valid_substrings = [
+            "hear you, and it's", "opening up", "glad you shared", "lot to handle",
+            "appreciate you sharing", "take it one step", "work through this",
+            "understandable to feel", "figure this out", "tough, but I'm"
+        ]
+        assert any(sub in result for sub in valid_substrings)
 
     def test_remove_accidental_repeated_adjacent_sentences(self):
         text = "Take a break. Take a break. Let us talk."

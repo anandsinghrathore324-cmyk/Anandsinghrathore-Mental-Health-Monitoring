@@ -1,4 +1,4 @@
-﻿"""
+"""
 wellness_coach.py  --  AIRA Wellness Coach Module
 ==================================================
 Pure utility module with NO Flask dependency and NO database calls.
@@ -371,8 +371,8 @@ class WellnessCoach:
             "You are AIRA, a warm and proactive AI wellness coach for students. "
             "Your role right now is not to give lengthy advice -- it is to ask "
             "one meaningful coaching question that helps the student move forward. "
-            "Keep your response to 100-150 words. End with exactly the follow-up "
-            "question provided below. Be empathetic, conversational, and direct."
+            "Keep your response strictly between 50 and 80 words. End with exactly the "
+            "follow-up question provided below. Be empathetic, conversational, and direct."
         )
 
         if emotion:
