@@ -1,0 +1,3 @@
+[run]
+omit =
+    scratch_*.py
