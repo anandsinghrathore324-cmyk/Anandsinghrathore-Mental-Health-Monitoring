@@ -27,7 +27,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app import create_app
 from config import Config
 from chatbot.conversation_orchestrator import ConversationOrchestrator
-from chatbot.llm_provider import llm_provider, GroqProvider, OllamaProvider
+from chatbot.llm_provider import llm_provider, GroqProvider
 from chatbot.crisis_handler import CrisisHandler
 from chatbot.wellness_coach import WellnessCoach
 from chatbot.response_validator import ResponseValidator
@@ -364,8 +364,7 @@ class TestGroqProvider(unittest.TestCase):
         with patch.dict(os.environ, {"GROQ_MODEL": "llama-3.3-70b-versatile"}):
             self.assertIn("Groq-", GroqProvider().model_name)
 
-    def test_ollama_model_name(self):
-        self.assertEqual(OllamaProvider().model_name, "Ollama-llama3.2:3b")
+
 
 
 # ===========================================================================

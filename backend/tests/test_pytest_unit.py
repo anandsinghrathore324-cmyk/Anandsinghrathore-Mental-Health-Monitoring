@@ -1085,13 +1085,6 @@ class TestLLMProvider:
                 result = provider.generate_response("Hello")
         assert isinstance(result, str)
 
-    def test_ollama_provider_generate_response(self):
-        from chatbot.llm_provider import OllamaProvider
-        provider = OllamaProvider()
-        with patch("chatbot.ollama_client.generate_response", return_value="Ollama says hello"):
-            result = provider.generate_response("Test prompt")
-        assert isinstance(result, str)
-
     def test_llm_provider_singleton_is_provider_instance(self):
         from chatbot.llm_provider import llm_provider, LLMProvider
         assert isinstance(llm_provider, LLMProvider)
@@ -1099,36 +1092,6 @@ class TestLLMProvider:
     def test_llm_provider_has_model_name(self):
         from chatbot.llm_provider import llm_provider
         assert isinstance(llm_provider.model_name, str)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# OllamaClient
-# ─────────────────────────────────────────────────────────────────────────────
-class TestOllamaClient:
-    def test_generate_response_success(self):
-        from chatbot import ollama_client
-        with patch("chatbot.ollama_client.requests.post") as mock_post:
-            mock_resp = MagicMock()
-            mock_resp.status_code = 200
-            mock_resp.json.return_value = {"response": "Ollama says hello"}
-            mock_post.return_value = mock_resp
-            result = ollama_client.generate_response("Test prompt")
-        assert isinstance(result, str)
-
-    def test_generate_response_connection_error_returns_fallback(self):
-        from chatbot import ollama_client
-        with patch("chatbot.ollama_client.requests.post",
-                   side_effect=Exception("Connection refused")):
-            result = ollama_client.generate_response("Hello")
-        assert isinstance(result, str)
-
-    def test_generate_response_timeout_returns_fallback(self):
-        from chatbot import ollama_client
-        import requests as req_lib
-        with patch("chatbot.ollama_client.requests.post",
-                   side_effect=req_lib.exceptions.Timeout("Timeout")):
-            result = ollama_client.generate_response("Hello")
-        assert isinstance(result, str)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

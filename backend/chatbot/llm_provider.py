@@ -17,16 +17,7 @@ class LLMProvider(ABC):
         pass
 
 
-class OllamaProvider(LLMProvider):
-    """Default implementation delegating to the local Ollama client."""
-    
-    def generate_response(self, prompt: str) -> str:
-        from chatbot.ollama_client import generate_response
-        return generate_response(prompt)
 
-    @property
-    def model_name(self) -> str:
-        return "Ollama-llama3.2:3b"
 
 
 class GroqProvider(LLMProvider):
