@@ -24,7 +24,7 @@ class ReportModel:
             "wellness_score": int(wellness),
             "emotion": emotion.strip(),
             "risk_level": risk.strip(),
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.datetime.now(datetime.timezone.utc)
         }
         if behavioral_probability is not None:
             report_doc["behavioral_probability"] = float(behavioral_probability)

@@ -21,38 +21,69 @@ Welcome to the production-ready backend architectural core of **AIRA (Artificial
 
 ```text
 backend/
-├── app.py                      # Flask Application Root & DB Seeding Manager
-├── config.py                   # Secure Configuration Variables (Env Decoders)
-├── requirements.txt            # Python Module Dependencies List
-├── .env                        # Local Environment Variable Decrypter (never committed)
-├── database/                   # MongoDB Collection Model Frameworks
-│   ├── db.py                   # DB Manager, Index Deployer & Unique Constraints
-│   ├── user_model.py           # Bcrypt verification & standard search indexes
-│   ├── report_model.py         # Assessment diagnostic report records
+├── app.py                      # Flask Application Entry Point & Blueprint Registrar
+├── config.py                   # Environment Configuration & Secret Resolver
+├── requirements.txt            # Python Dependencies Manifest
+├── pytest.ini                  # Pytest runner & cache configuration
+├── gunicorn.conf.py            # Production WSGI server parameters
+├── .env                        # Local Runtime Environment Secrets (untracked)
+├── .env.example                # Environment Template (Brevo HTTPS & SMTP)
+├── database/                   # MongoDB Collection Models & Persistence
+│   ├── db.py                   # PyMongo Manager & Index Configurator
+│   ├── user_model.py           # User profiles & Bcrypt hashing
+│   ├── report_model.py         # Diagnostic assessment reports
 │   ├── mood_model.py           # Daily mood calendar entries
-│   ├── chatbot_model.py        # Conversational dialogue retention matrices
-│   └── doctor_model.py         # Psychological clinical geographical locations
-├── middleware/                 # Flask Request Filters
-│   └── auth_middleware.py      # Secure JWT validation interceptors
-├── ml/                         # Advanced Machine Learning Pipelines
-│   ├── preprocess.py           # Workload/sleep vectors transformer
-│   ├── train_model.py          # Behavioral ML Model trainer script
-│   └── saved_model.pkl         # Trained serialized machine learning weights
+│   ├── chatbot_model.py        # Dialogue history persistence
+│   ├── doctor_model.py         # Clinic & psychologist directory
+│   ├── geo_model.py            # City/state/country coordinate mappings
+│   ├── hotline_model.py        # Crisis helpline directory
+│   └── seeds/                  # Seed datasets and import utilities
+│       ├── import_hotlines.py
+│       ├── import_geo_data.py
+│       └── mental_health_hotlines.json
+├── chatbot/                    # Conversational AI Architecture
+│   ├── conversation_orchestrator.py # Pipeline coordinator (Memory -> Intent -> LLM)
+│   ├── crisis_handler.py       # Emergency phrase detector & safety router
+│   ├── wellness_coach.py       # CBT/grounding coaching strategies
+│   ├── memory_manager.py       # Session dialog state manager
+│   ├── prompt_builder.py       # Context-aware dynamic prompt assembler
+│   ├── response_validator.py   # Output sanitizer & follow-up generator
+│   └── llm_provider.py         # Multi-provider LLM connector (Groq/Gemini)
+├── middleware/                 # Security & Filter Middlewares
+│   ├── auth_middleware.py      # JWT Bearer Token validation decorator
+│   └── validation.py           # Request payload sanitizers & schema guards
+├── ml/                         # Machine Learning Models & Inference
+│   ├── behavioral/             # Real Logistic Regression Kaggle Model
+│   │   ├── models/risk_model.pkl
+│   │   └── preprocessed/preprocessor.joblib
+│   └── text_model/             # TF-IDF + Logistic Regression text classifier
+│       ├── text_model.pkl
+│       └── text_vectorizer.pkl
 ├── nlp/                        # Cognitive Language Engines
-│   └── distilbert.py           # Text Analysis Model Singleton with rule fallbacks
-├── routes/                     # Blueprint API Endpoint Handlers
-│   ├── auth_routes.py          # OTP authentication, login, signup, profile
-│   ├── prediction_routes.py    # ML assessment triggers & Text Analysis Model sentiments
-│   ├── chatbot_routes.py       # Conversational chatbot loops & logs
-│   ├── doctor_routes.py        # Haversine distance calculations sorted ascending
-│   └── dashboard_routes.py     # Aggregated weekly timelines & heatmap blocks
-└── services/                   # Business Logic Processing Units
-    ├── email_service.py        # Unified email driver (Resend API primary, SMTP local fallback)
-    ├── prediction_service.py   # Hybrid model/algorithmic diagnostic blenders
-    ├── chatbot_service.py      # Context-rich support dialect generators
-    ├── doctor_service.py       # Proximity location sorters
-    ├── dashboard_service.py    # Chart.js list structures compilers
-    └── nlp_service.py          # Text classifier gateways
+│   ├── distilbert.py           # Text Analysis Model / Lexical Fallback
+│   └── gibberish_detector.py   # Nonsense & spam input filter
+├── routes/                     # Blueprint API Endpoint Handlers (/api/*)
+│   ├── auth_routes.py          # OTP request, verify, register, login
+│   ├── prediction_routes.py    # Multi-modal assessment inference
+│   ├── chatbot_routes.py       # Conversational chatbot loops
+│   ├── doctor_routes.py        # Therapist directory & proximity search
+│   ├── dashboard_routes.py     # Analytics & 30-day mood heatmap
+│   ├── geo_routes.py           # City coordinate queries
+│   └── hotline_routes.py       # Emergency crisis contact queries
+├── services/                   # Business Logic Processing Units
+│   ├── email_service.py        # Brevo HTTPS primary API + SMTP fallback
+│   ├── prediction_service.py   # Multi-modal diagnostic inference service
+│   ├── chatbot_service.py      # Chatbot conversation service wrapper
+│   ├── doctor_service.py       # Haversine distance calculator
+│   ├── dashboard_service.py    # Mood trend aggregation engine
+│   ├── assessment_service.py   # Clinical diagnostic rules engine
+│   └── nlp_service.py          # Sentiment analysis gateway
+└── tests/                      # 355-Test Pytest Suite
+    ├── conftest.py             # Test fixtures & MongoDB mock isolation
+    ├── test_pytest_unit.py     # Unit test specifications
+    ├── test_pytest_routes.py   # Route integration test suite
+    ├── test_validation.py      # Input validation & security tests
+    └── test_comprehensive.py   # End-to-end edge case suite
 ```
 
 ---

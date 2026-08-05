@@ -25,9 +25,11 @@ class HotlineModel:
         """Seeds the hotlines database from the JSON dataset if empty."""
         try:
             if db_manager.db.mental_health_hotlines.count_documents({}) == 0:
-                # Load JSON data
+                # Load JSON data from seeds directory
                 dir_path = os.path.dirname(os.path.realpath(__file__))
-                json_path = os.path.join(dir_path, "mental_health_hotlines.json")
+                json_path = os.path.join(dir_path, "seeds", "mental_health_hotlines.json")
+                if not os.path.exists(json_path):
+                    json_path = os.path.join(dir_path, "mental_health_hotlines.json")
                 if os.path.exists(json_path):
                     with open(json_path, "r", encoding="utf-8") as f:
                         hotlines_list = json.load(f)

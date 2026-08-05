@@ -76,6 +76,9 @@ _ADVICE_KEYWORDS = frozenset([
     "please help", "can you help", "any advice", "any tips",
     "what do you think", "is there a way", "help me",
     "i'm lost", "i don't know how", "not sure what",
+    "give me tips", "tips to", "tips for", "tips on",
+    "how to manage", "ways to manage", "how to cope", "how to deal",
+    "how to reduce", "suggest some", "techniques to",
 ])
 
 _PLANNING_KEYWORDS = frozenset([
@@ -83,7 +86,9 @@ _PLANNING_KEYWORDS = frozenset([
     "chapters left", "pages left", "assignments left", "need to finish",
     "i have to", "deadline", "by tomorrow", "by tonight", "before monday",
     "next week", "this week", "study for", "prepare for", "review",
-    "how many", "finish before", "complete before",
+    "how many", "finish before", "complete before", "plan my goals",
+    "plan goals", "set goals", "goals for", "goal planning", "plan",
+    "planning", "schedule", "routine",
 ])
 _PLANNING_PATTERNS = [
     re.compile(r"\b(physics|chemistry|math|biology|history|english|economics|"
@@ -101,24 +106,39 @@ _PROGRESS_KEYWORDS = frozenset([
     "actually did", "ended up", "turned out", "i made progress",
 ])
 
+_GENERAL_KEYWORDS = frozenset([
+    "hello", "hi", "hey", "good morning", "good evening", "good afternoon",
+    "my name is", "what is", "tell me about", "write an essay", "can you write",
+    "explain", "i am happy", "feeling good", "i feel happy", "great day",
+    "awesome", "yay", "wonderful", "who is", "how are you", "who are you",
+    "what are you", "tell me a joke", "i'm happy", "im happy",
+])
+
 _DEFAULT_FOLLOW_UPS = {
     "seeking_advice": [
-        "Which part is hardest right now -- the workload, the time, or how you're feeling?",
-        "When you say you're struggling, is it more about knowing what to do, or finding the energy to do it?",
-        "What would feel like a small win for you today?",
+        "Which part would you like to start with?",
+        "How does that approach feel to you?",
+        "What would feel like the most helpful next step for you today?",
     ],
     "goal_planning": [
         "How much time do you have before the deadline?",
-        "Which part feels most uncertain right now?",
-        "If you could tackle just one thing today, what would it be?",
+        "Which part feels most important to tackle first?",
+        "If you could tackle just one small piece right now, what would it be?",
     ],
     "progress_update": [
-        "That's a step forward -- what felt different this time?",
-        "How are you feeling after that? More confident, or still uncertain?",
-        "What would make the next step feel more manageable?",
+        "That is awesome progress! How are you feeling after getting that done?",
+        "How are you feeling right now -- more confident or ready for a break?",
+        "What would make the next step feel easiest for you?",
     ],
     "venting": [
-        "That sounds really hard. Do you want to talk more about what's been happening?",
+        "I'm right here with you. What feels like the heaviest part of it right now?",
+        "I'm listening whenever you want to share more. How are you holding up at this moment?",
+        "Take a deep breath -- you're not alone in this. What would help you feel a bit lighter today?",
+    ],
+    "general_chat": [
+        "How is the rest of your day going?",
+        "What's on your mind today?",
+        "Is there anything specific you'd like to explore together?",
     ],
 }
 
@@ -291,6 +311,19 @@ class WellnessCoach:
                 reasoning=f"advice={advice_score}, plan={plan_score}, vent={vent_score}"
             )
 
+        # General / positive chat signals
+        gen_hits = _keyword_hits(lower, _GENERAL_KEYWORDS)
+        if gen_hits >= 1 and vent_score == 0 and plan_score < 4 and advice_score < 2:
+            follow_up = _pick_follow_up("general_chat", ctx)
+            return CoachingDecision(
+                mode="general_chat",
+                follow_up_question=follow_up,
+                coaching_goal="",
+                action_type="engage",
+                confidence=min(0.6 + gen_hits * 0.1, 0.90),
+                reasoning=f"General/positive chat signals={gen_hits}"
+            )
+
         # Default: venting
         follow_up = _pick_follow_up("venting", ctx)
         return CoachingDecision(
@@ -347,12 +380,11 @@ class WellnessCoach:
         decision:         CoachingDecision,
         coaching_context: dict | None = None,
         assessment:       dict | None = None,
+        history:          list | None = None,
+        student_profile:  dict | None = None,
     ) -> str:
         """
-        Assemble a compact coaching-mode LLM prompt.
-
-        Used instead of prompt_builder.build_prompt() when the student is
-        seeking_advice, goal_planning, or progress_update.
+        Assemble a natural, empathetic coaching-mode LLM prompt.
 
         Returns:
             A single prompt string ready for OllamaClient.generate_response().
@@ -368,38 +400,52 @@ class WellnessCoach:
 
         # System header
         parts.append(
-            "You are AIRA, a warm and proactive AI wellness coach for students. "
-            "Your role right now is not to give lengthy advice -- it is to ask "
-            "one meaningful coaching question that helps the student move forward. "
-            "Keep your response strictly between 50 and 80 words. End with exactly the "
-            "follow-up question provided below. Be empathetic, conversational, and direct."
+            "You are AIRA, a warm, supportive, and intelligent AI Student Wellness Companion & Digital Bestie. "
+            "Talk like a caring, empathetic, and encouraging student peer and mentor. "
+            "Be conversational, natural, and helpful. "
+            "If the student asks for advice or tips, provide practical, actionable, easy-to-digest suggestions. "
+            "If the student shares happy news, celebrate enthusiastically. "
+            "If the student is stressed or venting, validate them warmly without repeating canned robotic phrases. "
+            "If the student asks a general question or needs study/academic help, answer helpfully and clearly. "
+            "Never diagnose or prescribe medication."
         )
 
-        if emotion:
-            parts.append(f"Student is currently feeling: {emotion}.")
+        if student_profile and student_profile.get("name"):
+            parts.append(f"Student's Name: {student_profile['name']}")
+
+        if emotion and emotion.lower() not in ("calm", "neutral", ""):
+            parts.append(f"Recent assessment report mood: {emotion}.")
 
         if goal:
             parts.append(f"Active coaching goal: {goal}")
 
+        # Recent conversation history
+        if history:
+            recent_turns = history[-4:]
+            hist_lines = []
+            for item in recent_turns:
+                r = "Student" if item.get("role") == "student" else "AIRA"
+                hist_lines.append(f"{r}: {item.get('message', '').strip()}")
+            if hist_lines:
+                parts.append("Recent conversation history:\n" + "\n".join(hist_lines))
+
         mode_instructions = {
             "seeking_advice": (
-                "The student is looking for guidance. Acknowledge their situation "
-                "briefly, then ask your follow-up question to help narrow down what "
-                "they need most."
+                "The student is seeking advice or practical tips. Provide clear, empathetic, and actionable guidance, "
+                "then invite them to share how that feels."
             ),
             "goal_planning": (
-                "The student has a specific task or deadline. Help them scope it "
-                "by asking your follow-up question. Do not produce a full plan yet -- "
-                "wait for their answer first."
+                "The student has a specific task, exam, or deadline. Help them break it down realistically and encourage them."
             ),
             "progress_update": (
-                "The student is reporting progress (or difficulty). Acknowledge what "
-                "they shared with genuine warmth, then ask your follow-up to keep "
-                "the momentum going."
+                "The student is sharing an update or progress. Celebrate their effort warmly and encourage the next step."
             ),
             "venting": (
-                "The student is venting. Validate their feelings first. Only ask the "
-                "follow-up question if it feels natural -- do not push."
+                "The student is expressing distress or venting. Validate their feelings with genuine empathy and warmth. "
+                "Do NOT repeat robotic phrases like 'That sounds really hard'."
+            ),
+            "general_chat": (
+                "The student is greeting you, sharing happy news, or asking a general question. Respond warmly, engagingly, and helpfully."
             ),
         }
         if mode in mode_instructions:
@@ -408,7 +454,7 @@ class WellnessCoach:
         parts.append(f"Student: {message.strip()}")
 
         if fup:
-            parts.append(f'End your response with this exact question: "{fup}"')
+            parts.append(f'Suggested follow-up to inspire your response (do not repeat verbatim if context demands otherwise): "{fup}"')
 
         parts.append("AIRA:")
 

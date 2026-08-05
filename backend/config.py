@@ -42,3 +42,6 @@ class Config:
     SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
     SMTP_EMAIL = os.getenv("SMTP_EMAIL", "")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+
+    # Google Places API (Live Doctor Lookup)
+    GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY", "")

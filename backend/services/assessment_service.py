@@ -27,7 +27,7 @@ class AssessmentService:
             birth_year = user.get("birth_year")
             if birth_year:
                 try:
-                    profile["age"] = datetime.datetime.utcnow().year - int(birth_year)
+                    profile["age"] = datetime.datetime.now(datetime.timezone.utc).year - int(birth_year)
                 except ValueError:
                     pass
 

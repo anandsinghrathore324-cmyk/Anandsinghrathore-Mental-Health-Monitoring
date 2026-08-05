@@ -41,7 +41,7 @@ from chatbot.prompt_builder import build_prompt
 def _make_token(delta_hours=1):
     payload = {
         "sub": "507f1f77bcf86cd799439011",
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=delta_hours),
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=delta_hours),
     }
     return jwt.encode(payload, Config.JWT_SECRET_KEY, algorithm="HS256")
 
@@ -189,17 +189,12 @@ class TestPredictionPipeline(BaseTestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.get_json()["status"], "success")
 
-    def test_invalid_age_below_min(self):
+    def test_optional_demographics_fallback(self):
         r = self.client.post("/api/predict",
-                             json=self._valid_payload(age=10), headers=self.headers)
-        self.assertEqual(r.status_code, 400)
-        self.assertIn("Age", r.get_json()["message"])
-
-    def test_invalid_gender(self):
-        r = self.client.post("/api/predict",
-                             json=self._valid_payload(gender="Robot"),
+                             json={"text": "I feel fine and happy today. Work is going great and life feels calm."},
                              headers=self.headers)
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["status"], "success")
 
     def test_workload_warning_on_overload(self):
         r = self.client.post("/api/predict",

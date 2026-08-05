@@ -1,3 +1,4 @@
+import os
 import jwt
 import datetime
 import logging
@@ -92,11 +93,12 @@ def login():
         }), 401
         
     try:
-        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
+        now_utc = datetime.datetime.now(datetime.timezone.utc)
+        expiration = now_utc + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
         token_payload = {
             "sub": user["_id"],
             "exp": expiration,
-            "iat": datetime.datetime.utcnow()
+            "iat": now_utc
         }
         logger.info(f"[AUTH LOGIN] Generating token: sub={user['_id']}, exp={expiration.isoformat()}")
         token = jwt.encode(token_payload, Config.JWT_SECRET_KEY, algorithm="HS256")
@@ -155,7 +157,7 @@ def request_otp():
         # Persist OTP (TTL-indexed — auto-expires in 5 minutes)
         db_manager.db.otp_codes.update_one(
             {"email": email},
-            {"$set": {"email": email, "otp": otp_code, "created_at": datetime.datetime.utcnow()}},
+            {"$set": {"email": email, "otp": otp_code, "created_at": datetime.datetime.now(datetime.timezone.utc)}},
             upsert=True,
         )
     except Exception as db_err:
@@ -172,10 +174,14 @@ def request_otp():
     ok, err = EmailService.send_otp(to_email=email, otp_code=otp_code, purpose="reset")
 
     if ok:
-        return jsonify({
+        has_real_email = bool((os.getenv("BREVO_API_KEY") and os.getenv("BREVO_FROM_EMAIL")) or (os.getenv("SMTP_EMAIL") and os.getenv("SMTP_PASSWORD")))
+        resp = {
             "status": "success",
-            "message": "One-Time Password has been dispatched to your email inbox.",
-        }), 200
+            "message": "One-Time Password has been dispatched to your email inbox." if has_real_email else "One-Time Password generated (Dev mode: check console).",
+        }
+        if not has_real_email:
+            resp["otp_bypass"] = otp_code
+        return jsonify(resp), 200
 
     logger.error("[OTP] Email delivery failed for %s: %s", email, err)
     return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
@@ -204,7 +210,7 @@ def signup_request_otp():
     try:
         db_manager.db.otp_codes.update_one(
             {"email": email},
-            {"$set": {"email": email, "otp": otp_code, "created_at": datetime.datetime.utcnow()}},
+            {"$set": {"email": email, "otp": otp_code, "created_at": datetime.datetime.now(datetime.timezone.utc)}},
             upsert=True,
         )
     except Exception as db_err:
@@ -226,10 +232,14 @@ def signup_request_otp():
     )
 
     if ok:
-        return jsonify({
+        has_real_email = bool((os.getenv("BREVO_API_KEY") and os.getenv("BREVO_FROM_EMAIL")) or (os.getenv("SMTP_EMAIL") and os.getenv("SMTP_PASSWORD")))
+        resp = {
             "status": "success",
-            "message": "Verification code has been dispatched to your email address.",
-        }), 200
+            "message": "Verification code has been dispatched to your email address." if has_real_email else "Verification code generated (Dev mode: check console).",
+        }
+        if not has_real_email:
+            resp["otp_bypass"] = otp_code
+        return jsonify(resp), 200
 
     logger.error("[SIGNUP OTP] Email delivery failed for %s: %s", email, err)
     return jsonify({"status": "error", "message": f"Email delivery failed: {err}"}), 500
@@ -258,7 +268,11 @@ def signup_verify_otp():
                 "message": "Invalid or expired One-Time Password. Access Denied."
             }), 401
             
-        time_elapsed = datetime.datetime.utcnow() - record["created_at"]
+        now_utc = datetime.datetime.now(datetime.timezone.utc)
+        created_at = record.get("created_at")
+        if created_at and getattr(created_at, "tzinfo", None) is None:
+            created_at = created_at.replace(tzinfo=datetime.timezone.utc)
+        time_elapsed = now_utc - (created_at or now_utc)
         if time_elapsed > datetime.timedelta(minutes=5):
             db_manager.db.otp_codes.delete_one({"_id": record["_id"]})
             return jsonify({
@@ -308,7 +322,11 @@ def verify_otp():
                 "message": "Invalid or expired One-Time Password. Access Denied."
             }), 401
             
-        time_elapsed = datetime.datetime.utcnow() - record["created_at"]
+        now_utc = datetime.datetime.now(datetime.timezone.utc)
+        created_at = record.get("created_at")
+        if created_at and getattr(created_at, "tzinfo", None) is None:
+            created_at = created_at.replace(tzinfo=datetime.timezone.utc)
+        time_elapsed = now_utc - (created_at or now_utc)
         logger.info(f"[AUTH OTP VERIFY] OTP record found. Created at {record['created_at'].isoformat()}, time elapsed: {time_elapsed.total_seconds()}s")
         if time_elapsed > datetime.timedelta(minutes=5):
             logger.warning(f"[AUTH OTP VERIFY] OTP code has expired (> 5 minutes elapsed) for user: {email}")
@@ -332,11 +350,12 @@ def verify_otp():
         else:
             logger.info(f"[AUTH OTP VERIFY] Found existing user profile for email: {email}")
             
-        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
+        now_utc = datetime.datetime.now(datetime.timezone.utc)
+        expiration = now_utc + datetime.timedelta(hours=Config.JWT_EXPIRATION_HOURS)
         token_payload = {
             "sub": user["_id"],
             "exp": expiration,
-            "iat": datetime.datetime.utcnow()
+            "iat": now_utc
         }
         logger.info(f"[AUTH OTP VERIFY] Generating token: sub={user['_id']}, exp={expiration.isoformat()}")
         token = jwt.encode(token_payload, Config.JWT_SECRET_KEY, algorithm="HS256")
@@ -405,7 +424,7 @@ def reset_password():
 @token_required
 def profile_status(current_user):
     """Returns whether the user has completed their profile and the stored profile data."""
-    current_year = datetime.datetime.utcnow().year
+    current_year = datetime.datetime.now(datetime.timezone.utc).year
     birth_year = current_user.get("birth_year")
     age = (current_year - int(birth_year)) if birth_year else None
 
@@ -451,7 +470,7 @@ def save_profile(current_user):
             "message": f"Gender must be one of: {', '.join(valid_genders)}."
         }), 400
 
-    current_year = datetime.datetime.utcnow().year
+    current_year = datetime.datetime.now(datetime.timezone.utc).year
     try:
         birth_year = int(birth_year)
         age = current_year - birth_year

@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="AIRA - Futuristic AI-based Student Mental Health Monitoring & Support Platform. Real-time stress, depression, anxiety analysis using NLP, interactive dashboards, and geolocation doctor referrals.">
+    <title>AIRA | AI Student Mental Health & Support Platform</title>
+
+    <!-- Stylesheets & Fonts -->
+    <link rel="stylesheet" href="style.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+
+    <!-- ChartJS CDN for Analytics Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- FUTURISTIC NEURAL PRELOADER -->
+    <div id="aira-preloader">
+        <div class="preloader-content">
+            <div class="preloader-hologram">
+                <div class="preloader-ring preloader-ring-1"></div>
+                <div class="preloader-ring preloader-ring-2"></div>
+                <div class="preloader-core">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+            </div>
+            <h2 class="preloader-title">AIRA <span class="gradient-text">CORE</span></h2>
+            <p class="preloader-subtitle">Quantum Neural Sentiment Network</p>
+
+            <div class="preloader-progress-container">
+                <div class="preloader-progress-bar" id="preloader-progress-bar"></div>
+            </div>
+            <span class="preloader-percentage" id="preloader-percentage">0%</span>
+
+            <div class="preloader-console" id="preloader-console">
+                <div class="console-line">>> Initializing micro-nodal handshakes...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM GLASSMORPHIC LOGIN PORTAL -->
+    <div id="aira-login-portal">
+        <div class="login-container">
+            <div class="login-card glass-panel">
+                <div class="login-scanner" id="login-scanner-laser"></div>
+
+                <div class="login-header">
+                    <div class="login-brand">
+                        <i class="fa-solid fa-shield-halved brand-glow"></i>
+                        <h3>AIRA PORTAL</h3>
+                    </div>
+                    <p>Sign in to your AIRA account</p>
+                </div>
+
+                <!-- Glassmorphic Tab Navigation Bar -->
+                <div class="login-tabs-nav">
+                    <button class="login-tab active" data-tab="password"><i class="fa-solid fa-right-to-bracket"></i>
+                        Login</button>
+                    <button class="login-tab" data-tab="register"><i class="fa-solid fa-user-plus"></i> Signup</button>
+                </div>
+
+                <form id="aira-login-form" onsubmit="event.preventDefault();">
+                    <!-- Tab 1: Password Auth Section -->
+                    <div class="auth-fields-section active" id="auth-section-password">
+                        <div class="login-form-group">
+                            <label for="login-student-id"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                            <input type="email" id="login-student-id" class="form-input" placeholder="Enter your email">
+                        </div>
+                        <div class="login-form-group">
+                            <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                            <div class="password-field-wrapper">
+                                <input type="password" id="login-password" class="form-input"
+                                    placeholder="Enter your password">
+                                <button type="button" class="password-toggle-btn"
+                                    onclick="togglePasswordVisibility('login-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Sleek helpers row (Keep me signed in & Forgot Pass) -->
+                        <div class="login-helpers-row">
+                            <label class="login-remember-checkbox">
+                                <input type="checkbox" id="login-remember">
+                                <span>Keep me signed in</span>
+                            </label>
+                            <a href="javascript:void(0)" class="login-forgot-link">Forgot Password?</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Gmail OTP Verification Section -->
+                    <div class="auth-fields-section" id="auth-section-otp" style="display: none;">
+                        <div class="login-form-group">
+                            <label for="login-otp-email"><i class="fa-solid fa-envelope"></i> Personal / Gmail
+                                Address</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="email" id="login-otp-email" class="form-input"
+                                    placeholder="student@gmail.com" style="flex: 1;">
+                                <button type="button" class="neon-btn neon-btn-secondary" id="btn-send-otp"
+                                    style="padding: 0.6rem 1rem; border-radius: 12px; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; min-width: 90px; justify-content: center;">Send
+                                    OTP</button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden initially, revealed dynamically after dispatching OTP -->
+                        <div class="login-form-group" id="group-otp-verify"
+                            style="display: none; animation: fadeIn 0.4s ease-in-out;">
+                            <label for="login-otp-code"><i class="fa-solid fa-shield-halved"></i> 6-Digit Verification
+                                OTP</label>
+                            <input type="text" id="login-otp-code" class="form-input" placeholder="••••••" maxlength="6"
+                                style="letter-spacing: 6px; text-align: center; font-family: monospace; font-size: 1.25rem;">
+                            <div
+                                style="font-size: 0.72rem; color: var(--neon-cyan); margin-top: 6px; display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-clock-rotate-left"></i> <span>Expires in 5 mins. Check terminal
+                                    logs/inbox.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Register New User Section -->
+                    <div class="auth-fields-section" id="auth-section-register" style="display: none;">
+                        <!-- Signup Stage 1: Contact Details -->
+                        <div id="signup-stage-1" style="animation: fadeIn 0.4s ease-in-out;">
+                            <div class="login-form-group">
+                                <label for="register-name"><i class="fa-solid fa-user-tag"></i> Student Full
+                                    Name</label>
+                                <input type="text" id="register-name" class="form-input"
+                                    placeholder="Enter your full name">
+                            </div>
+                            <div class="login-form-group">
+                                <label for="register-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                                <input type="email" id="register-email" class="form-input"
+                                    placeholder="Enter your email">
+                            </div>
+                        </div>
+
+                        <!-- Signup Stage 2: verification code (hidden initially) -->
+                        <div id="signup-stage-2" style="display: none; animation: fadeIn 0.4s ease-in-out;">
+                            <div
+                                style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-cyan); font-size: 0.82rem; font-weight: 600;">
+                                <i class="fa-solid fa-envelope-open-text"></i> Verification OTP dispatched to email
+                                address.
+                            </div>
+                            <div class="login-form-group">
+                                <label for="register-otp-code"><i class="fa-solid fa-shield-halved"></i> 6-Digit
+                                    Verification OTP</label>
+                                <input type="text" id="register-otp-code" class="form-input" placeholder="••••••"
+                                    maxlength="6"
+                                    style="letter-spacing: 6px; text-align: center; font-family: monospace; font-size: 1.25rem;">
+                            </div>
+                        </div>
+
+                        <!-- Signup Stage 3: Set Password (hidden initially) -->
+                        <div id="signup-stage-3" style="display: none; animation: fadeIn 0.4s ease-in-out;">
+                            <div
+                                style="text-align: center; margin-bottom: 1.2rem; color: var(--neon-emerald); font-size: 0.82rem; font-weight: 600;">
+                                <i class="fa-solid fa-circle-check"></i> Email verified. Set your secure password key.
+                            </div>
+                            <div class="login-form-group">
+                                <label for="register-password"><i class="fa-solid fa-lock"></i> Password</label>
+                                <div class="password-field-wrapper">
+                                    <input type="password" id="register-password" class="form-input"
+                                        placeholder="Enter your password">
+                                    <button type="button" class="password-toggle-btn"
+                                        onclick="togglePasswordVisibility('register-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength-container" style="display: none; margin-top: 0.5rem;">
+                                    <div class="password-strength-bar-wrapper"
+                                        style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 0.3rem;">
+                                        <div id="password-strength-bar"
+                                            style="width: 0%; height: 100%; transition: all 0.3s ease;"></div>
+                                    </div>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                                        <span id="password-strength-text"
+                                            style="font-size: 0.72rem; font-weight: 600; font-family: 'Space Grotesk', sans-serif;">Strength:
+                                            Weak</span>
+                                    </div>
+                                    <ul id="password-checklist"
+                                        style="list-style: none; padding: 0; margin: 0; font-size: 0.7rem; color: rgba(255, 255, 255, 0.6); display: flex; flex-direction: column; gap: 4px; font-family: 'Space Grotesk', sans-serif;">
+                                        <li id="req-length"
+                                            style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                            <i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i> At
+                                            least 8 characters
+                                        </li>
+                                        <li id="req-capital"
+                                            style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                            <i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i>
+                                            Capital letter (A-Z)
+                                        </li>
+                                        <li id="req-small"
+                                            style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                            <i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i>
+                                            Small letter (a-z)
+                                        </li>
+                                        <li id="req-number"
+                                            style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                            <i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i>
+                                            Number (0-9)
+                                        </li>
+                                        <li id="req-special"
+                                            style="display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;">
+                                            <i class="fa-solid fa-circle-xmark" style="color: var(--neon-rose);"></i>
+                                            Special character (e.g. !, @, #, $, %)
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="login-form-group">
+                                <label for="register-confirm-password"><i class="fa-solid fa-lock"></i> Confirm
+                                    Password</label>
+                                <div class="password-field-wrapper">
+                                    <input type="password" id="register-confirm-password" class="form-input"
+                                        placeholder="Confirm your password">
+                                    <button type="button" class="password-toggle-btn"
+                                        onclick="togglePasswordVisibility('register-confirm-password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="login-error-message" id="login-error-msg" style="display: none;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <span>Invalid credentials. Access
+                            Denied.</span>
+                    </div>
+
+                    <button type="submit" class="neon-btn neon-btn-primary login-btn" id="login-submit-btn"
+                        style="width: 100%; border-radius: 12px; justify-content: center; margin-top: 1rem;">
+                        <i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i> Login
+                    </button>
+                </form>
+
+                <div class="login-footer-helper" id="login-footer-desc">
+                    <div>
+                        <span>Don't have an account? </span>
+                        <a href="javascript:void(0)" id="footer-helper-link">Signup</a>
+                    </div>
+                </div>
+
+                <div class="login-security-tag">
+                    <i class="fa-solid fa-fingerprint"></i> Secure Login System
+                </div>
+
+                <!-- PREMIUM FORGOT PASSWORD GLASS MODAL -->
+                <div id="aira-forgot-modal"
+                    style="display: none; position: absolute; inset: 0; z-index: 100; background: rgba(18, 5, 36, 0.95); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border-radius: 28px; padding: 2.5rem 2rem; flex-direction: column; justify-content: center; animation: fadeIn 0.4s ease-in-out;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-key brand-glow"
+                            style="font-size: 2.2rem; color: var(--neon-cyan); margin-bottom: 0.8rem; display: inline-block;"></i>
+                        <h3 style="color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem;">Password
+                            Recovery</h3>
+                        <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.4rem;">Reset your password
+                            using email verification.</p>
+                    </div>
+
+                    <div id="forgot-step-1">
+                        <div class="login-form-group" style="position: relative; margin-bottom: 2rem;">
+                            <label for="forgot-email"
+                                style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
+                                    class="fa-solid fa-envelope"></i> Email Address</label>
+                            <input type="email" id="forgot-email" class="form-input" placeholder="Enter your email"
+                                style="border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; font-size: 0.98rem !important; color: #fff !important; width: 100%; outline: none !important; transition: all 0.3s ease;">
+                        </div>
+                        <button type="button" class="neon-btn neon-btn-primary" id="btn-forgot-send"
+                            style="width: 100%; border-radius: 12px; justify-content: center; margin-bottom: 1rem; padding: 0.75rem 1rem;">
+                            <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i> Send Reset OTP
+                        </button>
+                    </div>
+
+                    <div id="forgot-step-2" style="display: none;">
+                        <div class="login-form-group" style="position: relative; margin-bottom: 1.2rem;">
+                            <label for="forgot-otp"
+                                style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
+                                    class="fa-solid fa-shield-halved"></i> 6-Digit OTP</label>
+                            <input type="text" id="forgot-otp" class="form-input" placeholder="••••••" maxlength="6"
+                                style="letter-spacing: 6px; text-align: center; font-family: monospace; font-size: 1.2rem; border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; color: #fff !important; width: 100%; outline: none !important;">
+                        </div>
+                        <div class="login-form-group" style="position: relative; margin-bottom: 2rem;">
+                            <label for="forgot-new-password"
+                                style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85);"><i
+                                    class="fa-solid fa-lock"></i> New Password</label>
+                            <div class="password-field-wrapper">
+                                <input type="password" id="forgot-new-password" class="form-input"
+                                    placeholder="Enter your password"
+                                    style="border: none !important; border-bottom: 1.5px solid rgba(255,255,255,0.25) !important; background: transparent !important; border-radius: 0px !important; padding: 0.6rem 0 !important; font-size: 0.98rem !important; color: #fff !important; width: 100%; outline: none !important;">
+                                <button type="button" class="password-toggle-btn"
+                                    onclick="togglePasswordVisibility('forgot-new-password', this)">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="neon-btn neon-btn-primary" id="btn-forgot-verify"
+                            style="width: 100%; border-radius: 12px; justify-content: center; margin-bottom: 1rem; padding: 0.75rem 1rem;">
+                            <i class="fa-solid fa-check" style="margin-right: 8px;"></i> Verify &amp; Reset Password
+                        </button>
+                    </div>
+
+                    <div class="login-error-message" id="forgot-error-msg"
+                        style="display: none; margin-bottom: 1rem; color: var(--neon-rose); font-size: 0.8rem; align-items: center; gap: 8px; justify-content: center; font-family: 'Space Grotesk', sans-serif;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <span>Invalid verification signature.</span>
+                    </div>
+
+                    <button type="button" class="neon-btn neon-btn-secondary" id="btn-forgot-close"
+                        style="width: 100%; border-radius: 12px; justify-content: center; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.75rem 1rem;">
+                        Cancel Recovery
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ONBOARDING PROFILE MODAL (shown once after first login) ─────────── -->
+    <div id="onboarding-modal" style="display:none; position:fixed; inset:0; z-index:9999;
+         background:rgba(0,0,0,0.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+         align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:linear-gradient(135deg,rgba(15,15,30,0.98),rgba(10,10,25,0.98));
+                    border:1px solid rgba(0,242,254,0.25); border-radius:24px; padding:2.5rem 2rem;
+                    max-width:440px; width:100%; box-shadow:0 0 60px rgba(0,242,254,0.15);
+                    position:relative;">
+            <!-- Header -->
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg,rgba(0,242,254,0.2),rgba(189,0,255,0.2));
+                             border:1px solid rgba(0,242,254,0.3); border-radius:50%;
+                             display:flex; align-items:center; justify-content:center;
+                             margin:0 auto 1rem; font-size:1.5rem;">
+                    <i class="fa-solid fa-user-gear" style="color:var(--neon-cyan);"></i>
+                </div>
+                <h2 style="font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700;
+                            background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+                            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+                            margin:0 0 0.4rem;">Complete Your Profile</h2>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); margin:0;">
+                    This is collected once and used for all future analyses.
+                </p>
+            </div>
+
+            <!-- Error message -->
+            <div id="onboarding-error" style="display:none; background:rgba(255,50,50,0.12);
+                 border:1px solid rgba(255,50,50,0.3); border-radius:10px; padding:0.7rem 1rem;
+                 margin-bottom:1.2rem; color:#ff6b6b; font-size:0.82rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>
+                <span id="onboarding-error-text"></span>
+            </div>
+
+            <!-- Name -->
+            <div style="margin-bottom:1.2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-user" style="margin-right:6px; color:var(--neon-cyan);"></i>Full Name
+                </label>
+                <input type="text" id="onboarding-name" class="form-input" placeholder="e.g. Anand Singh"
+                    style="width:100%; border-radius:10px;">
+            </div>
+
+            <!-- Gender -->
+            <div style="margin-bottom:1.2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-venus-mars" style="margin-right:6px; color:var(--neon-purple);"></i>Gender
+                </label>
+                <select id="onboarding-gender" class="form-input" style="width:100%; border-radius:10px;">
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other / Non-Binary</option>
+                    <option value="Prefer not to say">Prefer Not To Say</option>
+                </select>
+            </div>
+
+            <!-- Birth Year -->
+            <div style="margin-bottom:2rem;">
+                <label style="font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.75);
+                               display:block; margin-bottom:0.4rem;">
+                    <i class="fa-solid fa-calendar-days" style="margin-right:6px; color:var(--neon-pink);"></i>Birth
+                    Year
+                </label>
+                <input type="number" id="onboarding-birth-year" class="form-input" placeholder="e.g. 2000" min="1966"
+                    max="2011" style="width:100%; border-radius:10px;">
+                <span style="font-size:0.73rem; color:rgba(255,255,255,0.35); margin-top:4px; display:block;">
+                    Used to calculate your age — never stored as-is.
+                </span>
+            </div>
+
+            <!-- Save Button -->
+            <button id="onboarding-save-btn" type="button" style="width:100%; padding:0.85rem; border:none; border-radius:12px;
+                           background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+                           color:#fff; font-size:0.95rem; font-weight:700; cursor:pointer;
+                           font-family:'Space Grotesk',sans-serif; letter-spacing:0.5px;
+                           transition:opacity 0.2s, transform 0.15s;">
+                <i class="fa-solid fa-check" style="margin-right:8px;"></i>Save & Continue to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Dynamic Particle Network Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- 1. STICKY RESPONSIVE NAVBAR -->
+    <nav class="navbar" id="main-navbar">
+        <div class="navbar-container">
+            <a href="#home" class="nav-logo">
+                <svg class="brand-svg-logo" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                    stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                    style="color: var(--neon-cyan); margin-right: 0.5rem; filter: drop-shadow(0 0 5px var(--neon-cyan));">
+                    <path
+                        d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-4.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z" />
+                </svg> AIRA
+            </a>
+            <ul class="nav-links" id="navbar-links">
+                <li><a href="index.html#home" class="nav-link active">Home</a></li>
+                <li><a href="index.html#analysis" class="nav-link">AI Analysis</a></li>
+                <li><a href="index.html#mindfulness" class="nav-link">Mindfulness</a></li>
+                <li><a href="doctor-support.html" class="nav-link">Doctor Support</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+                <li><a href="javascript:void(0)" class="nav-link" id="nav-chat-trigger">AI Chatbot</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#footer" class="nav-link">Contact</a></li>
+                <li><a href="javascript:void(0)" class="nav-link" id="nav-logout-trigger"
+                        style="color: var(--neon-rose); display: none;"><i class="fa-solid fa-power-off"
+                            style="margin-right: 4px;"></i> Logout</a></li>
+            </ul>
+            <div class="nav-hamburger" id="nav-hamburger-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. FUTURISTIC HERO SECTION -->
+    <header class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span></span> Quantum Emotion AI v2.5 Active
+            </div>
+            <h1 class="hero-title">
+                AI-Based Student <br>
+                <span class="gradient-text">Mental Health Monitoring</span> <br>
+                & Support System
+            </h1>
+            <p class="hero-description">
+                Unlock deeper self-awareness. Our platform parses academic pressure, sleep parameters, and journal
+                transcripts using the Text Analysis Model to provide dynamic stress models, actionable mental health
+                analytics,
+                and empathetic Gen-Z guidance.
+            </p>
+            <div class="hero-btns">
+                <a href="#analysis" class="neon-btn neon-btn-primary">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+                        <path
+                            d="M15 4V2M15 16v-2M8 9h2M20 9h-2M17.8 5.2l-1.4 1.4M7.6 15.4l-1.4 1.4M6.2 5.2l1.4 1.4M16.4 15.4l1.4 1.4M2 22l9-9M13 11l4-4" />
+                    </svg> Analyze Mental Health
+                </a>
+                <a href="javascript:void(0)" class="neon-btn neon-btn-secondary" id="hero-chat-trigger">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                    </svg> Talk with AI Friend
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">99.2%</span>
+                    <span class="stat-label">NLP Accuracy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">12k+</span>
+                    <span class="stat-label">Students Assisted</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">&lt;3ms</span>
+                    <span class="stat-label">Latency Response</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hologram-container">
+                <div class="holo-circle holo-circle-1"></div>
+                <div class="holo-circle holo-circle-2"></div>
+                <div class="holo-circle holo-circle-3"></div>
+                <div class="holo-core">
+                    <i class="fa-solid fa-head-side-brain"></i>
+                </div>
+
+                <!-- Voice Assistant Pulsing Waveform -->
+                <div class="holo-waveform">
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                    <div class="holo-wave-bar"></div>
+                </div>
+
+                <span class="hologram-label">AIRA CORE AI</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. DETAILED FEATURES SECTION -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <span class="section-tag">System Protocols</span>
+            <h2 class="section-title">Sophisticated Mental Health Features</h2>
+            <p class="section-desc">Explore our cutting-edge AI architecture built specifically to identify, monitor,
+                and alleviate emotional and academic struggles in student life.</p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Card 1: Stress Detection -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                </div>
+                <h3>Stress Detection</h3>
+                <p>Cross-references physiological estimates, sleep records, and workload to track acute cognitive
+                    exhaustion indexes.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 2: Depression Prediction -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25" />
+                        <line x1="8" y1="16" x2="8" y2="22" />
+                        <line x1="12" y1="18" x2="12" y2="22" />
+                        <line x1="16" y1="16" x2="16" y2="22" />
+                    </svg>
+                </div>
+                <h3>Depression Prediction</h3>
+                <p>Monitors long-term behavioral drops, persistent low moods, and withdrawal trends over structured
+                    timelines.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 3: Anxiety Analysis -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                </div>
+                <h3>Anxiety Analysis</h3>
+                <p>Gathers qualitative anxiety assessments and isolates acute nervous behaviors under exam stress
+                    periods.</p>
+                <a href="#analysis" class="feature-link">Initiate Scan <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 4: Text Analysis Model -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </div>
+                <h3>Text Analysis Model</h3>
+                <p>Parses linguistic triggers, extracting emotional sentiments (Joy, Sadness, Anger, Fear, Love,
+                    Surprise) from journals.</p>
+                <a href="#analysis" class="feature-link">NLP details <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 5: AI Wellness Suggestions -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 22C2 12 10 4 22 2M22 2c-10 0-18 8-18 18M11 11a5 5 0 0 1 7-7" />
+                    </svg>
+                </div>
+                <h3>AI Recommendations</h3>
+                <p>Generates tailored bio-behavioral recommendations, coping exercises, and micro-breaks based on
+                    calculated scores.</p>
+                <a href="#analysis" class="feature-link">Analyze details <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 6: Burnout Detection -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                    </svg>
+                </div>
+                <h3>Burnout Analytics</h3>
+                <p>Calculates the exact ratio of social activity and screen time relative to sleep to map academic
+                    saturation risks.</p>
+                <a href="#analysis" class="feature-link">Check indicators <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 7: Emotional Tracking -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Shield representing trust/safety -->
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <!-- Heart at center -->
+                        <path
+                            d="M12 14.5c-.83-.75-2.5-2.08-2.5-3.5a1.5 1.5 0 0 1 3 0 1.5 1.5 0 0 1 3 0c0 1.42-1.67 2.75-2.5 3.5z" />
+                    </svg>
+                </div>
+                <h3>Emotional Tracking</h3>
+                <p>Provides interactive mood metrics, historical tracking dashboards, and emoji stability patterns.</p>
+                <a href="#dashboard" class="feature-link">View charts <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 8: Nearby Counselor Referral -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Heart outline -->
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                        <!-- Handshake lines inside heart -->
+                        <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08v0c.82.82 2.13.85 3 .07l2.07-1.9" />
+                        <path d="m14 13 2.96-2.96a2.17 2.17 0 0 1 3.08 0v0a2.17 2.17 0 0 1 0 3.08L17 16" />
+                    </svg>
+                </div>
+                <h3>Counselor Recommendation</h3>
+                <p>Leverages native geolocation metrics to connect you immediately with verified psychologists and
+                    advisors.</p>
+                <a href="doctor-support.html" class="feature-link">Find doctor <i
+                        class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 9: AI Gen-Z Chatbot -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Two friends (users) -->
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <h3>AI Gen-Z Friend</h3>
+                <p>A conversational bot built with high emotional intelligence, speaking in relatable terms to lift your
+                    spirits.</p>
+                <a href="javascript:void(0)" class="feature-link" id="feature-chat-trigger">Talk to Aira <i
+                        class="fa-solid fa-chevron-right"></i></a>
+            </div>
+
+            <!-- Card 10: Analytics Dashboard -->
+            <div class="feature-card glass-panel">
+                <div class="feature-icon-container">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="21" x2="4" y2="14" />
+                        <line x1="4" y1="10" x2="4" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12" y2="3" />
+                        <line x1="20" y1="21" x2="20" y2="16" />
+                        <line x1="20" y1="12" x2="20" y2="3" />
+                        <line x1="1" y1="14" x2="7" y2="14" />
+                        <line x1="9" y1="8" x2="15" y2="8" />
+                        <line x1="17" y1="16" x2="23" y2="16" />
+                    </svg>
+                </div>
+                <h3>Analytics Dashboard</h3>
+                <p>Fully customizable visual arrays highlighting emotional wellness index curves over weekly intervals.
+                </p>
+                <a href="#dashboard" class="feature-link">Open metrics <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. MENTAL HEALTH ANALYSIS FORM SECTION -->
+    <section class="analysis-section" id="analysis">
+        <div class="section-header">
+            <span class="section-tag">AI Neural Diagnostic</span>
+            <h2 class="section-title"> Mental Health Scanner</h2>
+            <p class="section-desc">Express how you feel in your own words. Our Deep Learning (DistilBERT) and Machine
+                Learning models will analyze your emotional distress, assign a 3-tier risk warning (Low, Moderate,
+                High), and match you with verified specialists or 24/7 national helplines.</p>
+        </div>
+
+        <div class="analysis-container">
+            <!-- Sidebar Guide Info -->
+            <div class="analysis-sidebar-card glass-panel">
+                <h3><i class="fa-solid fa-brain" style="color: var(--neon-cyan); margin-right: 8px;"></i> How AIRA
+                    Evaluates Risk</h3>
+                <p>AIRA uses advanced natural language processing to understand your emotional state from real text—no
+                    arbitrary questionnaires or formulas.</p>
+
+                <div class="analysis-steps">
+                    <div class="step-bullet">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <h4>Text-First Journaling</h4>
+                            <p>Share your academic stress, exhaustion, or daily thoughts freely.</p>
+                        </div>
+                    </div>
+                    <div class="step-bullet">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <h4>Dual ML & DistilBERT NLP</h4>
+                            <p>Multi-modal classifiers extract sentiment, anxiety, and depression markers.</p>
+                        </div>
+                    </div>
+                    <div class="step-bullet">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <h4>3-Tier Risk & Safety Match</h4>
+                            <p>Classified into <strong>Low</strong>, <strong>Moderate</strong>, or <strong>High</strong>
+                                risk with doctor & helpline suggestions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reflection Starters -->
+                <div class="reflection-starters-box"
+                    style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,0.08);">
+                    <h4
+                        style="font-size: 0.88rem; color: var(--neon-pink); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-sparkles"></i> Quick Reflection Starters</h4>
+                    <div class="reflection-chips-grid" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button type="button" class="reflection-chip"
+                            data-prompt="I am feeling completely overwhelmed by my upcoming college exams and assignment deadlines. I can't concentrate, my mind feels foggy, and I feel terrified of failing.">
+                            🎓 Exam & Deadline Stress
+                        </button>
+                        <button type="button" class="reflection-chip"
+                            data-prompt="I feel utterly exhausted and burnt out every single day. Even after sleeping, I wake up tired with zero motivation to study or attend classes.">
+                            🥱 Burnout & Fatigue
+                        </button>
+                        <button type="button" class="reflection-chip"
+                            data-prompt="My heart races whenever I think about my future and academic performance. I feel constantly restless, tense, and anxious for no clear reason.">
+                            💔 Restlessness & Anxiety
+                        </button>
+                        <button type="button" class="reflection-chip"
+                            data-prompt="I feel lonely and disconnected from everyone around me lately. I have lost interest in my hobbies and feel down most of the day.">
+                            🌧️ Feeling Low & Isolated
+                        </button>
+                        <button type="button" class="reflection-chip"
+                            data-prompt="Today was a productive and calm day. I managed my study schedule well, went for a refreshing walk, and feel in control of my coursework.">
+                            🌿 Balanced & Peaceful Day
+                        </button>
+                    </div>
+                </div>
+
+                <div class="analysis-support-note" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <span>All inputs are 100% encrypted & confidential. AIRA is built exclusively to support student
+                        wellness.</span>
+                </div>
+            </div>
+
+            <!-- Analysis Input Form -->
+            <div class="analysis-form-card glass-panel scan-overlay" id="form-container">
+                <!-- Laser Scanning Effect overlay -->
+                <div class="scanner-laser" id="scanner-laser-bar"></div>
+
+                <form id="mental-health-form" onsubmit="event.preventDefault();">
+                    <!-- Main Textarea Journal Input -->
+                    <div class="form-group-full form-group" style="margin-bottom: 1.5rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label for="diary-input"
+                                style="font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 0;">
+                                <i class="fa-solid fa-feather-pointed"
+                                    style="color: var(--neon-cyan); margin-right: 6px;"></i> Describe How You Feel Today
+                                (Your Reflection)
+                            </label>
+                            <span id="diary-word-count"
+                                style="font-size: 0.78rem; color: var(--text-muted); font-family: 'Fira Code', monospace;">0
+                                words</span>
+                        </div>
+                        <p
+                            style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem; line-height: 1.4;">
+                            Share what's on your mind—your thoughts, exam pressures, feelings, or sleep quality. Our
+                            dual ML models parse these linguistic cues to isolate risks.
+                        </p>
+                        <textarea id="diary-input" class="form-input" rows="7"
+                            style="min-height: 160px; line-height: 1.6; font-size: 0.95rem; resize: vertical;"
+                            placeholder="Write what's on your mind... (e.g. 'I've been feeling extremely stressed about my university finals next week. It feels like too much pressure, I haven't been sleeping well, and I feel on edge all the time...')"
+                            required></textarea>
+                    </div>
+
+                    <!-- Compact Row: Quick Mood Tag & Sleep Duration -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem;"
+                        class="scanner-compact-row">
+                        <!-- Mood Selector -->
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.88rem;"><i class="fa-solid fa-face-smile"
+                                    style="color: var(--neon-purple); margin-right: 6px;"></i> Current Mood
+                                Status</label>
+                            <input type="hidden" name="selected_mood" id="selected-mood-input" value="calm">
+                            <div class="mood-selector" id="mood-selector-container" style="margin-top: 0.4rem;">
+                                <div class="mood-option" data-mood="super_happy">
+                                    <span class="emoji">😊</span>
+                                    <span>Happy</span>
+                                </div>
+                                <div class="mood-option active" data-mood="calm">
+                                    <span class="emoji">😌</span>
+                                    <span>Calm</span>
+                                </div>
+                                <div class="mood-option" data-mood="stressed">
+                                    <span class="emoji">😕</span>
+                                    <span>Stressed</span>
+                                </div>
+                                <div class="mood-option" data-mood="anxious">
+                                    <span class="emoji">😫</span>
+                                    <span>Anxious</span>
+                                </div>
+                                <div class="mood-option" data-mood="melancholy">
+                                    <span class="emoji">😭</span>
+                                    <span>Down</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sleep Hours -->
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="sleep-hours" style="font-size: 0.88rem;"><i class="fa-solid fa-bed"
+                                    style="color: var(--neon-cyan); margin-right: 6px;"></i> Sleep (Hours)</label>
+                            <input type="number" id="sleep-hours" class="form-input" placeholder="7" min="0" max="24"
+                                value="7" style="margin-top: 0.4rem;" required>
+                        </div>
+                    </div>
+
+                    <!-- Hidden legacy fields for background model compatibility -->
+                    <input type="hidden" id="study-hours" value="6">
+                    <input type="hidden" id="work-hours" value="0">
+                    <input type="hidden" id="screen-time" value="5">
+                    <input type="hidden" id="academic-pressure" value="5">
+                    <input type="hidden" id="study-satisfaction" value="6">
+                    <input type="hidden" id="dietary-habits" value="Moderate">
+                    <input type="hidden" id="social-media" value="Instagram">
+                    <input type="hidden" id="anxiety-level" value="4">
+                    <input type="hidden" id="stress-level" value="5">
+                    <input type="hidden" id="financial-stress" value="4">
+                    <input type="hidden" id="family-history" value="No">
+
+                    <button type="submit" class="neon-btn neon-btn-pink form-group-full"
+                        style="width: 100%; border-radius: 12px; font-size: 1.05rem; padding: 1rem; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem;"
+                        id="submit-scan-btn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Run Neural ML Risk Scan
+                    </button>
+                </form>
+
+                <!-- Simulated Flask API log console output -->
+                <div class="scan-console-log" id="terminal-console"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. AI PREDICTION RESULTS SECTION -->
+    <section class="results-section" id="results-display">
+        <div class="dashboard-title-bar">
+            <div>
+                <span class="section-tag" style="margin-bottom:0.2rem;">Processed Diagnostics</span>
+                <h2>Core AI Predictions & Risk Warning</h2>
+            </div>
+            <div class="dashboard-meta">
+                <span><i class="fa-solid fa-lock"></i> Secured Node</span>
+                <span>|</span>
+                <span id="diagnostic-timestamp">2026-05-24 10:49:31</span>
+            </div>
+        </div>
+
+        <!-- 3-TIER MENTAL HEALTH RISK WARNING BANNER -->
+        <div class="risk-tier-banner glass-panel" id="risk-tier-banner"
+            style="margin-bottom: 2rem; padding: 1.8rem; border-radius: 16px; border: 1px solid rgba(0, 242, 254, 0.3); background: rgba(13, 20, 38, 0.85); box-shadow: 0 0 25px rgba(0, 242, 254, 0.1);">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <span style="font-size: 1.3rem;" id="risk-tier-icon">🟢</span>
+                    <div>
+                        <span
+                            style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Diagnostic
+                            Risk Assessment</span>
+                        <h3 id="risk-tier-heading"
+                            style="font-size: 1.4rem; margin: 0; color: var(--neon-emerald); font-family: 'Space Grotesk', sans-serif;">
+                            Low Risk Level</h3>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span class="action-plan-badge" id="risk-tier-confidence"
+                        style="background: rgba(0, 242, 254, 0.12); color: var(--neon-cyan); padding: 0.35rem 0.8rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.25);">
+                        ML Confidence: 94.8%
+                    </span>
+                    <span class="action-plan-badge" id="risk-tier-category-pill"
+                        style="background: rgba(16, 185, 129, 0.15); color: var(--neon-emerald); padding: 0.35rem 0.8rem; border-radius: 8px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); text-transform: uppercase;">
+                        Low Risk
+                    </span>
+                </div>
+            </div>
+            <p id="risk-tier-description"
+                style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 0; line-height: 1.6;">
+                Your emotional and psychological scores indicate a healthy, balanced state. Your daily routine is
+                supportive of positive mental wellbeing.
+            </p>
+        </div>
+
+        <div class="results-grid">
+            <!-- Left Side: Risk breakdowns -->
+            <div class="results-cards-container">
+                <!-- Stress Risk Card -->
+                <div class="result-card glass-panel" id="stress-risk-card">
+                    <div class="result-card-header">
+                        <h4>Stress Risk</h4>
+                        <i class="fa-solid fa-bolt-lightning" style="color: var(--neon-cyan);"></i>
+                    </div>
+                    <span class="derived-sublabel"
+                        style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">Emotion
+                        Dimension</span>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-stress" cx="50" cy="50" r="40"
+                                stroke="var(--neon-cyan)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-stress">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-stress">Calm</div>
+                </div>
+
+                <!-- Anxiety Risk Card -->
+                <div class="result-card glass-panel" id="anxiety-risk-card">
+                    <div class="result-card-header">
+                        <h4>Anxiety Risk</h4>
+                        <i class="fa-solid fa-heart-pulse" style="color: var(--neon-purple);"></i>
+                    </div>
+                    <span class="derived-sublabel"
+                        style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">DistilBERT
+                        NLP</span>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-anxiety" cx="50" cy="50" r="40"
+                                stroke="var(--neon-purple)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-anxiety">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-anxiety">Stable</div>
+                </div>
+
+                <!-- Depression Risk Card -->
+                <div class="result-card glass-panel" id="depression-risk-card">
+                    <div class="result-card-header">
+                        <h4>Depression Risk</h4>
+                        <i class="fa-solid fa-cloud-showers-heavy" style="color: var(--neon-rose);"></i>
+                    </div>
+                    <span class="derived-sublabel"
+                        style="font-size: 0.65rem; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: -6px; margin-bottom: 8px; text-align: left;">ML
+                        Model Inferred</span>
+                    <div class="circle-progress-container">
+                        <svg class="circle-progress-svg" width="100" height="100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-bar" id="ring-depression" cx="50" cy="50" r="40"
+                                stroke="var(--neon-rose)"></circle>
+                        </svg>
+                        <div class="circle-percentage" id="perc-depression">0%</div>
+                    </div>
+                    <div class="risk-badge" id="badge-depression">Optimal</div>
+                </div>
+
+                <!-- Wellness Index Full Card -->
+                <div class="wellness-card glass-panel">
+                    <div class="wellness-text">
+                        <h3>Overall Wellness Index</h3>
+                        <p id="wellness-interpretation">Your cognitive loads are in harmony with physiological patterns.
+                            AI recommends maintaining physical breaks every two hours.</p>
+                    </div>
+                    <div class="wellness-score-container">
+                        <div class="wellness-score-num" id="total-wellness-score">85</div>
+                        <div class="wellness-score-label">Wellness Score</div>
+                    </div>
+                </div>
+
+                <!-- Neural Model API Pipelines Panel -->
+                <div class="result-card glass-panel"
+                    style="grid-column: span 3; width: 100%; display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem;">
+                    <div class="result-card-header"
+                        style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <h4
+                            style="font-size: 1.1rem; color: var(--neon-cyan); margin: 0; font-family: 'Space Grotesk', sans-serif;">
+                            <i class="fa-solid fa-server" style="margin-right: 8px;"></i> Neural Model API Pipelines
+                        </h4>
+                        <span class="action-plan-badge" id="mcp-status-badge"
+                            style="background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); padding: 0.25rem 0.6rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(0, 242, 254, 0.3);">API
+                            Synced</span>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; text-align: center; width: 100%;">
+                        <!-- Text Probability -->
+                        <div class="mcp-metric-box"
+                            style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span
+                                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Text
+                                Risk Probability</span>
+                            <span id="metric-text-prob"
+                                style="font-size: 1.8rem; font-weight: 800; color: var(--neon-purple); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">NLP ML Classifier</span>
+                        </div>
+
+                        <!-- Behavioral Prior Probability -->
+                        <div class="mcp-metric-box"
+                            style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span
+                                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Behavioral
+                                Prior</span>
+                            <span id="metric-behavioral-prob"
+                                style="font-size: 1.8rem; font-weight: 800; color: var(--neon-cyan); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Student Baseline</span>
+                        </div>
+
+                        <!-- Combined Probability -->
+                        <div class="mcp-metric-box"
+                            style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span
+                                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Combined
+                                Probability</span>
+                            <span id="metric-combined-prob"
+                                style="font-size: 1.8rem; font-weight: 800; color: var(--neon-pink); font-family: 'Space Grotesk', sans-serif;">0.0%</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Weighted Aggregation</span>
+                        </div>
+
+                        <!-- 3-Tier Risk Level -->
+                        <div class="mcp-metric-box"
+                            style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span
+                                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">3-Tier
+                                Risk Level</span>
+                            <span id="metric-final-risk"
+                                style="font-size: 1.5rem; font-weight: 800; color: var(--neon-emerald); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase;">Low</span>
+                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Diagnostic Tier</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Text Analysis Model visualizer -->
+            <div class="nlp-visualization-card glass-panel">
+                <div class="nlp-header">
+                    <h3><i class="fa-solid fa-quote-left"></i> NLP Semantic Breakdown</h3>
+                    <span class="nlp-badge">DistilBERT Spectrum</span>
+                </div>
+
+                <p class="nlp-interpretation" id="nlp-interpretation-text">"Analyzing emotional parameters. Sentiment
+                    registers slight anxiety tags corresponding to academic keyword logs."</p>
+
+                <div class="nlp-metrics-list">
+                    <!-- Joy -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Joy / Optimism</span>
+                            <span id="nlp-joy-perc">40%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-joy-bar" style="background: var(--neon-emerald);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sadness -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Sadness / Melancholy</span>
+                            <span id="nlp-sad-perc">20%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-sad-bar" style="background: var(--neon-rose);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Anger / Burnout -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Anger / Frustration</span>
+                            <span id="nlp-anger-perc">15%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-anger-bar" style="background: var(--neon-orange);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anxiety / Fear -->
+                    <div class="nlp-metric-item">
+                        <div class="nlp-metric-label">
+                            <span>Fear / Anxiety</span>
+                            <span id="nlp-fear-perc">25%</span>
+                        </div>
+                        <div class="nlp-progress-bg">
+                            <div class="nlp-progress-fill" id="nlp-fear-bar" style="background: var(--neon-purple);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Highlighted Semantic Keywords Box -->
+                <div class="nlp-keywords-box">
+                    <span class="nlp-keywords-title">Extracted Keyword Sentiment Triggers:</span>
+                    <div class="nlp-keywords-list" id="nlp-extracted-keywords">
+                        <span class="nlp-keyword-tag">exam</span>
+                        <span class="nlp-keyword-tag">exhausted</span>
+                        <span class="nlp-keyword-tag">sleep</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 24/7 NATIONAL EMERGENCY HELPLINES SECTION -->
+        <div class="helplines-card glass-panel" id="national-helplines-section"
+            style="margin-top: 2.5rem; padding: 2rem; border-radius: 16px; border: 1px solid rgba(255, 0, 127, 0.25); background: rgba(13, 20, 38, 0.85);">
+            <div class="action-plan-header"
+                style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-pink);">24/7 Immediate
+                        Help</span>
+                    <h3
+                        style="font-size: 1.3rem; margin: 0; color: var(--text-main); font-family: 'Space Grotesk', sans-serif;">
+                        <i class="fa-solid fa-phone-volume" style="color: var(--neon-pink); margin-right: 8px;"></i>
+                        National Mental Health Helplines</h3>
+                </div>
+                <span class="action-plan-badge"
+                    style="background: rgba(255, 0, 127, 0.15); color: var(--neon-pink); padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(255, 0, 127, 0.3);">
+                    Free & Confidential
+                </span>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                If you or a fellow student are experiencing severe emotional distress, anxiety crises, or need someone
+                to talk to, these certified national support lines are available 24/7:
+            </p>
+
+            <div class="helplines-grid" id="helplines-cards-container"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem;">
+                <!-- Tele-MANAS -->
+                <div class="helpline-item-card glass-panel"
+                    style="padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem;">
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--neon-cyan);">Tele-MANAS</h4>
+                            <span
+                                style="font-size: 0.7rem; background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;">Govt
+                                of India</span>
+                        </div>
+                        <p
+                            style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem; line-height: 1.4;">
+                            Comprehensive round-the-clock tele-mental health support across all Indian languages.</p>
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.6rem;">
+                        <span
+                            style="font-family: 'Fira Code', monospace; font-size: 1.1rem; font-weight: 700; color: #fff;">14416</span>
+                        <a href="tel:14416" class="neon-btn neon-btn-cyan"
+                            style="padding: 0.35rem 0.8rem; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">
+                            <i class="fa-solid fa-phone"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Kiran Helpline -->
+                <div class="helpline-item-card glass-panel"
+                    style="padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(127, 0, 255, 0.2); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem;">
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--neon-purple);">KIRAN Mental Health
+                            </h4>
+                            <span
+                                style="font-size: 0.7rem; background: rgba(127, 0, 255, 0.15); color: var(--neon-purple); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;">24/7
+                                Toll-Free</span>
+                        </div>
+                        <p
+                            style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem; line-height: 1.4;">
+                            Govt mental health helpline providing early screening, first-aid, psychological support and
+                            crisis management.</p>
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.6rem;">
+                        <span
+                            style="font-family: 'Fira Code', monospace; font-size: 0.92rem; font-weight: 700; color: #fff;">1800-599-0019</span>
+                        <a href="tel:18005990019" class="neon-btn neon-btn-purple"
+                            style="padding: 0.35rem 0.8rem; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">
+                            <i class="fa-solid fa-phone"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 988 Lifeline -->
+                <div class="helpline-item-card glass-panel"
+                    style="padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(255, 0, 127, 0.2); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem;">
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--neon-pink);">988 Lifeline</h4>
+                            <span
+                                style="font-size: 0.7rem; background: rgba(255, 0, 127, 0.15); color: var(--neon-pink); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;">Global
+                                Standard</span>
+                        </div>
+                        <p
+                            style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem; line-height: 1.4;">
+                            24/7, free and confidential support for people in distress, prevention, and crisis
+                            resources.</p>
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.6rem;">
+                        <span
+                            style="font-family: 'Fira Code', monospace; font-size: 1.1rem; font-weight: 700; color: #fff;">988</span>
+                        <a href="tel:988" class="neon-btn neon-btn-pink"
+                            style="padding: 0.35rem 0.8rem; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">
+                            <i class="fa-solid fa-phone"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Crisis Text Line -->
+                <div class="helpline-item-card glass-panel"
+                    style="padding: 1.2rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem;">
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--neon-emerald);">Crisis Text Line</h4>
+                            <span
+                                style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: var(--neon-emerald); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 600;">Text
+                                / SMS</span>
+                        </div>
+                        <p
+                            style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.6rem; line-height: 1.4;">
+                            Free 24/7 text support at your fingertips. Connect with a crisis counselor over SMS.</p>
+                    </div>
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.6rem;">
+                        <span
+                            style="font-family: 'Fira Code', monospace; font-size: 0.88rem; font-weight: 700; color: #fff;">Text
+                            HOME to 741741</span>
+                        <a href="sms:741741?body=HOME" class="neon-btn neon-btn-cyan"
+                            style="padding: 0.35rem 0.8rem; font-size: 0.8rem; border-radius: 6px; text-decoration: none;">
+                            <i class="fa-solid fa-comment-sms"></i> Text
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MATCHED VERIFIED DOCTORS & SPECIALISTS SECTION -->
+        <div class="matched-doctors-card glass-panel" id="matched-doctors-section"
+            style="margin-top: 2.5rem; padding: 2.5rem;">
+            <div class="action-plan-header"
+                style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-cyan);">Clinical
+                        Network</span>
+                    <h3><i class="fa-solid fa-user-doctor" style="color: var(--neon-cyan); margin-right: 8px;"></i>
+                        Recommended Specialists & Counselors</h3>
+                </div>
+                <span class="action-plan-badge" id="doctors-count-badge"
+                    style="background: rgba(0, 242, 254, 0.15); color: var(--neon-cyan); padding: 0.25rem 0.6rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">
+                    Top Matched
+                </span>
+            </div>
+
+            <p class="action-plan-desc" style="margin-bottom: 2rem;">Based on your ML diagnostic assessment, our
+                clinical matching system suggests these verified adolescent and youth mental health professionals:</p>
+
+            <div class="doctors-grid" id="matched-doctors-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Dynamically populated doctor cards -->
+            </div>
+        </div>
+
+        <!-- AI Personalized Recommendations Section -->
+        <div class="recommendations-card glass-panel" id="ai-recommendations-section"
+            style="margin-top: 2.5rem; padding: 2.5rem; display: none;">
+            <div class="action-plan-header"
+                style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-cyan);">AI Engine</span>
+                    <h3><i class="fa-solid fa-lightbulb" style="color: var(--neon-cyan); margin-right: 8px;"></i>
+                        Personalized Coping Recommendations</h3>
+                </div>
+            </div>
+
+            <p class="action-plan-desc" style="margin-bottom: 2rem;">Based on your ML distress prediction, our AI engine
+                has tailored these action steps:</p>
+
+            <div class="recommendations-grid" id="recommendations-cards-container"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Dynamically populated card items -->
+            </div>
+        </div>
+
+        <!-- Tailored Wellness Action Plan Card -->
+        <div class="action-plan-card glass-panel" id="wellness-action-plan" style="margin-top: 2.5rem; display: none;">
+            <div class="action-plan-header">
+                <div>
+                    <span class="section-tag" style="margin-bottom: 0.2rem; color: var(--neon-pink);">AI Recovery
+                        Protocol</span>
+                    <h3>Personalized Wellness Action Plan</h3>
+                </div>
+                <div class="action-plan-badge" id="action-plan-badge-status">0/4 Completed</div>
+            </div>
+
+            <p class="action-plan-desc">Based on your computed NLP and emotional coefficients, AIRA has compiled these
+                target behaviors to restore your cognitive balance.</p>
+
+            <!-- Dynamic progress bar -->
+            <div class="action-progress-container">
+                <div class="action-progress-bg">
+                    <div class="action-progress-fill" id="action-progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <span class="action-progress-text" id="action-progress-percent">0%</span>
+            </div>
+
+            <!-- Checklist container -->
+            <div class="action-checklist" id="action-checklist-container">
+                <!-- Checkbox items are injected dynamically in script.js -->
+            </div>
+
+            <!-- Unlocked Success Badge -->
+            <div class="action-success-badge" id="action-success-alert" style="display: none;">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <h4>Neural Balance Restored! ✨</h4>
+                    <p>Great job completing your personalized wellness checklist! Your nervous system will thank you for
+                        these intentional micro-breaks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. STRESS & EMOTIONAL ANALYTICS DASHBOARD -->
+    <section class="dashboard-section" id="dashboard">
+        <div class="section-header"
+            style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.2rem; border-bottom: none; margin-bottom: 3.5rem; width: 100%;">
+            <div style="text-align: center; width: 100%;">
+                <span class="section-tag" style="margin: 0 auto 0.6rem auto; display: table;">Interactive
+                    Analytics</span>
+                <h2 class="section-title" style="text-align: center; margin: 0 auto 0.8rem auto;">Academic & Stress
+                    Trend Matrix</h2>
+                <p class="section-desc" style="margin: 0 auto; max-width: 650px; text-align: center;">Monitor continuous
+                    temporal behaviors, sleep correlations, and mood thresholds in our quantum reporting dashboard.</p>
+            </div>
+            <div
+                style="display: flex; align-items: center; gap: 0.8rem; justify-content: center; margin-top: 0.5rem; width: 100%;">
+                <label for="trend-month-select"
+                    style="font-size: 0.88rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif; font-weight: 500;">Select
+                    Month:</label>
+                <select id="trend-month-select" class="glass-select"
+                    style="font-size: 0.85rem; padding: 0.4rem 1.2rem 0.4rem 0.8rem; background: rgba(6, 8, 19, 0.8); color: var(--text-main); border: 1px solid var(--border-glass); border-radius: 8px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; outline: none; transition: var(--transition-fast); box-shadow: 0 0 10px rgba(0, 242, 254, 0.05);">
+                    <!-- Dynamically populated -->
+                </select>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Line Graph -->
+            <div class="chart-card glass-panel">
+                <h4>Stress & Anxiety Trend Path <i class="fa-solid fa-chart-line"></i></h4>
+                <div class="chart-container">
+                    <canvas id="stressTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Radar / Doughnut Graph -->
+            <div class="chart-card glass-panel">
+                <h4>Linguistic Emotion Distribution <i class="fa-solid fa-chart-pie"></i></h4>
+                <div class="chart-container">
+                    <canvas id="emotionProfileChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Mood Heatmap Calendar Card -->
+            <div class="heatmap-card glass-panel" style="grid-column: span 2;">
+                <div class="heatmap-header">
+                    <h4>Monthly Mood Stability Heatmap <i class="fa-solid fa-calendar-days"
+                            style="color: var(--neon-pink);"></i></h4>
+                    <!-- Legend -->
+                    <div class="heatmap-legend">
+                        <span class="legend-item"><span class="legend-dot"
+                                style="background-color: transparent; border: 1px solid rgba(255, 255, 255, 0.22); box-shadow: none;"></span>
+                            Unvisited</span>
+                        <span class="legend-item"><span class="legend-dot"
+                                style="background-color: rgba(0, 255, 135, 0.25); border: 1px solid rgba(0, 255, 135, 0.4); box-shadow: none;"></span>
+                            1-39 Wellness</span>
+                        <span class="legend-item"><span class="legend-dot"
+                                style="background-color: rgba(255, 159, 67, 0.25); border: 1px solid rgba(255, 159, 67, 0.4); box-shadow: none;"></span>
+                            40-59 Wellness</span>
+                        <span class="legend-item"><span class="legend-dot"
+                                style="background-color: rgba(255, 0, 85, 0.25); border: 1px solid rgba(255, 0, 85, 0.4); box-shadow: none;"></span>
+                            60-79 Wellness</span>
+                        <span class="legend-item"><span class="legend-dot"
+                                style="background-color: rgba(127, 0, 255, 0.25); border: 1px solid rgba(127, 0, 255, 0.4); box-shadow: var(--glow-purple);"></span>
+                            80-100 Wellness</span>
+                    </div>
+                </div>
+
+                <div class="heatmap-body">
+                    <div class="heatmap-grid" id="mood-heatmap-grid">
+                        <!-- 30 cells will be dynamically injected here in script.js -->
+                    </div>
+
+                    <!-- Side Day Inspector Panel -->
+                    <div class="heatmap-inspector glass-panel" id="heatmap-inspector-panel">
+                        <div class="inspector-empty" id="inspector-empty-msg">
+                            <i class="fa-solid fa-circle-info"
+                                style="font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 0.5rem;"></i>
+                            <p>Click any logged day square to inspect historical sentiment logs and wellness index
+                                scores.</p>
+                        </div>
+                        <div class="inspector-details" id="inspector-content" style="display: none;">
+                            <div class="inspector-header">
+                                <h5 id="inspector-day-title">Day 12 Details</h5>
+                                <span class="inspector-score-badge" id="inspector-wellness-score">85 Wellness</span>
+                            </div>
+                            <div class="inspector-metrics-grid"
+                                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.8rem; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem; text-align: left;">
+                                <div class="inspector-metric-row">
+                                    <span
+                                        style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Date:</span>
+                                    <span id="inspector-date"
+                                        style="font-size: 0.75rem; color: var(--text-main); font-weight: 600; display: block;">2026-06-12</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span
+                                        style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Risk
+                                        Level:</span>
+                                    <span id="inspector-risk-level"
+                                        style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: block;">Low</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span
+                                        style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Behavioral
+                                        Prob:</span>
+                                    <span id="inspector-behavioral-prob"
+                                        style="font-size: 0.75rem; color: var(--neon-cyan); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                                <div class="inspector-metric-row">
+                                    <span
+                                        style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Text
+                                        Prob:</span>
+                                    <span id="inspector-text-prob"
+                                        style="font-size: 0.75rem; color: var(--neon-purple); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                                <div class="inspector-metric-row" style="grid-column: span 2;">
+                                    <span
+                                        style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase;">Combined
+                                        Prob:</span>
+                                    <span id="inspector-combined-prob"
+                                        style="font-size: 0.75rem; color: var(--neon-pink); font-weight: 600; display: block;">0.0%</span>
+                                </div>
+                            </div>
+                            <p class="inspector-mood-label"
+                                style="font-size: 0.8rem; margin-bottom: 0.5rem; text-align: left;">Primary Sentiment:
+                                <span id="inspector-mood-name">Joy 😊</span></p>
+                            <div class="inspector-journal-quote">
+                                <i class="fa-solid fa-quote-left"></i>
+                                <span id="inspector-journal-text">"Did really well on the exam today, feeling so
+                                    accomplished!"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Emoji Status Strip -->
+            <div class="analytics-status-strip glass-panel" id="emoji-status-strip">
+                <div class="status-indicator">
+                    <span class="status-emoji-large" id="status-emoji">😌</span>
+                    <div class="status-info-text">
+                        <h3 id="status-message-title">Stress Category: Slight Stress</h3>
+                        <p id="status-message-desc">Your profiles suggest stable resilience. Recommended protocol: 7
+                            hours sleep cycles.</p>
+                    </div>
+                </div>
+                <div class="status-action-box">
+                    <div class="status-score-bubble" id="status-score-display">Wellness score: 85</div>
+                    <a href="doctor-support.html" class="neon-btn neon-btn-primary"
+                        style="padding: 0.6rem 1.4rem; border-radius: 12px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-hospital-user"></i> View Counselors
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mini Dashboard statistics metrics cards -->
+            <div class="analytics-cards-grid">
+                <!-- 1 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-shield-heart" style="color: var(--neon-cyan);"></i>
+                    <h5>Stability Index</h5>
+                    <span id="stat-stability">78%</span>
+                </div>
+                <!-- 2 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-bed" style="color: var(--neon-emerald);"></i>
+                    <h5>Sleep Quality</h5>
+                    <span id="stat-sleep">Good</span>
+                </div>
+                <!-- 3 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-fire" style="color: var(--neon-orange);"></i>
+                    <h5>Burnout Threat</h5>
+                    <span class="derived-sublabel"
+                        style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-top: 2px; margin-bottom: 4px;">Derived
+                        Indicator</span>
+                    <span id="stat-burnout">Low</span>
+                </div>
+                <!-- 4 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-weight-hanging" style="color: var(--neon-rose);"></i>
+                    <h5>Academic Strain</h5>
+                    <span class="derived-sublabel"
+                        style="font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-top: 2px; margin-bottom: 4px;">Derived
+                        Indicator</span>
+                    <span id="stat-academic">Medium</span>
+                </div>
+                <!-- 5 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-user-group" style="color: var(--neon-purple);"></i>
+                    <h5>Social Balance</h5>
+                    <span id="stat-social">Balanced</span>
+                </div>
+                <!-- 6 -->
+                <div class="analytics-small-card glass-panel">
+                    <i class="fa-solid fa-face-laugh-beam" style="color: var(--neon-pink);"></i>
+                    <h5>Primary Emotion</h5>
+                    <span id="stat-primary-emo">Calm</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6.5 MINDFULNESS & GUIDED BREATHING CENTER -->
+    <section class="mindfulness-section" id="mindfulness">
+        <div class="section-header">
+            <span class="section-tag" style="color: var(--neon-cyan);">De-escalation Node</span>
+            <h2 class="section-title">Guided Breathing & Mindfulness</h2>
+            <p class="section-desc">Pace your nervous system, reset mental saturation indexes, and restore emotional
+                resilience with interactive bio-rhythm selectors.</p>
+        </div>
+
+        <div class="mindfulness-container">
+            <!-- Left Pane: Control Panel -->
+            <div class="mindfulness-controls glass-panel">
+                <h3>Breathing Controls</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select your breathing
+                    routine below, hit Play, and follow the visual bubble indicators.</p>
+
+                <!-- Routine Selection Cards -->
+                <div class="breath-rhythm-list">
+                    <div class="breath-rhythm-card active" data-rhythm="box">
+                        <div class="rhythm-meta">
+                            <h5>Box Breathing</h5>
+                            <span>4s Inhale • 4s Hold • 4s Exhale • 4s Hold</span>
+                        </div>
+                        <p class="rhythm-desc">Navy SEAL standard for extreme focus under high stress.</p>
+                    </div>
+
+                    <div class="breath-rhythm-card" data-rhythm="relax">
+                        <div class="rhythm-meta">
+                            <h5>4-7-8 Relax Routine</h5>
+                            <span>4s Inhale • 7s Hold • 8s Exhale</span>
+                        </div>
+                        <p class="rhythm-desc">Clinically proven sequence for grounding acute anxieties.</p>
+                    </div>
+
+                    <div class="breath-rhythm-card" data-rhythm="coherent">
+                        <div class="rhythm-meta">
+                            <h5>Coherent Breathing</h5>
+                            <span>5s Inhale • 5s Exhale</span>
+                        </div>
+                        <p class="rhythm-desc">Harmonizes heart rate and oxygen coefficients for clarity.</p>
+                    </div>
+                </div>
+
+                <!-- Playback Controllers -->
+                <div class="breath-play-controls">
+                    <button class="neon-btn neon-btn-primary" id="breath-btn-play"
+                        style="flex: 1; border-radius: 12px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-play" style="margin-right: 0.4rem;"></i> Start Session
+                    </button>
+                    <button class="neon-btn neon-btn-secondary" id="breath-btn-reset"
+                        style="padding: 0.8rem 1.2rem; border-radius: 12px;" disabled>
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Pane: Breathing Bubble Visualizer -->
+            <div class="mindfulness-visualizer glass-panel">
+                <!-- Visual morphing background glow rings -->
+                <div class="visual-glow-ring ring-1"></div>
+                <div class="visual-glow-ring ring-2"></div>
+
+                <!-- Pulsing Core Bubble -->
+                <div class="breath-bubble-outer" id="breath-visual-bubble">
+                    <div class="breath-bubble-inner">
+                        <span class="breath-state-label" id="breath-text-indicator">Paced</span>
+                        <span class="breath-timer" id="breath-countdown">4</span>
+                    </div>
+                </div>
+
+                <div class="breath-instructions" id="breath-instruction-text">Choose a rhythm and press Start to
+                    synchronize your breath.</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 8. DETAILED ABOUT PLATFORM SECTION -->
+    <section class="about-section" id="about">
+        <div class="about-grid">
+            <div class="about-info-side">
+                <span class="section-tag">Platform Manifesto</span>
+                <h2 class="section-title">Decoding Academic Stress with Ethical AI</h2>
+                <p class="section-desc" style="margin-bottom:1.5rem;">
+                    AIRA stands at the intersection of cognitive clinical sciences and neural machine learning. We
+                    believe that student mental wellness should never be an afterthought in fast-paced modern learning
+                    environments.
+                </p>
+                <p class="section-desc">
+                    By tracking continuous metrics like academic hours, digital strain ratios, and subjective journal
+                    expressions, AIRA computes deep-layered risk profiles. This provides students with proactive
+                    recommendations and seamless pathways to counselors long before acute fatigue shifts to clinical
+                    levels.
+                </p>
+
+                <div class="about-features-list">
+                    <!-- Feature Item 1 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Fine-Tuned NLP Classifiers</h5>
+                            <p>Powered by fine-tuned Text Analysis Models mapping syntactic features to emotional
+                                labels.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Feature Item 2 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Proactive Geolocation Sourcing</h5>
+                            <p>Computes Haversine distances to match you immediately with nearest certified therapist
+                                nodes.</p>
+                        </div>
+                    </div>
+                    <!-- Feature Item 3 -->
+                    <div class="about-feature-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <h5>Ethical Anonymization Standard</h5>
+                            <p>Data privacy first. We never monetize sensitive metrics or logs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-image-side">
+                <div class="about-visual-box glass-panel">
+                    <div class="about-visual-overlay"></div>
+
+                    <!-- Futuristic Node Network Visualization -->
+                    <div class="neuro-nodes-container">
+                        <div class="neuro-node neuro-node-1"></div>
+                        <div class="neuro-node neuro-node-2"></div>
+                        <div class="neuro-node neuro-node-3"></div>
+                        <div class="neuro-node neuro-node-4"></div>
+                        <div class="neuro-node neuro-node-5"></div>
+                    </div>
+
+                    <svg class="neuro-line-svg">
+                        <path class="neuro-signal" d="M 144 114 L 96 228 L 288 266 L 336 152 L 264 76 Z" />
+                        <path
+                            d="M 144 114 L 96 228 M 96 228 L 288 266 M 288 266 L 336 152 M 336 152 L 264 76 M 264 76 L 144 114 M 144 114 L 288 266" />
+                    </svg>
+
+                    <div class="hologram-container" style="width:200px; height:200px; z-index:2;">
+                        <div class="holo-circle holo-circle-1" style="border-color: var(--neon-pink);"></div>
+                        <div class="holo-core"
+                            style="width:70px; height:70px; box-shadow: 0 0 15px rgba(225, 0, 255, 0.4);">
+                            <i class="fa-solid fa-microchip-ai" style="font-size:1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FLOATING EMOTIONAL SMART CHATBOT ("AIRA") -->
+    <div class="chatbot-widget" id="chatbot-wrapper">
+        <!-- Floating Chatbox Panel -->
+        <div class="chatbot-panel glass-panel" id="chat-panel">
+            <!-- Header -->
+            <div class="chatbot-header">
+                <div class="chatbot-identity">
+                    <div class="chatbot-avatar-ring">
+                        <div class="chatbot-avatar-inner">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="chatbot-info">
+                        <h4>Aira <span></span></h4>
+                        <span class="chatbot-status">AI Bestie • Online</span>
+                    </div>
+                </div>
+                <button class="chatbot-close-btn" id="close-chat-widget">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Messages Window -->
+            <div class="chatbot-messages" id="chatbot-msg-container">
+                <div class="chat-msg chat-msg-bot">
+                    Hey! 👋 I'm Aira, your digital bestie! Life as a student can be super exhausting 😭 I'm here to
+                    listen, hype you up, and help you chill. How's your energy level today? 💙
+                </div>
+                <!-- Dynamic typing indicator dots -->
+                <div class="typing-indicator" id="chat-typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestion Vent Chips Scrollable Tray -->
+            <div class="chatbot-chips-container" id="chatbot-quick-chips">
+                <span class="chat-chip" data-msg="I feel super stressed by exams">😫 Exam Panic</span>
+                <span class="chat-chip" data-msg="I am burnt out and exhausted">🔥 Burnout</span>
+                <span class="chat-chip" data-msg="Can you help me focus?">📚 Focus Help</span>
+                <span class="chat-chip" data-msg="Teach me a breathing exercise">😌 Calm Me</span>
+                <span class="chat-chip" data-msg="I feel lonely and isolated">🥺 Feeling Lonely</span>
+            </div>
+
+            <!-- Input area -->
+            <div class="chatbot-input-area">
+                <input type="text" class="chatbot-input" id="chatbot-input-field"
+                    placeholder="Vent to Aira... (e.g. 'I feel stressed')">
+                <button class="chatbot-send-btn" id="chatbot-submit-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <div class="chatbot-toggle-btn" id="open-chat-widget" title="Vent to Aira">
+            <i class="fa-solid fa-comment-dots"></i>
+        </div>
+    </div>
+
+    <!-- 10. FOOTER & CONTACT COLUMN -->
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <!-- Column 1: App Bio -->
+            <div class="footer-info-column">
+                <a href="#home" class="footer-info-logo">
+                    <i class="fa-solid fa-brain"></i> AIRA
+                </a>
+                <p class="footer-info-desc">
+                    Futuristic Student Mental Health Monitoring & support protocols. Merging cognitive classification
+                    logic with geolocation medical referrals.
+                </p>
+                <div class="footer-socials">
+                    <a href="https://github.com" class="social-icon-btn" target="_blank"><i
+                            class="fa-brands fa-github"></i></a>
+                    <a href="https://twitter.com" class="social-icon-btn" target="_blank"><i
+                            class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://discord.com" class="social-icon-btn" target="_blank"><i
+                            class="fa-brands fa-discord"></i></a>
+                    <a href="https://linkedin.com" class="social-icon-btn" target="_blank"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Column 2: Quick Navigation links -->
+            <div class="footer-column">
+                <h4>Protocols</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="#home">Quantum Home</a></li>
+                    <li class="footer-link-item"><a href="#features">Platform Features</a></li>
+                    <li class="footer-link-item"><a href="#analysis">Neuro Assessment</a></li>
+                    <li class="footer-link-item"><a href="#dashboard">Stability Dashboard</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Resources -->
+            <div class="footer-column">
+                <h4>Sourcing</h4>
+                <ul class="footer-links">
+                    <li class="footer-link-item"><a href="doctor-support.html">Therapist Locator</a></li>
+                    <li class="footer-link-item"><a href="#about">Technical Manifesto</a></li>
+                    <li class="footer-link-item"><a href="tel:988">988 Emergency Crisis</a></li>
+                    <li class="footer-link-item"><a href="#analysis">NLP Confidence Scale</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Contact details -->
+            <div class="footer-column">
+                <h4>Quantum Node</h4>
+                <ul class="footer-contact-details">
+                    <li><i class="fa-solid fa-square-envelope"></i> support@aira-wellness.ai</li>
+                    <li><i class="fa-solid fa-square-phone"></i> +1 (800) 555-AIRA</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Jk Lakshmipat University</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom bar copyright details -->
+        <div class="footer-bottom-bar">
+            <span>&copy; 2026 AIRA Wellness Systems. Designed under Ethical AI Guidelines. All rights reserved.</span>
+            <div class="footer-legal-links">
+                <a href="javascript:void(0)" id="footer-link-privacy">Privacy Policy</a>
+                <a href="javascript:void(0)" id="footer-link-terms">Terms & Conditions</a>
+                <a href="javascript:void(0)" id="footer-link-ai">AI Guidelines</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 11. GLOBAL POLICY MODAL OVERLAY -->
+    <div class="policy-modal" id="aira-policy-modal" role="dialog" aria-modal="true"
+        aria-labelledby="policy-modal-title" tabindex="-1">
+        <div class="policy-modal-content glass-panel">
+            <div class="policy-modal-header">
+                <div class="policy-brand">
+                    <i class="fa-solid fa-shield-halved brand-glow"
+                        style="color: var(--neon-cyan); font-size: 1.15rem; margin-right: 6px;"></i>
+                    <span id="policy-modal-title"
+                        style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff; letter-spacing: 0.5px;">AIRA
+                        Policy Hub</span>
+                </div>
+                <button class="policy-modal-close" id="policy-modal-close-btn" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div class="policy-tabs">
+                <button class="policy-tab-btn active" data-policy="privacy">Privacy Policy</button>
+                <button class="policy-tab-btn" data-policy="terms">Terms & Conditions</button>
+                <button class="policy-tab-btn" data-policy="ai">AI Guidelines</button>
+            </div>
+
+            <div class="policy-search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"
+                    style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); font-size: 0.85rem;"></i>
+                <input type="text" id="policy-search-input" placeholder="Search policy guidelines..."
+                    style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.2rem; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff; font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; outline: none; transition: all 0.3s ease;">
+                <button id="policy-search-clear"
+                    style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 1.15rem; outline: none; display: none;">&times;</button>
+            </div>
+
+            <div class="policy-content-body" id="policy-content-viewer">
+                <div class="policy-loading"
+                    style="text-align: center; padding: 3rem 0; color: var(--text-muted); font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px; color: var(--neon-cyan);"></i>
+                    Loading policy details...
+                </div>
+            </div>
+
+            <div class="policy-modal-footer"
+                style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.8rem; margin-top: auto; font-size: 0.7rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif;">
+                <span id="policy-last-updated">Last Updated: June 7, 2026</span>
+                <span style="color: rgba(255,255,255,0.25);"><i class="fa-solid fa-fingerprint"
+                        style="margin-right: 4px;"></i> Secure Node Policy</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script File -->
+    <script src="script.js?v=2.0"></script>
+</body>
+
+</html>

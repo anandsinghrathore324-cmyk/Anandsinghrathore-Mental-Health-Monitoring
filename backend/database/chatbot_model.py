@@ -12,7 +12,7 @@ class ChatbotModel:
             "user_id": ObjectId(user_id) if user_id else None,
             "message": message.strip(),
             "response": response.strip(),
-            "timestamp": datetime.datetime.utcnow()
+            "timestamp": datetime.datetime.now(datetime.timezone.utc)
         }
         
         result = db_manager.db.chatbot_history.insert_one(chat_doc)
@@ -27,7 +27,7 @@ class ChatbotModel:
         try:
             cursor = db_manager.db.chatbot_history.find(
                 {"user_id": ObjectId(user_id)}
-            ).sort("timestamp", 1).limit(limit) # sorted chronologically ascending
+            ).sort("timestamp", -1).limit(limit)
             
             chats = []
             for doc in cursor:
@@ -35,6 +35,7 @@ class ChatbotModel:
                 doc["user_id"] = str(doc["user_id"])
                 doc["timestamp"] = doc["timestamp"].isoformat()
                 chats.append(doc)
+            chats.reverse()  # Return chronological order (oldest to newest among recent limit)
             return chats
         except Exception:
             return []

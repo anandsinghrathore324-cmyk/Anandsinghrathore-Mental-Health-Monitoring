@@ -170,8 +170,8 @@ class ToolRouter:
                 "arguments": {}
             }
 
-        # D. Future Calendar Service
-        calendar_keywords = ["calendar", "schedule", "deadlines", "upcoming events", "exam dates", "tasks for tomorrow", "agenda"]
+        # D. Calendar Service (specific exam/deadline queries)
+        calendar_keywords = ["upcoming exam dates", "exam dates", "my exam dates", "schedule of exams", "upcoming exams"]
         if any(kw in msg_lower for kw in calendar_keywords):
             return {
                 "route": "calendar",
@@ -179,8 +179,8 @@ class ToolRouter:
                 "arguments": {}
             }
 
-        # E. Future Habit Tracker
-        habit_keywords = ["habit", "habit tracker", "routine", "streaks", "habit streak", "track my habits"]
+        # E. Habit Tracker Service (specific tracker queries)
+        habit_keywords = ["habit tracker", "check my habit tracker", "track my habits", "my habit streaks", "habit streaks"]
         if any(kw in msg_lower for kw in habit_keywords):
             return {
                 "route": "habit",
@@ -206,7 +206,11 @@ class ConversationOrchestrator:
     @staticmethod
     def orchestrate(message: str, user_id: Optional[str] = None) -> str:
         start_time = time.time()
-        cleaned = message.strip()
+        cleaned = message.strip() if message else ""
+
+        # Step 0: Fast return for empty message
+        if not cleaned:
+            return ResponseValidator.validate("", None)
 
         # Step 1: Crisis Detection check
         from chatbot.crisis_handler import CrisisHandler
@@ -309,13 +313,15 @@ class ConversationOrchestrator:
             SessionCache.set(user_id, assessment_ctx)
 
         # Step 5: Prompt Construction
-        coaching_modes = {"seeking_advice", "goal_planning", "progress_update", "venting"}
+        coaching_modes = {"seeking_advice", "goal_planning", "progress_update", "venting", "general_chat"}
         if intent_decision["mode"] in coaching_modes:
             prompt = WellnessCoach.build_coaching_prompt(
                 cleaned,
                 intent_decision,
                 updated_coaching_ctx,
-                assessment_ctx.get("scores")
+                assessment_ctx.get("scores"),
+                history=assessment_ctx.get("history"),
+                student_profile=assessment_ctx.get("student_profile"),
             )
             if useful_memories:
                 mem_lines = [f"* {m}" for m in useful_memories]
@@ -356,18 +362,13 @@ class ConversationOrchestrator:
         except Exception:
             pass
 
-        # Step 8: Metrics Telemetry Logging
-        total_latency = (time.time() - start_time) * 1000
-        MetricsLogger.log(
-            user_id=user_id,
-            total_time_ms=total_latency,
-            prompt_size=len(prompt),
-            coaching_mode=coaching_mode,
-            crisis_flag=False,
-            assessment_loaded=assessment_loaded_db,
-            model_used=llm_provider.model_name,
-            generation_latency_ms=gen_latency
-        )
+        # Update session history cache for immediate multi-turn continuity
+        if user_id and assessment_ctx is not None:
+            hist = list(assessment_ctx.get("history") or [])
+            hist.append({"role": "student", "message": cleaned})
+            hist.append({"role": "aira", "message": final_reply})
+            assessment_ctx["history"] = hist[-10:]
+            SessionCache.set(user_id, assessment_ctx)
 
         return final_reply
 

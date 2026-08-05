@@ -19,7 +19,7 @@ def predict(current_user):
     # The validation middleware already attempted this, but we do it again here
     # as a safety net so the prediction service always receives age and gender.
     if "age" not in data and current_user.get("birth_year"):
-        data["age"] = datetime.datetime.utcnow().year - int(current_user["birth_year"])
+        data["age"] = datetime.datetime.now(datetime.timezone.utc).year - int(current_user["birth_year"])
     if "gender" not in data and current_user.get("gender"):
         data["gender"] = current_user["gender"]
 
@@ -113,3 +113,22 @@ def analyze_text(current_user):
             "status": "error",
             "message": f"NLP pipeline error: {str(e)}"
         }), 500
+
+@prediction_bp.route("/doctors", methods=["GET"])
+def get_doctors():
+    """Returns verified youth mental health doctors directory."""
+    from services.prediction_service import DOCTOR_DIRECTORY
+    return jsonify({
+        "status": "success",
+        "doctors": DOCTOR_DIRECTORY
+    }), 200
+
+@prediction_bp.route("/helplines", methods=["GET"])
+def get_helplines():
+    """Returns 24/7 national mental health helplines."""
+    from services.prediction_service import NATIONAL_HELPLINES
+    return jsonify({
+        "status": "success",
+        "helplines": NATIONAL_HELPLINES
+    }), 200
+

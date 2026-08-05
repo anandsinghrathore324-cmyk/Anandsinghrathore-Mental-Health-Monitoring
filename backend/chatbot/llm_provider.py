@@ -24,8 +24,8 @@ class GroqProvider(LLMProvider):
     """Production implementation delegating to the Groq API."""
     
     def generate_response(self, prompt: str) -> str:
-        api_key = os.getenv("GROQ_API_KEY")
-        model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        api_key = (os.getenv("GROQ_API_KEY") or "").strip()
+        model = (os.getenv("GROQ_MODEL") or "llama-3.3-70b-versatile").strip()
         
         if not api_key:
             return "Groq API key is missing. Please configure GROQ_API_KEY in your environment."

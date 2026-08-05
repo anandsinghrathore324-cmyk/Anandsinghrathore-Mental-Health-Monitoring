@@ -87,43 +87,54 @@ class DistilBertClassifier:
                 raw_predictions = output[0] if isinstance(output[0], list) else output
                 raw_scores = {pred["label"]: float(pred["score"]) for pred in raw_predictions}
                 
-                scores = {
-                    "Joy": raw_scores.get("joy", 0.0) + raw_scores.get("love", 0.0),
-                    "Melancholy": raw_scores.get("sadness", 0.0),
-                    "Anxiety": raw_scores.get("fear", 0.0),
-                    "Burnout/Frustration": raw_scores.get("anger", 0.0),
-                    "Neutral": raw_scores.get("surprise", 0.0)
-                }
+                joy_val = raw_scores.get("joy", 0.0) + raw_scores.get("love", 0.0)
+                sadness_val = raw_scores.get("sadness", 0.0)
+                fear_val = raw_scores.get("fear", 0.0)
+                anger_val = raw_scores.get("anger", 0.0)
+                neutral_val = raw_scores.get("surprise", 0.0)
                 
-                # Normalize mapped scores
-                total_sum = sum(scores.values())
+                total_sum = joy_val + sadness_val + fear_val + anger_val + neutral_val
                 if total_sum > 0:
-                    scores = {k: v / total_sum for k, v in scores.items()}
+                    joy_val /= total_sum
+                    sadness_val /= total_sum
+                    fear_val /= total_sum
+                    anger_val /= total_sum
+                    neutral_val /= total_sum
+                
+                scores = {
+                    "Joy": round(joy_val, 4),
+                    "Sadness": round(sadness_val, 4),
+                    "Melancholy": round(sadness_val, 4),
+                    "Fear": round(fear_val, 4),
+                    "Anxiety": round(fear_val, 4),
+                    "Anger": round(anger_val, 4),
+                    "Burnout/Frustration": round(anger_val, 4),
+                    "Neutral": round(neutral_val, 4)
+                }
                 
                 # Determine dominant emotion
-                dominant_emotion = max(scores, key=scores.get)
-                confidence = scores[dominant_emotion]
-                
-                # Confidence Threshold check (< 0.60)
-                if confidence < 0.60:
-                    return {
-                        "sentiment": "Uncertain",
-                        "emotion": "Insufficient Information",
-                        "confidence": round(confidence, 3),
-                        "scores": {"Joy": 0.0, "Melancholy": 0.0, "Anxiety": 0.0, "Burnout/Frustration": 0.0, "Neutral": 0.0},
-                        "message": "Unable to confidently analyze journal entry."
-                    }
-                
-                sentiment_map = {
-                    "Joy": "Positive",
-                    "Melancholy": "Negative",
-                    "Anxiety": "Negative",
-                    "Burnout/Frustration": "Negative",
-                    "Neutral": "Neutral"
+                primary_map = {
+                    "Joy": joy_val,
+                    "Melancholy": sadness_val,
+                    "Sadness": sadness_val,
+                    "Anxiety": fear_val,
+                    "Burnout/Frustration": anger_val,
+                    "Neutral": neutral_val
                 }
+                dominant_emotion = max(primary_map, key=primary_map.get)
+                confidence = primary_map[dominant_emotion]
+                
+                if confidence < 0.35:
+                    final_sentiment = "Uncertain"
+                elif dominant_emotion in ["Joy"]:
+                    final_sentiment = "Positive"
+                elif dominant_emotion in ["Melancholy", "Sadness", "Anxiety", "Fear", "Burnout/Frustration", "Anger"]:
+                    final_sentiment = "Negative"
+                else:
+                    final_sentiment = "Neutral"
                 
                 return {
-                    "sentiment": sentiment_map.get(dominant_emotion, "Neutral"),
+                    "sentiment": final_sentiment,
                     "emotion": dominant_emotion,
                     "confidence": round(confidence, 3),
                     "scores": scores
@@ -134,60 +145,104 @@ class DistilBertClassifier:
         # 4. High-Fidelity Rule-Based Lexicon Fallback
         text_lower = clean_text.lower()
         
-        # Scoring variables using mapped keys
-        scores = {
-            "Joy": 0.1,
-            "Melancholy": 0.1,
-            "Burnout/Frustration": 0.1,
-            "Anxiety": 0.1,
-            "Neutral": 0.1
-        }
+        # Base prior weights
+        joy_weight = 0.05
+        sadness_weight = 0.05
+        fear_weight = 0.05
+        anger_weight = 0.05
+        neutral_weight = 0.20
         
         # Keyword triggers
-        stress_triggers = ["stress", "exhaust", "tire", "pressure", "burnout", "grades", "exam", "deadline", "fail"]
-        anxiety_triggers = ["anxious", "worry", "panic", "scare", "shake", "nervous", "dread", "fear"]
-        sad_triggers = ["sad", "lonely", "melancholy", "cry", "hopeless", "empty", "depress", "worthless"]
-        joy_triggers = ["happy", "joy", "accomplished", "excited", "glad", "proud", "relax", "calm", "love"]
+        mild_stress = ["grades", "exam", "deadline", "midterm", "assignment", "busy", "workload", "study", "tired", "pressure"]
+        severe_stress = ["burnout", "breakdown", "drowning", "suffocating", "cannot cope", "exhausted", "overwhelmed"]
         
-        for word in stress_triggers:
-            if word in text_lower: scores["Burnout/Frustration"] += 0.5
-        for word in anxiety_triggers:
-            if word in text_lower: scores["Anxiety"] += 0.5
-        for word in sad_triggers:
-            if word in text_lower: scores["Melancholy"] += 0.5
+        mild_anxiety = ["worry", "worried", "nervous", "restless", "trouble sleeping", "insomnia", "uneasy", "stressed", "stress"]
+        severe_anxiety = ["anxious", "anxiety", "panic", "panicking", "scared", "shaking", "dread", "heart racing", "paralyzed", "terrified"]
+        
+        mild_sadness = ["sad", "lonely", "alone", "isolated", "gloomy", "down"]
+        severe_depression = ["hopeless", "empty", "depress", "depressed", "depression", "worthless", "miserable", "giving up", "no point", "lost", "crying", "despair"]
+        
+        joy_triggers = [
+            "happy", "joy", "accomplished", "excited", "glad", "proud", "relax",
+            "relaxed", "calm", "peace", "peaceful", "love", "great", "motivated",
+            "productive", "wonderful", "refreshing", "good", "confident", "thriving", "hopeful"
+        ]
+        
+        for word in mild_stress:
+            if word in text_lower:
+                anger_weight += 0.12
+                fear_weight += 0.08
+        for word in severe_stress:
+            if word in text_lower:
+                anger_weight += 0.55
+                fear_weight += 0.30
+                
+        for word in mild_anxiety:
+            if word in text_lower:
+                fear_weight += 0.18
+                anger_weight += 0.08
+        for word in severe_anxiety:
+            if word in text_lower:
+                fear_weight += 0.65
+                anger_weight += 0.15
+                
+        for word in mild_sadness:
+            if word in text_lower:
+                sadness_weight += 0.20
+        for word in severe_depression:
+            if word in text_lower:
+                sadness_weight += 0.75
+                fear_weight += 0.15
+                
         for word in joy_triggers:
-            if word in text_lower: scores["Joy"] += 0.5
-            
-        # Normalization
-        sum_scores = sum(scores.values())
-        normalized_scores = {k: v / sum_scores for k, v in scores.items()}
+            if word in text_lower:
+                joy_weight += 0.65
+                
+        sum_weights = joy_weight + sadness_weight + fear_weight + anger_weight + neutral_weight
+        joy_val = joy_weight / sum_weights
+        sadness_val = sadness_weight / sum_weights
+        fear_val = fear_weight / sum_weights
+        anger_val = anger_weight / sum_weights
+        neutral_val = neutral_weight / sum_weights
         
-        dominant = max(normalized_scores, key=normalized_scores.get)
-        confidence = normalized_scores[dominant]
-        
-        # Confidence Threshold check for Lexicon Fallback (< 0.60)
-        if confidence < 0.60:
-            return {
-                "sentiment": "Uncertain",
-                "emotion": "Insufficient Information",
-                "confidence": round(confidence, 3),
-                "scores": {"Joy": 0.0, "Melancholy": 0.0, "Anxiety": 0.0, "Burnout/Frustration": 0.0, "Neutral": 0.0},
-                "message": "Unable to confidently analyze journal entry."
-            }
-            
-        sentiment_map = {
-            "Joy": "Positive",
-            "Melancholy": "Negative",
-            "Burnout/Frustration": "Negative",
-            "Anxiety": "Negative",
-            "Neutral": "Neutral"
+        scores = {
+            "Joy": round(joy_val, 4),
+            "Sadness": round(sadness_val, 4),
+            "Melancholy": round(sadness_val, 4),
+            "Fear": round(fear_val, 4),
+            "Anxiety": round(fear_val, 4),
+            "Anger": round(anger_val, 4),
+            "Burnout/Frustration": round(anger_val, 4),
+            "Neutral": round(neutral_val, 4)
         }
         
+        primary_map = {
+            "Joy": joy_val,
+            "Melancholy": sadness_val,
+            "Sadness": sadness_val,
+            "Anxiety": fear_val,
+            "Burnout/Frustration": anger_val,
+            "Neutral": neutral_val
+        }
+        dominant = max(primary_map, key=primary_map.get)
+        confidence = primary_map[dominant]
+        
+        # Check if text had any emotional trigger words or was completely flat
+        has_triggers = any(w in text_lower for w in mild_stress + severe_stress + mild_anxiety + severe_anxiety + mild_sadness + severe_depression + joy_triggers)
+        if not has_triggers or confidence < 0.35:
+            final_sentiment = "Uncertain"
+        elif dominant in ["Joy"]:
+            final_sentiment = "Positive"
+        elif dominant in ["Melancholy", "Sadness", "Anxiety", "Fear", "Burnout/Frustration", "Anger"]:
+            final_sentiment = "Negative"
+        else:
+            final_sentiment = "Neutral"
+        
         return {
-            "sentiment": sentiment_map[dominant],
+            "sentiment": final_sentiment,
             "emotion": dominant,
             "confidence": round(confidence, 3),
-            "scores": normalized_scores
+            "scores": scores
         }
 
 # Global singleton classifier node instance

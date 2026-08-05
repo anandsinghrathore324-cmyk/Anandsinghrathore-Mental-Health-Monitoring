@@ -22,7 +22,7 @@ class MoodModel:
             "$set": {
                 "mood": mood.strip().lower(),
                 "wellness": int(wellness),
-                "updated_at": datetime.datetime.utcnow()
+                "updated_at": datetime.datetime.now(datetime.timezone.utc)
             }
         }
         if journal is not None:

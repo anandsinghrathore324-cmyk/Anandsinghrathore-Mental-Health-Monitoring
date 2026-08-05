@@ -69,13 +69,14 @@ def auth_headers(mock_db):
             "profile_complete": True,
             "age": 21,
             "gender": "Male",
-            "created_at": datetime.datetime.utcnow() - datetime.timedelta(days=10)
+            "created_at": datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=10)
         }},
         upsert=True,
     )
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "sub": _MOCK_USER_OID,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2),
+        "exp": now_utc + datetime.timedelta(hours=2),
     }
     token = jwt.encode(payload, Config.JWT_SECRET_KEY, algorithm="HS256")
     return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}

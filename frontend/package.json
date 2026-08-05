@@ -1,0 +1,13 @@
+{
+  "name": "aira-frontend",
+  "version": "2.0.0",
+  "description": "AIRA - AI Student Mental Health & Support Platform (Frontend Client)",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server . -p 3000 -c-1",
+    "start": "npx http-server . -p 3000 -c-1"
+  },
+  "keywords": ["mental-health", "ai", "wellness", "frontend"],
+  "author": "AIRA Team",
+  "license": "ISC"
+}

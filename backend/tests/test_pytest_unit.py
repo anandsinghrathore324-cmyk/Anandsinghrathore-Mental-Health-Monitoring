@@ -328,7 +328,7 @@ class TestCrisisHandler:
             "user_id": ObjectId(user_id),
             "risk_level": "High", "stress_score": 90, "anxiety_score": 80,
             "depression_score": 70, "burnout_score": 85, "wellness_score": 20,
-            "emotion": "Fear", "created_at": datetime.datetime.utcnow()
+            "emotion": "Fear", "created_at": datetime.datetime.now(datetime.timezone.utc)
         })
         r = self._ch().detect_crisis("I want to kill myself", user_id=user_id)
         assert r["is_crisis"] is True and r["confidence"] == 0.99
@@ -527,8 +527,11 @@ class TestDistilBertClassifier:
         assert "error" in res
 
     def test_lexicon_fallback_low_confidence(self):
-        # Text with no keyword triggers, making confidence flat/low
-        res = self._clf().analyze_sentiment("This is a completely plain text with no emotional trigger words whatsoever.")
+        # Text with no keyword triggers — tests lexical fallback branch explicitly
+        from unittest.mock import patch
+        clf = self._clf()
+        with patch.object(clf, "pipeline", None):
+            res = clf.analyze_sentiment("This is a completely plain text with no emotional trigger words whatsoever.")
         assert res["sentiment"] == "Uncertain"
 
     def test_lexicon_fallback_high_confidence_joy(self):
@@ -618,11 +621,16 @@ class TestDoctorService:
              "specialization": "General", "specialization_type": "general",
              "experience": 3, "rating": 4.0, "hospital": "H2"},
         ])
-        results = self._ds().get_nearby_specialists(28.61, 77.20, specialization_filter="psychologist")
+        from unittest.mock import patch
+        with patch("services.doctor_service.GooglePlacesService.fetch_nearby_specialists", return_value=[]):
+            results = self._ds().get_nearby_specialists(28.61, 77.20, specialization_filter="psychologist")
         assert all(r["specialization_type"] == "psychologist" for r in results)
 
     def test_empty_doctor_list_returns_empty(self, mock_db):
-        assert self._ds().get_nearby_specialists(28.6, 77.2) == []
+        from unittest.mock import patch
+        with patch("services.doctor_service.GooglePlacesService.fetch_nearby_specialists", return_value=[]):
+            result = self._ds().get_nearby_specialists(28.6, 77.2)
+        assert result == []
 
 
 # ─────────────────────────────────────────────────────────────────────────────

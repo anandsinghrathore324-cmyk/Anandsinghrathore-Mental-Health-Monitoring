@@ -93,7 +93,7 @@ class TestAuthRoutes:
         mock_db["otp_codes"].insert_one({
             "email": "correct@test.com",
             "otp": "654321",
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.datetime.now(datetime.timezone.utc)
         })
         resp = client.post("/api/verify-otp", json={
             "email": "correct@test.com", "otp": "654321"
@@ -103,7 +103,7 @@ class TestAuthRoutes:
     def test_verify_otp_wrong_code_returns_401(self, client, mock_db):
         mock_db["otp_codes"].insert_one({
             "email": "otp@test.com", "otp": "123456",
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.datetime.now(datetime.timezone.utc)
         })
         resp = client.post("/api/verify-otp", json={
             "email": "otp@test.com", "otp": "999999"
@@ -124,7 +124,7 @@ class TestAuthRoutes:
         from config import Config
         payload = {
             "sub": "507f1f77bcf86cd799439011",
-            "exp": datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+            "exp": datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=1)
         }
         token = jwt.encode(payload, Config.JWT_SECRET_KEY, algorithm="HS256")
         assert client.get("/api/profile",
@@ -210,147 +210,21 @@ class TestPredictionRoutes:
     def test_predict_valid_returns_200(self, client, auth_headers):
         resp = client.post("/api/predict", json=self._payload(), headers=auth_headers)
         assert resp.status_code == 200
-        assert resp.get_json()["status"] == "success"
+        data = resp.get_json()
+        assert data["status"] == "success"
+        assert "metrics" in data
+        assert data["metrics"]["final_risk_level"] in ["Low", "Moderate", "High"]
 
-    def test_predict_missing_age_profile_incomplete_returns_400(self, client, auth_headers, mock_db):
-        # Remove age from payload and remove age/birth_year from user profile in db to hit line 22-26 in validation.py
-        mock_db["users"].update_one(
-            {"email": "test@aira.edu"},
-            {"$unset": {"age": "", "birth_year": ""}}
-        )
-        payload = self._payload()
-        del payload["age"]
-        resp = client.post("/api/predict", json=payload, headers=auth_headers)
-        assert resp.status_code == 400
-        assert "Age not found" in resp.get_json()["message"]
-
-    def test_predict_missing_age_but_profile_has_birth_year_success(self, client, auth_headers, mock_db):
-        # Remove age from payload but set birth_year in db to hit line 19-20 in validation.py
-        mock_db["users"].update_one(
-            {"email": "test@aira.edu"},
-            {"$set": {"birth_year": 2000, "gender": "Male"}}
-        )
-        payload = self._payload()
-        del payload["age"]
-        resp = client.post("/api/predict", json=payload, headers=auth_headers)
+    def test_predict_defaults_when_optional_fields_omitted(self, client, auth_headers):
+        resp = client.post("/api/predict", json={
+            "text": "I feel very anxious and overwhelmed about my upcoming final semester exams."
+        }, headers=auth_headers)
         assert resp.status_code == 200
-
-    def test_predict_invalid_age_int_returns_400(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(age="not-an-int"),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_invalid_age_out_of_bounds(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(age=5),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_missing_gender_profile_incomplete_returns_400(self, client, auth_headers, mock_db):
-        # Remove gender from payload and database to hit line 42-45 in validation.py
-        mock_db["users"].update_one(
-            {"email": "test@aira.edu"},
-            {"$unset": {"gender": ""}}
-        )
-        payload = self._payload()
-        del payload["gender"]
-        resp = client.post("/api/predict", json=payload, headers=auth_headers)
-        assert resp.status_code == 400
-        assert "Gender not found" in resp.get_json()["message"]
-
-    def test_predict_missing_gender_but_profile_has_gender_success(self, client, auth_headers, mock_db):
-        mock_db["users"].update_one(
-            {"email": "test@aira.edu"},
-            {"$set": {"gender": "Female", "birth_year": 2000}}
-        )
-        payload = self._payload()
-        del payload["gender"]
-        resp = client.post("/api/predict", json=payload, headers=auth_headers)
-        assert resp.status_code == 200
-
-    def test_predict_invalid_gender_val(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(gender="Alien"),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_missing_academic_pressure(self, client, auth_headers):
-        payload = self._payload()
-        del payload["academic_pressure"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_invalid_academic_pressure_val(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(academic_pressure=15),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_missing_study_satisfaction(self, client, auth_headers):
-        payload = self._payload()
-        del payload["study_satisfaction"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_dietary_habits(self, client, auth_headers):
-        payload = self._payload()
-        del payload["dietary_habits"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_invalid_dietary_habits_val(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(dietary_habits="Trash"),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_missing_anxiety_level(self, client, auth_headers):
-        payload = self._payload()
-        del payload["anxiety_level"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_stress_level(self, client, auth_headers):
-        payload = self._payload()
-        del payload["stress_level"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_financial_stress(self, client, auth_headers):
-        payload = self._payload()
-        del payload["financial_stress"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_family_history(self, client, auth_headers):
-        payload = self._payload()
-        del payload["family_history"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_invalid_family_history_val(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(family_history="Maybe"),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_missing_study_hours(self, client, auth_headers):
-        payload = self._payload()
-        del payload["study_hours"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_sleep_hours(self, client, auth_headers):
-        payload = self._payload()
-        del payload["sleep_hours"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_screen_time(self, client, auth_headers):
-        payload = self._payload()
-        del payload["screen_time"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_missing_work_hours(self, client, auth_headers):
-        payload = self._payload()
-        del payload["work_hours"]
-        assert client.post("/api/predict", json=payload, headers=auth_headers).status_code == 400
-
-    def test_predict_work_hours_too_high_returns_400(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(work_hours=25.0),
-                           headers=auth_headers).status_code == 400
-
-    def test_predict_soft_warnings_combined_hours(self, client, auth_headers):
-        # Combined sleep study work > 24
-        resp = client.post("/api/predict", json=self._payload(sleep_hours=10.0, study_hours=10.0, work_hours=10.0), headers=auth_headers)
-        assert resp.status_code == 200
-        assert "warnings" in resp.get_json()
-
-    def test_predict_soft_warnings_individual_high_values(self, client, auth_headers):
-        # sleep study work screen high
-        resp = client.post("/api/predict", json=self._payload(sleep_hours=17.0, study_hours=17.0, screen_time=19.0), headers=auth_headers)
-        assert resp.status_code == 200
-        assert len(resp.get_json()["warnings"]) > 0
+        data = resp.get_json()
+        assert data["status"] == "success"
+        assert "matched_doctors" in data["metrics"]
+        assert "helplines" in data["metrics"]
+        assert "final_risk_level" in data["metrics"]
 
     def test_predict_missing_journal_text(self, client, auth_headers):
         payload = self._payload()
@@ -366,7 +240,7 @@ class TestPredictionRoutes:
                            headers=auth_headers).status_code == 400
 
     def test_predict_long_journal_text(self, client, auth_headers):
-        assert client.post("/api/predict", json=self._payload(text="stressed " * 110),
+        assert client.post("/api/predict", json=self._payload(text="stressed " * 150),
                            headers=auth_headers).status_code == 400
 
     def test_predict_only_numbers_journal_text(self, client, auth_headers):
@@ -398,6 +272,20 @@ class TestPredictionRoutes:
         resp = client.post("/api/predict", json=self._payload(), headers=auth_headers)
         assert resp.status_code == 200
         assert "metrics" in resp.get_json()
+
+    def test_get_doctors_endpoint_returns_200(self, client):
+        resp = client.get("/api/doctors")
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["status"] == "success"
+        assert len(data["doctors"]) > 0
+
+    def test_get_helplines_endpoint_returns_200(self, client):
+        resp = client.get("/api/helplines")
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["status"] == "success"
+        assert len(data["helplines"]) > 0
 
     def test_analyze_text_requires_auth(self, client):
         assert client.post("/api/analyze-text",

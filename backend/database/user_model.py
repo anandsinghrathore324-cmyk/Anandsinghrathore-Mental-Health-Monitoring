@@ -16,7 +16,7 @@ class UserModel:
             "name": name.strip(),
             "email": email.strip().lower(),
             "password": hashed_password,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.datetime.now(datetime.timezone.utc)
         }
         
         result = db_manager.db.users.insert_one(user_doc)

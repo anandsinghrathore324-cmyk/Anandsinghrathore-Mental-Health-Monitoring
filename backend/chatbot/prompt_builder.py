@@ -24,10 +24,7 @@ Prompt structure:
 
 from __future__ import annotations
 
-# Compact system header -- covers all essential SYSTEM_PROMPT instructions
-# in ~30% of the character count. Used instead of the full SYSTEM_PROMPT
-# to reduce token overhead while preserving behavioral fidelity.
-_COMPACT_SYSTEM = """You are AIRA, an AI Student Wellness Assistant. Support students on mental health, stress, anxiety, depression, burnout, sleep, study habits, and wellbeing only. Decline unrelated topics politely. Never diagnose or prescribe. Be warm, empathetic, natural, concise (50-80 words), and end responses with a brief supportive question."""
+_COMPACT_SYSTEM = """You are AIRA, a warm, supportive, and intelligent AI Student Wellness Companion & Digital Bestie. Talk like an empathetic, encouraging student peer and mentor. Help with emotional wellness, stress, study habits, exam preparation, motivation, and everyday student life. Answer questions warmly, give practical tips when asked, celebrate positive moments, and never diagnose or prescribe. Keep responses natural, engaging, and supportive."""
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -98,12 +95,14 @@ def _build_wellbeing_summary(
     )
 
 
-def _format_recommendations(recommendations: list[dict]) -> str:
+def _format_recommendations(recommendations: list[dict | str] | None) -> str:
     """Return up to 2 one-line recommendation hints as compact bullets."""
     if not recommendations:
         return ""
 
-    def _key(rec: dict) -> int:
+    def _key(rec: dict | str) -> int:
+        if isinstance(rec, str):
+            return len(_RECOMMENDATION_PRIORITY)
         cat = rec.get("category", "")
         try:
             return _RECOMMENDATION_PRIORITY.index(cat)
@@ -111,7 +110,12 @@ def _format_recommendations(recommendations: list[dict]) -> str:
             return len(_RECOMMENDATION_PRIORITY)
 
     top = sorted(recommendations, key=_key)[:_MAX_RECOMMENDATIONS]
-    lines = [f"- {r['title'].strip()}" for r in top if r.get("title")]
+    lines = []
+    for r in top:
+        if isinstance(r, str) and r.strip():
+            lines.append(f"- {r.strip()}")
+        elif isinstance(r, dict) and r.get("title"):
+            lines.append(f"- {r['title'].strip()}")
     return "\n".join(lines) if lines else ""
 
 

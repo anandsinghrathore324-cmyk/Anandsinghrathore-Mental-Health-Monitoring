@@ -77,7 +77,7 @@ class MemoryManager:
             update = {
                 "$set": {
                     "fact": item["fact"],
-                    "timestamp": datetime.datetime.utcnow()
+                    "timestamp": datetime.datetime.now(datetime.timezone.utc)
                 }
             }
             try:

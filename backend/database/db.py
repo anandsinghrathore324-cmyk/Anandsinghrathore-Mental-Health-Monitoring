@@ -25,13 +25,16 @@ class DatabaseManager:
             logger.info(f"Successfully connected to MongoDB database: {db_name}")
             self.setup_indexes()
         except Exception as e:
-            logger.error(f"Failed to connect to MongoDB secure node: {str(e)}")
-            logger.warning("Deploying resilient mongomock in-memory database fallback...")
+            logger.error(f"Failed to connect to MongoDB instance: {str(e)}")
+            if Config.IS_PRODUCTION:
+                logger.critical("PRODUCTION FATAL: Cannot connect to MongoDB cluster in production environment. Halting.")
+                raise e
+            logger.warning("DEVELOPMENT: Local MongoDB unreachable. Deploying in-memory mongomock fallback for local testing...")
             try:
                 import mongomock
                 self.client = mongomock.MongoClient()
                 self.db = self.client["aira_wellness"]
-                logger.info("In-memory mongomock fallback database initialized successfully.")
+                logger.info("In-memory mongomock development database initialized successfully.")
                 self.setup_indexes()
             except Exception as mock_err:
                 logger.critical(f"Failed to initialize mongomock fallback: {str(mock_err)}")
