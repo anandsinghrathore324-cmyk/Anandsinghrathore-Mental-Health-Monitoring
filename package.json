@@ -1,0 +1,15 @@
+{
+  "name": "aira-mental-health-analyzer",
+  "version": "1.0.0",
+  "description": "AIRA — AI-Based Student Mental Health Monitoring & Support Platform",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite --port 3000 --open"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}
