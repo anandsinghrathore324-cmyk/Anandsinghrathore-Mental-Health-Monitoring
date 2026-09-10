@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIRA — Practice School-I Final Defense Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #060813;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --primary: #38bdf8;
+      --secondary: #a855f7;
+      --accent: #f43f5e;
+      --success: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide-container {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      padding: 3rem 4.5rem;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(30px);
+      background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      flex: 1;
+      align-items: center;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      flex: 1;
+      align-items: stretch;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.8rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+    .card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .card p, .card li {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 0.6rem;
+    }
+    ul { list-style: none; }
+    li { position: relative; padding-left: 1.5rem; }
+    li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+    .stat-number {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .slide-img {
+      max-width: 100%;
+      max-height: 58vh;
+      object-fit: contain;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      background: #ffffff;
+      padding: 0.5rem;
+    }
+    /* Controls Footer */
+    .controls {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #fff;
+      padding: 0.4rem 1.2rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--primary);
+      color: #000;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-right: 0.4rem;
+    }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .badge-danger { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid #f43f5e; }
+  </style>
+</head>
+<body>
+
+  <div class="slide-container">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" style="justify-content: center; align-items: center; text-align: center;">
+      <div class="kicker">PRACTICE SCHOOL – I FINAL EXAMINATION & DEFENSE</div>
+      <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">AIRA: AI-Based Student Mental Health<br>Monitoring & Support Platform</h1>
+      <p style="font-size: 1.3rem; color: #94a3b8; max-width: 850px; margin-bottom: 2.5rem;">
+        A Decoupled Full-Stack Architecture Integrating Dual ML Risk Diagnostics, Conversational AI Crisis Triaging, and Live Spatial Specialist Referrals
+      </p>
+      <div style="display: flex; gap: 2rem; max-width: 900px; width: 100%; text-align: left;">
+        <div class="card" style="flex: 1; border-color: var(--primary);">
+          <h3>Presented By:</h3>
+          <p><strong>• Anand Singh Rathore</strong> (2024BTECH158)</p>
+          <p><strong>• Diksha Shekhawat</strong> (2024BTECH156)</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">B.Tech Computer Science & Engineering</p>
+        </div>
+        <div class="card" style="flex: 1; border-color: var(--secondary);">
+          <h3>Supervision & Institution:</h3>
+          <p><strong>• Internal:</strong> Dr. Sonali Vyas & Dr. Rajnish Kumar</p>
+          <p><strong>• External:</strong> Dr. Saurabh Kumar</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Dept. of CSE, JK Lakshmipat University, Jaipur</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide">
+      <div class="kicker">01 • CLINICAL MOTIVATION</div>
+      <h1>The Mental Health Crisis in Higher Education</h1>
+      <div class="grid-3">
+        <div class="card" style="text-align: center;">
+          <div class="stat-number" style="color: var(--accent);">60%+</div>
+          <h3>Severe Anxiety & Strain</h3>
+          <p>Of university students report acute academic pressure, sleep deprivation, or emotional burnout during their degrees.</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="stat-number" style="color: var(--primary);">&lt; 15%</div>
+          <h3>Underutilized Centers</h3>
+          <p>Seek institutional care due to social stigma, fear of peer judgment, and privacy concerns regarding academic penalization.</p>
+        </div>
+        <div class="card" style="text-align: center;">
+          <div class="stat-number" style="color: var(--secondary);">11PM - 4AM</div>
+          <h3>Midnight Crisis Window</h3>
+          <p>Psychological distress and acute panic attacks peak late at night when university counseling centers are completely closed.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3>Why Traditional Campus Counseling Fails:</h3>
+        <ul>
+          <li><strong>3 to 14 Days Waiting Queues:</strong> Bureaucratic appointment delays fail during acute crises.</li>
+          <li><strong>Static Survey Blindspot:</strong> Traditional questionnaires (PHQ-9) capture only one static moment, missing daily oscillations between sleep and strain.</li>
+          <li><strong>Purely Reactive Model:</strong> Support occurs only after academic failure or breakdown rather than through early proactive detection.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: SOLUTION -->
+    <div class="slide">
+      <div class="kicker">02 • THE SOLUTION</div>
+      <h1>The AIRA 24/7 Proactive Digital Sanctuary</h1>
+      <div class="grid-3">
+        <div class="card" style="border-top: 4px solid var(--primary);">
+          <h3>1. Dual ML Diagnostics</h3>
+          <p>Combines Hugging Face DistilBERT NLP (free-text emotions) with Scikit-Learn Logistic Regression (sleep, study, screen time) to compute an objective 0–100 Wellness Index.</p>
+          <div style="margin-top: 1rem;"><span class="badge badge-success">Instantaneous (&lt; 1s)</span></div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--secondary);">
+          <h3>2. Conversational AI Companion</h3>
+          <p>Driven by Llama 3.3 70B on Groq LPUs delivering sub-400ms coaching with an automated CrisisHandler that immediately intercepts self-harm and surfaces 24/7 helplines.</p>
+          <div style="margin-top: 1rem;"><span class="badge badge-danger">Tele-MANAS (14416)</span></div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--success);">
+          <h3>3. Live Geolocation Referrals</h3>
+          <p>Captures device GPS coordinates, queries Google Places API (New), and applies the spherical Haversine formula to sort verified local psychiatrists within a strict 100 km boundary.</p>
+          <div style="margin-top: 1rem;"><span class="badge badge-success">Real GPS Proximity</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: ARCHITECTURE -->
+    <div class="slide">
+      <div class="kicker">03 • SYSTEM ARCHITECTURE</div>
+      <h1>Decoupled Full-Stack Architecture</h1>
+      <div class="card" style="margin-bottom: 1rem; border-left: 4px solid var(--primary);">
+        <h3>Client Layer (Port 3000) — Vite 6 Dev & Build Server</h3>
+        <p>Vanilla HTML5, CSS3 Glassmorphism UI, Vanilla ES6+ JavaScript, Chart.js analytics. Zero framework bloat (<300ms First Contentful Paint).</p>
+      </div>
+      <div class="card" style="margin-bottom: 1rem; border-left: 4px solid var(--secondary);">
+        <h3>Backend API (Port 5000) — Python 3.12 Flask Microservice</h3>
+        <p>Modular Flask Blueprints, stateless PyJWT bearer tokens (24h expiry), Bcrypt 12-salt-round hashing, and validation middleware.</p>
+      </div>
+      <div class="card" style="border-left: 4px solid var(--success);">
+        <h3>Intelligence & External Cloud Services</h3>
+        <p>DistilBERT NLP Singleton, Logistic Regression Predictor, Groq LPU Llama 3.3 70B, Google Places API (New), MongoDB Atlas (TTL OTP Index), and Brevo REST API (HTTPS Port 443).</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: DATASETS -->
+    <div class="slide">
+      <div class="kicker">04 • EMPIRICAL DATASETS</div>
+      <h1>Datasets & Data Engineering Pipeline</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Student Depression Dataset (Primary)</h3>
+          <ul>
+            <li><strong>27,901 authentic records</strong> (~2.8 MB CSV).</li>
+            <li><strong>18 variables:</strong> Academic pressure, sleep duration, study hours, CGPA, study satisfaction, financial stress.</li>
+            <li><strong>Target:</strong> Depression (Binary classification: 0 = Low, 1 = Elevated Risk).</li>
+            <li><strong>Stratified Split:</strong> 80% Training (22,320 rows) & 20% Testing (5,581 rows).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Preprocessing & Secondary Corpora</h3>
+          <ul>
+            <li><strong>Imputation & Encoding:</strong> Median/mode imputation; OneHotEncoding on nominal features.</li>
+            <li><strong>StandardScaler:</strong> Standardized continuous features to zero mean and unit variance.</li>
+            <li><strong>smmh.csv (481 rows):</strong> Validates social media screen time vs restlessness.</li>
+            <li><strong>depression-reddit-cleaned (7,731 posts):</strong> Linguistic emotional tuning.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: GRAPH 1 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">05 • MACHINE LEARNING EVALUATION</div>
+      <h1>Behavioral Predictor — Multi-Model Benchmark</h1>
+      <div class="grid-2">
+        <div>
+          <img src="presentation_graphs/1_model_performance_comparison.png" class="slide-img" alt="Model Benchmark">
+        </div>
+        <div class="card">
+          <h3>Why Logistic Regression Won:</h3>
+          <ul>
+            <li><strong>Accuracy:</strong> 79.82% vs XGBoost (78.73%) and Random Forest (77.39%).</li>
+            <li><strong>Recall:</strong> 85.16% — Highest sensitivity in detecting at-risk students.</li>
+            <li><strong>ROC-AUC:</strong> 0.8666 — Dominant discrimination across all thresholds.</li>
+            <li><strong>Inference Speed:</strong> Sub-0.5ms execution with zero heavy dependencies.</li>
+            <li><strong>Calibrated Probabilities:</strong> Directly drives the 0–100 Wellness Index.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: GRAPH 2 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">06 • CONFUSION MATRICES</div>
+      <h1>Confusion Matrices & Clinical Safety Defense</h1>
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <img src="presentation_graphs/2_confusion_matrices_comparison.png" style="max-height: 48vh; background: #fff; padding: 0.5rem; border-radius: 0.5rem;" alt="Confusion Matrices">
+      </div>
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <h3 style="color: var(--accent);">The Clinical Recall Principle: Minimizing False Negatives Saves Lives</h3>
+        <p>In mental health screening, a <strong>False Negative</strong> means a student in acute distress is missed without support. Logistic Regression produced only <strong>485 False Negatives</strong>, significantly outperforming Random Forest (604 missed) and XGBoost (536 missed).</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: GRAPH 3 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">07 • ROC-AUC CURVES</div>
+      <h1>Receiver Operating Characteristic (ROC) Analysis</h1>
+      <div class="grid-2">
+        <div>
+          <img src="presentation_graphs/3_roc_auc_curves.png" class="slide-img" alt="ROC Curves">
+        </div>
+        <div class="card">
+          <h3>Discriminative Separation:</h3>
+          <ul>
+            <li><strong>Logistic Regression:</strong> AUC = 0.8666 (Dominant true positive rate).</li>
+            <li><strong>XGBoost:</strong> AUC = 0.8537.</li>
+            <li><strong>Random Forest:</strong> AUC = 0.8444.</li>
+            <li><strong>Random Guess Baseline:</strong> AUC = 0.5000.</li>
+            <li>Demonstrates resilient trade-off between Sensitivity and Specificity.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: GRAPH 4 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">08 • FEATURE CORRELATION</div>
+      <h1>Behavioral Drivers of Student Depression</h1>
+      <div class="grid-2">
+        <div>
+          <img src="presentation_graphs/4_feature_importance_correlation.png" class="slide-img" alt="Feature Correlation">
+        </div>
+        <div class="card">
+          <h3>Key Statistical Takeaways (N = 27,901):</h3>
+          <ul>
+            <li><strong>Academic Pressure (r = +0.435):</strong> The single largest positive driver of student depression.</li>
+            <li><strong>Financial Stress (r = +0.312):</strong> Strongly compounds exam anxiety.</li>
+            <li><strong>Daily Study Hours (r = +0.285):</strong> Long study blocks without restorative sleep compound cognitive fatigue.</li>
+            <li><strong>Study Satisfaction (r = -0.320):</strong> High engagement acts as the strongest protective buffer.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: GRAPH 5 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">09 • NLP DEEP LEARNING</div>
+      <h1>DistilBERT Multi-Emotion Classifier</h1>
+      <div class="grid-2">
+        <div>
+          <img src="presentation_graphs/5_distilbert_emotion_analysis.png" class="slide-img" alt="DistilBERT Emotions">
+        </div>
+        <div class="card">
+          <h3>NLP Architecture & Singleton Pattern:</h3>
+          <ul>
+            <li><strong>Model:</strong> <code>bhadresh-savani/distilbert-base-uncased-emotion</code></li>
+            <li><strong>6 Emotions:</strong> Sadness, Fear, Anger, Joy, Love, Surprise.</li>
+            <li><strong>Singleton Pipeline:</strong> Model weights loaded once into shared RAM to prevent server out-of-memory crashes.</li>
+            <li><strong>Gibberish Detector:</strong> Validates vowel ratios and character spam before tokenizing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: CHATBOT & CRISIS -->
+    <div class="slide">
+      <div class="kicker">10 • AI SAFETY PROTOCOL</div>
+      <h1>Chatbot Architecture & The CrisisHandler Safety Net</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Groq LPU + Llama 3.3 70B</h3>
+          <ul>
+            <li><strong>Sub-400ms Latency:</strong> Replaced slow 15-30s local Ollama with Groq's specialized LPUs.</li>
+            <li><strong>Contextual Memory:</strong> Stores past dialogue turns per student ID.</li>
+            <li><strong>WellnessCoach Loop:</strong> Classifies intent into venting, advice-seeking, or goal-planning.</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color: var(--accent);">
+          <h3 style="color: var(--accent);">CrisisHandler Pre-LLM Interceptor</h3>
+          <ul>
+            <li><strong>Immediate Generative Abort:</strong> If suicidal or self-harm keywords are detected, the LLM is bypassed.</li>
+            <li><strong>Emergency Hotlines Displayed:</strong>
+              <ul>
+                <li><strong>Tele-MANAS:</strong> 14416 / 1800-891-4416 (24/7 National Line)</li>
+                <li><strong>KIRAN:</strong> 1800-599-0019 (Govt. Rehabilitation)</li>
+                <li><strong>988 Lifeline & Crisis Text Line (741741)</strong></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: GRAPH 6 EMBEDDED -->
+    <div class="slide">
+      <div class="kicker">11 • SPATIAL GEOLOCATION</div>
+      <h1>Live Doctor Referral & Spatial Haversine Engine</h1>
+      <div class="grid-2">
+        <div>
+          <img src="presentation_graphs/6_spatial_haversine_radius.png" class="slide-img" alt="Haversine Radius">
+        </div>
+        <div class="card">
+          <h3>Spherical Distance & Quota Protection:</h3>
+          <ul>
+            <li><strong>HTML5 GPS Detection:</strong> Captures device coordinates on page load.</li>
+            <li><strong>Google Places API (New):</strong> Live rating and location search with field masks.</li>
+            <li><strong>Haversine Formula:</strong> Calculates true great-circle distance over Earth's curvature.</li>
+            <li><strong>Strict &le; 100 km Radius Cap:</strong> Local database filters out distant clinics during API rate limits.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: SECURITY & BREVO -->
+    <div class="slide">
+      <div class="kicker">12 • SECURITY & CLOUD INTEGRATION</div>
+      <h1>Enterprise Security, PyJWT & The Brevo HTTPS Driver</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Bcrypt & Stateless JWT</h3>
+          <ul>
+            <li><strong>Bcrypt (12 Salt Rounds):</strong> 4,096 Blowfish iterations render GPU brute-force attacks impossible.</li>
+            <li><strong>PyJWT:</strong> Signed with HS256, 24-hour expiration. Stateless tokens eliminate server session memory bottlenecks.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Why Brevo REST API over SMTP?</h3>
+          <ul>
+            <li><strong>Cloud Port Blocking:</strong> Render and AWS block outbound TCP ports 25, 465, and 587.</li>
+            <li><strong>HTTPS Port 443:</strong> Brevo transmits OTP verification over standard HTTPS, which is never blocked.</li>
+            <li><strong>MongoDB TTL Index:</strong> Auto-deletes expired OTP documents after exactly 5 minutes.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: MOOD HEATMAP -->
+    <div class="slide">
+      <div class="kicker">13 • STUDENT ANALYTICS</div>
+      <h1>30-Day Longitudinal Mood Stability Heatmap</h1>
+      <div class="card">
+        <h3>Longitudinal Self-Awareness & Habit Tracking:</h3>
+        <ul>
+          <li><strong>GitHub-Style Contribution Grid:</strong> Visualizes 30 days of emotional check-ins, coloring days from dark restless blue to vibrant balanced green.</li>
+          <li><strong>Click-to-Inspect Historic Records:</strong> Students can click any past square to view previous journal snippets and sleep-strain correlations.</li>
+          <li><strong>Compound Unique Index:</strong> MongoDB enforces <code>[("user_id", 1), ("date", 1)]</code> to guarantee one check-in per calendar date.</li>
+          <li><strong>Mindfulness Audio Suite:</strong> Integrated grounding breathing visualizer to de-escalate acute stress episodes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: EMPIRICAL QA -->
+    <div class="slide">
+      <div class="kicker">14 • QUALITY ASSURANCE</div>
+      <h1>Empirical Validation — 175 Automated Pytests</h1>
+      <div class="grid-3" style="margin-bottom: 1.5rem;">
+        <div class="card" style="text-align: center; border-color: var(--success);">
+          <div class="stat-number" style="color: var(--success);">175 / 175</div>
+          <h3>Tests Passed (100%)</h3>
+        </div>
+        <div class="card" style="text-align: center; border-color: var(--primary);">
+          <div class="stat-number" style="color: var(--primary);">20.67s</div>
+          <h3>Execution Time</h3>
+        </div>
+        <div class="card" style="text-align: center; border-color: var(--accent);">
+          <div class="stat-number" style="color: var(--accent);">0</div>
+          <h3>Regression Errors</h3>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Automated Test Scope:</h3>
+        <p>Authentication routes, JWT token lifecycles, DistilBERT singleton inference, Logistic Regression decision boundaries, CrisisHandler regex safety triggers, Haversine spatial constraints, and MongoDB fallback recovery.</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: CHALLENGES -->
+    <div class="slide">
+      <div class="kicker">15 • ENGINEERING LESSONS</div>
+      <h1>Key Engineering Challenges Overcome</h1>
+      <div class="card" style="margin-bottom: 1rem;">
+        <h3>1. Cloud SMTP Port Blocking</h3>
+        <p><strong>Problem:</strong> Render blocked outbound SMTP ports 25, 465, and 587 (`[Errno 101] Network unreachable`).<br>
+        <strong>Solution:</strong> Engineered a custom Brevo REST API email client transmitting OTP payloads over HTTPS port 443.</p>
+      </div>
+      <div class="card" style="margin-bottom: 1rem;">
+        <h3>2. Google Places API Quota Limits (HTTP 429)</h3>
+        <p><strong>Problem:</strong> Unbilled daily quota exhaustion during high-frequency testing caused API dropouts.<br>
+        <strong>Solution:</strong> Built a local MongoDB fallback database with Haversine filtering strictly capped to &le; 100 km.</p>
+      </div>
+      <div class="card">
+        <h3>3. Local LLM Latency (15-30s)</h3>
+        <p><strong>Problem:</strong> Running local models on consumer laptops caused severe response lag.<br>
+        <strong>Solution:</strong> Integrated Groq LPUs running Llama 3.3 70B, reducing inference time to sub-400 milliseconds.</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 17: LIVE DEMO -->
+    <div class="slide">
+      <div class="kicker">16 • DEMONSTRATION PROTOCOL</div>
+      <h1>Step-by-Step Live Demonstration Protocol</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Phase 1: Scanner & Diagnostics</h3>
+          <ul>
+            <li>Show Vite server on <code>localhost:3000</code> and Flask on <code>localhost:5000</code>.</li>
+            <li>Demonstrate real-time password checklist validation during registration.</li>
+            <li>Submit journal entry: *"Exam stress is overwhelming, haven't slept"*.</li>
+            <li>Show sub-second dual ML risk scoring (DistilBERT + Logistic Regression).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Phase 2: Safety & Specialist Referrals</h3>
+          <ul>
+            <li>Open AIRA Chatbot; ask for 5-minute study grounding exercises.</li>
+            <li><strong>The Crisis Demo:</strong> Type *"I feel hopeless and want to end it all"*.</li>
+            <li>Show immediate LLM abort and Tele-MANAS (14416) escalation.</li>
+            <li>Demonstrate Doctor Referral pulling nearby Jaipur psychiatrists via GPS.</li>
+            <li>Run <code>pytest backend/tests/test_pytest_unit.py</code> showing 175 green tests.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18: FUTURE ROADMAP -->
+    <div class="slide">
+      <div class="kicker">17 • PRODUCTION ROADMAP</div>
+      <h1>Future Scope & Production Roadmap</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. Native Cross-Platform Mobile Apps</h3>
+          <p>Developing React Native iOS and Android clients with native push notifications for morning and evening mindfulness reminders.</p>
+          <h3 style="margin-top: 1.5rem;">2. Smartwatch HRV Sensor Integration</h3>
+          <p>Connecting wearable APIs to stream real-time Heart Rate Variability (HRV) and sleep stages for passive stress detection.</p>
+        </div>
+        <div class="card">
+          <h3>3. Encrypted WebRTC Tele-Counseling</h3>
+          <p>Allowing students to book and conduct private, end-to-end encrypted video appointments directly with licensed campus counselors.</p>
+          <h3 style="margin-top: 1.5rem;">4. Multi-Lingual Indic NLP Models</h3>
+          <p>Fine-tuning transformer models for Hindi and regional Indian dialects using IndicBERT architectures.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19: CONCLUSION -->
+    <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+      <div class="kicker">DEFENSE CONCLUSION</div>
+      <h1 style="font-size: 3.8rem; margin-bottom: 1rem;">Thank You!</h1>
+      <p style="font-size: 1.3rem; color: #94a3b8; max-width: 800px; margin-bottom: 2rem;">
+        AIRA demonstrates that artificial intelligence, behavioral analytics, and spatial services can combine to provide proactive, compassionate, and life-saving mental health care for students.
+      </p>
+      <div class="card" style="max-width: 750px; border-color: var(--primary); text-align: center;">
+        <h3 style="color: var(--primary); font-size: 1.4rem;">NOW OPEN FOR DEFENSE QUESTIONS & EVALUATION</h3>
+        <p style="margin-top: 0.5rem; color: #fff;">
+          <strong>Authors:</strong> Anand Singh Rathore (2024BTECH158) & Diksha Shekhawat (2024BTECH156)<br>
+          <strong>Supervisors:</strong> Dr. Sonali Vyas, Dr. Rajnish Kumar & Dr. Saurabh Kumar<br>
+          Department of CSE, JK Lakshmipat University, Jaipur
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS FOOTER -->
+  <div class="controls">
+    <div>
+      <button class="btn" onclick="prevSlide()">❮ Prev</button>
+      <button class="btn" onclick="nextSlide()" style="margin-left: 0.5rem;">Next ❯</button>
+    </div>
+    <div id="slideCounter" style="font-family: 'JetBrains Mono', monospace; font-weight: 600;">Slide 1 / 19</div>
+    <div>
+      <span style="margin-right: 1rem; font-size: 0.85rem; color: #64748b;">Use Arrow Keys ◄ ► | F for Fullscreen</span>
+      <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+
+    function showSlide(index) {
+      slides.forEach((s, i) => {
+        s.classList.remove('active');
+        if (i === index) s.classList.add('active');
+      });
+      document.getElementById('slideCounter').innerText = `Slide ${index + 1} / ${slides.length}`;
+    }
+
+    function nextSlide() {
+      if (current < slides.length - 1) {
+        current++;
+        showSlide(current);
+      }
+    }
+
+    function prevSlide() {
+      if (current > 0) {
+        current--;
+        showSlide(current);
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+      else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+    });
+  </script>
+</body>
+</html>
